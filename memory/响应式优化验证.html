@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>直播应用响应式优化验证</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f7fa;
+      }
+      .test-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .test-title {
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #fb7299;
+        padding-bottom: 8px;
+      }
+      .optimization-summary {
+        background: #e8f5e8;
+        border: 1px solid #4caf50;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+      }
+      .demo-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .demo-phone {
+        background: #333;
+        border-radius: 30px;
+        padding: 15px;
+        position: relative;
+      }
+      .demo-phone.large {
+        width: 280px;
+        height: 560px;
+      }
+      .demo-phone.medium {
+        width: 240px;
+        height: 480px;
+      }
+      .demo-phone.small {
+        width: 200px;
+        height: 400px;
+      }
+      .demo-screen {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, #ffeef8 0%, #fff5f7 100%);
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .demo-header {
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px;
+        border-bottom: 1px solid #eee;
+        flex-shrink: 0;
+      }
+      .demo-phone.large .demo-header {
+        height: 40px;
+        font-size: 14px;
+      }
+      .demo-phone.medium .demo-header {
+        height: 36px;
+        font-size: 13px;
+      }
+      .demo-phone.small .demo-header {
+        height: 32px;
+        font-size: 12px;
+      }
+      .demo-app-content {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .demo-live-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .demo-video {
+        flex: 0 0 45%;
+        background: #000;
+        margin: 0 auto;
+        width: calc(100% - 16px);
+        border-radius: 8px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+      }
+      .demo-phone.large .demo-video {
+        margin-top: 8px;
+        padding: 12px;
+      }
+      .demo-phone.medium .demo-video {
+        margin-top: 6px;
+        padding: 10px;
+      }
+      .demo-phone.small .demo-video {
+        margin-top: 4px;
+        padding: 8px;
+      }
+      .demo-live-content {
+        text-align: center;
+        color: white;
+        overflow-y: auto;
+      }
+      .demo-phone.large .demo-live-content {
+        font-size: 15px;
+        line-height: 1.6;
+      }
+      .demo-phone.medium .demo-live-content {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .demo-phone.small .demo-live-content {
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .demo-live-status {
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+      }
+      .demo-phone.large .demo-live-status {
+        font-size: 13px;
+        gap: 5px;
+      }
+      .demo-phone.medium .demo-live-status {
+        font-size: 12px;
+        gap: 4px;
+      }
+      .demo-phone.small .demo-live-status {
+        font-size: 11px;
+        gap: 3px;
+      }
+      .demo-live-dot {
+        background: #ff4d4f;
+        border-radius: 50%;
+      }
+      .demo-phone.large .demo-live-dot {
+        width: 7px;
+        height: 7px;
+      }
+      .demo-phone.medium .demo-live-dot {
+        width: 6px;
+        height: 6px;
+      }
+      .demo-phone.small .demo-live-dot {
+        width: 5px;
+        height: 5px;
+      }
+      .demo-interaction {
+        flex: 0 0 20%;
+        background: white;
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+      }
+      .demo-phone.medium .demo-interaction {
+        padding: 6px;
+      }
+      .demo-phone.small .demo-interaction {
+        padding: 4px;
+      }
+      .demo-interaction-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .demo-phone.medium .demo-interaction-header {
+        margin-bottom: 6px;
+      }
+      .demo-phone.small .demo-interaction-header {
+        margin-bottom: 4px;
+      }
+      .demo-interaction h4 {
+        margin: 0;
+        font-weight: bold;
+      }
+      .demo-phone.large .demo-interaction h4 {
+        font-size: 14px;
+      }
+      .demo-phone.medium .demo-interaction h4 {
+        font-size: 13px;
+      }
+      .demo-phone.small .demo-interaction h4 {
+        font-size: 12px;
+      }
+      .demo-custom-btn {
+        background: linear-gradient(45deg, #fe8c8c 0%, #f7739a 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 4px 8px;
+        font-size: 9px;
+      }
+      .demo-phone.large .demo-custom-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+        border-radius: 14px;
+      }
+      .demo-phone.medium .demo-custom-btn {
+        padding: 5px 10px;
+        font-size: 10px;
+        border-radius: 12px;
+      }
+      .demo-interaction-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+        flex: 1;
+      }
+      .demo-phone.large .demo-interaction-grid {
+        gap: 6px;
+      }
+      .demo-phone.medium .demo-interaction-grid {
+        gap: 5px;
+      }
+      .demo-interaction-btn {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: center;
+        padding: 6px 4px;
+        font-size: 10px;
+      }
+      .demo-phone.large .demo-interaction-btn {
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 6px;
+      }
+      .demo-phone.medium .demo-interaction-btn {
+        padding: 7px 5px;
+        font-size: 11px;
+        border-radius: 5px;
+      }
+      .demo-danmaku-container {
+        flex: 1;
+        background: white;
+        overflow-y: auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 8px;
+      }
+      .demo-danmaku-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+        min-height: 0;
+      }
+      .demo-phone.large .demo-danmaku-list {
+        gap: 8px;
+      }
+      .demo-phone.medium .demo-danmaku-list {
+        gap: 7px;
+      }
+      .demo-danmaku-item {
+        background: #f5f5f5;
+        border-radius: 4px;
+        padding: 6px;
+        flex-shrink: 0;
+      }
+      .demo-phone.large .demo-danmaku-item {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .demo-phone.medium .demo-danmaku-item {
+        font-size: 13px;
+        padding: 7px;
+      }
+      .demo-phone.small .demo-danmaku-item {
+        font-size: 12px;
+        padding: 6px;
+      }
+      .demo-danmaku-container::-webkit-scrollbar {
+        width: 3px;
+      }
+      .demo-danmaku-container::-webkit-scrollbar-track {
+        background: #f0f2f5;
+      }
+      .demo-danmaku-container::-webkit-scrollbar-thumb {
+        background: #dcdfe6;
+        border-radius: 2px;
+      }
+      .phone-label {
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+      }
+      .ratio-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+      }
+      .ratio-table th,
+      .ratio-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+        font-size: 12px;
+      }
+      .ratio-table th {
+        background: #f5f5f5;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📱 直播应用响应式优化验证</h1>
+
+    <div class="test-section">
+      <div class="test-title">响应式优化总结</div>
+      <div class="optimization-summary">
+        ✅ 1. 弹幕字体响应式：大屏14px → 中屏13px → 小屏12px ✅ 2. LIVE装饰响应式：字体和小红点随屏幕缩小 ✅ 3.
+        直播内容文本：改为白色，提高可读性 ✅ 4. 推荐互动响应式：标题、按钮、装饰全面响应式 ✅ 5. 固定比例布局：视频45%
+        + 推荐互动20% + 弹幕35%
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">固定比例布局</div>
+      <table class="ratio-table">
+        <thead>
+          <tr>
+            <th>区域</th>
+            <th>比例</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>视频框</td>
+            <td>45%</td>
+            <td>flex: 0 0 45% - 主要内容显示区域</td>
+          </tr>
+          <tr>
+            <td>推荐互动</td>
+            <td>20%</td>
+            <td>flex: 0 0 20% - 固定高度的互动区域</td>
+          </tr>
+          <tr>
+            <td>弹幕列表</td>
+            <td>35%</td>
+            <td>flex: 1 - 自动占用剩余空间</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>优势：</strong>无论屏幕大小如何变化，三个区域的比例始终保持一致，确保界面布局的协调性。</p>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">不同屏幕尺寸效果演示</div>
+      <div class="demo-container">
+        <div class="demo-phone large">
+          <div class="demo-screen">
+            <div class="demo-header">
+              <span>← 直播中</span>
+              <span>1.2K 🎁 ⏹️</span>
+            </div>
+            <div class="demo-app-content">
+              <div class="demo-live-container">
+                <div class="demo-video">
+                  <div class="demo-live-content">你微笑着调整了一下耳机，准备开始今天的杂谈直播...</div>
+                  <div class="demo-live-status">
+                    <div class="demo-live-dot"></div>
+                    <span>LIVE</span>
+                  </div>
+                </div>
+                <div class="demo-interaction">
+                  <div class="demo-interaction-header">
+                    <h4>推荐互动：</h4>
+                    <button class="demo-custom-btn">✏️ 自定义</button>
+                  </div>
+                  <div class="demo-interaction-grid">
+                    <div class="demo-interaction-btn">聊聊观众最爱的菜品</div>
+                    <div class="demo-interaction-btn">分享今天的心情</div>
+                  </div>
+                </div>
+                <div class="demo-danmaku-container">
+                  <div class="demo-danmaku-list">
+                    <div class="demo-danmaku-item">👤 用户1: 主播你好！</div>
+                    <div class="demo-danmaku-item">🎁 用户2: 送出 火箭*1</div>
+                    <div class="demo-danmaku-item">👤 用户3: 声音好好听！</div>
+                    <div class="demo-danmaku-item">👤 用户4: 今天心情怎么样？</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">大屏幕</div>
+        </div>
+
+        <div class="demo-phone medium">
+          <div class="demo-screen">
+            <div class="demo-header">
+              <span>← 直播中</span>
+              <span>1.2K 🎁 ⏹️</span>
+            </div>
+            <div class="demo-app-content">
+              <div class="demo-live-container">
+                <div class="demo-video">
+                  <div class="demo-live-content">你微笑着调整了一下耳机，准备开始今天的杂谈直播...</div>
+                  <div class="demo-live-status">
+                    <div class="demo-live-dot"></div>
+                    <span>LIVE</span>
+                  </div>
+                </div>
+                <div class="demo-interaction">
+                  <div class="demo-interaction-header">
+                    <h4>推荐互动：</h4>
+                    <button class="demo-custom-btn">✏️ 自定义</button>
+                  </div>
+                  <div class="demo-interaction-grid">
+                    <div class="demo-interaction-btn">聊聊观众最爱的菜品</div>
+                    <div class="demo-interaction-btn">分享今天的心情</div>
+                  </div>
+                </div>
+                <div class="demo-danmaku-container">
+                  <div class="demo-danmaku-list">
+                    <div class="demo-danmaku-item">👤 用户1: 主播你好！</div>
+                    <div class="demo-danmaku-item">🎁 用户2: 送出 火箭*1</div>
+                    <div class="demo-danmaku-item">👤 用户3: 声音好好听！</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">中等屏幕</div>
+        </div>
+
+        <div class="demo-phone small">
+          <div class="demo-screen">
+            <div class="demo-header">
+              <span>← 直播中</span>
+              <span>1.2K 🎁 ⏹️</span>
+            </div>
+            <div class="demo-app-content">
+              <div class="demo-live-container">
+                <div class="demo-video">
+                  <div class="demo-live-content">你微笑着调整了一下耳机，准备开始今天的杂谈直播...</div>
+                  <div class="demo-live-status">
+                    <div class="demo-live-dot"></div>
+                    <span>LIVE</span>
+                  </div>
+                </div>
+                <div class="demo-interaction">
+                  <div class="demo-interaction-header">
+                    <h4>推荐互动：</h4>
+                    <button class="demo-custom-btn">✏️ 自定义</button>
+                  </div>
+                  <div class="demo-interaction-grid">
+                    <div class="demo-interaction-btn">聊聊观众最爱的菜品</div>
+                    <div class="demo-interaction-btn">分享今天的心情</div>
+                  </div>
+                </div>
+                <div class="demo-danmaku-container">
+                  <div class="demo-danmaku-list">
+                    <div class="demo-danmaku-item">👤 用户1: 主播你好！</div>
+                    <div class="demo-danmaku-item">🎁 用户2: 送出 火箭*1</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">小屏幕</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-title">验证步骤</div>
+      <ol>
+        <li>在SillyTavern中打开直播应用</li>
+        <li>调整浏览器窗口大小，观察响应式效果</li>
+        <li>检查弹幕字体是否随屏幕大小变化</li>
+        <li>检查LIVE装饰是否响应式缩放</li>
+        <li>检查直播内容文本是否为白色</li>
+        <li>检查推荐互动区域是否响应式调整</li>
+        <li>检查三个区域的比例是否保持一致</li>
+      </ol>
+    </div>
+
+    <script>
+      window.addEventListener('load', function () {
+        console.log('📱 直播应用响应式优化验证页面已加载');
+        console.log('🎯 优化重点：');
+        console.log('1. 弹幕字体响应式');
+        console.log('2. LIVE装饰响应式');
+        console.log('3. 直播内容白色文字');
+        console.log('4. 推荐互动响应式');
+        console.log('5. 固定比例布局 45%:20%:35%');
+      });
+    </script>
+  </body>
+</html>

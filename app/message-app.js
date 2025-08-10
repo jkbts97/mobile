@@ -2005,6 +2005,13 @@ class MessageApp {
 
             // 创建事件处理函数
             this.handleBackButtonClick = () => {
+                // 检查当前是否在消息应用中
+                const currentApp = window.mobilePhone?.currentAppState?.app;
+                if (currentApp !== 'messages') {
+                    console.log('[Message App] 当前不在消息应用中，跳过返回按钮处理');
+                    return;
+                }
+
                 console.log('[Message App] 返回按钮被点击');
                 if (this.currentView === 'detail' || this.currentView === 'messageDetail') {
                     // 如果当前在消息详情页面，返回到消息列表
@@ -2983,13 +2990,13 @@ class MessageApp {
         this.currentTab = 'add'; // 默认显示添加tab
 
         // 通知主框架更新应用状态
-        if (window.MobilePhone) {
+        if (window.mobilePhone) {
             const addFriendState = {
                 app: 'messages',
                 title: '添加好友',
                 view: 'addFriend'
             };
-            window.MobilePhone.pushAppState(addFriendState);
+            window.mobilePhone.pushAppState(addFriendState);
         }
 
         this.updateAppContent();
@@ -3004,14 +3011,17 @@ class MessageApp {
         this.currentFriendName = null;
         this.currentIsGroup = false; // 重置群聊状态
 
-        // 通知主框架更新应用状态
-        if (window.MobilePhone) {
+        // 通知主框架更新应用状态（不推送新状态，而是直接更新当前状态）
+        if (window.mobilePhone) {
             const listState = {
                 app: 'messages',
                 title: '信息',
                 view: 'messageList' // 主框架用这个值来区分状态
             };
-            window.MobilePhone.pushAppState(listState);
+            // 直接更新当前状态，不推送到栈中
+            window.mobilePhone.currentAppState = listState;
+            window.mobilePhone.updateAppHeader(listState);
+            console.log('[Message App] 更新状态到消息列表:', listState);
         }
 
         // 更新应用内容
@@ -3028,7 +3038,7 @@ class MessageApp {
             // this.currentView保持为'addFriend'，不要修改
 
             // 通知主框架更新应用状态（如果需要的话）
-            if (window.MobilePhone && this.currentView === 'addFriend') {
+            if (window.mobilePhone && this.currentView === 'addFriend') {
                 let title = '添加好友';
                 if (tabName === 'delete') {
                     title = '删除好友';
@@ -3039,9 +3049,9 @@ class MessageApp {
                 }
 
                 // 更新当前状态的标题，但不改变view
-                if (window.MobilePhone.currentAppState) {
-                    window.MobilePhone.currentAppState.title = title;
-                    window.MobilePhone.updateAppHeader(window.MobilePhone.currentAppState);
+                if (window.mobilePhone.currentAppState) {
+                    window.mobilePhone.currentAppState.title = title;
+                    window.mobilePhone.updateAppHeader(window.mobilePhone.currentAppState);
                 }
             }
 
@@ -3662,7 +3672,7 @@ class MessageApp {
         // 注意：currentIsGroup 状态在 selectFriend() 方法中已经设置
 
         // 通知主框架更新应用状态
-        if (window.MobilePhone) {
+        if (window.mobilePhone) {
             const detailState = {
                 app: 'messages',
                 title: friendName || `好友 ${friendId}`,
@@ -3670,7 +3680,7 @@ class MessageApp {
                 friendId: friendId,
                 friendName: friendName
             };
-            window.MobilePhone.pushAppState(detailState);
+            window.mobilePhone.pushAppState(detailState);
         }
 
         // 更新应用内容

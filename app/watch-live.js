@@ -1,12 +1,12 @@
 /**
- * Live App - 直播应用
- * 基于task-app.js的模式，为mobile-phone.js提供直播功能
+ * Watch Live App - 观看直播应用
+ * 基于live-app.js的模式，为mobile-phone.js提供观看直播功能
  * 监听SillyTavern上下文，解析直播数据，实时显示弹幕和互动
  */
 
 // @ts-nocheck
 // 避免重复定义
-if (typeof window.LiveApp === 'undefined') {
+if (typeof window.WatchLiveApp === 'undefined') {
   /**
    * 直播事件监听器
    * 负责监听SillyTavern的消息事件并触发数据解析
@@ -158,31 +158,41 @@ if (typeof window.LiveApp === 'undefined') {
      */
     async onMessageReceived(messageId) {
       try {
-        console.log(`[Live App] 🎯 接收到AI消息事件，ID: ${messageId}`);
-
-        // 检查直播是否活跃
-        if (!this.liveApp || !this.liveApp.isLiveActive) {
-          console.log('[Live App] 直播未激活，跳过处理');
-          return;
-        }
+        console.log(`[Watch Live App] 🎯 接收到AI消息事件，ID: ${messageId}`);
 
         // 检查是否有新消息
         const currentMessageCount = this.getCurrentMessageCount();
-        console.log(`[Live App] 消息数量检查: 当前=${currentMessageCount}, 上次=${this.lastMessageCount}`);
+        console.log(`[Watch Live App] 消息数量检查: 当前=${currentMessageCount}, 上次=${this.lastMessageCount}`);
 
         if (currentMessageCount <= this.lastMessageCount) {
-          console.log('[Live App] 没有检测到新消息，跳过解析');
+          console.log('[Watch Live App] 没有检测到新消息，跳过解析');
           return;
         }
 
-        console.log(`[Live App] ✅ 检测到新消息，消息数量从 ${this.lastMessageCount} 增加到 ${currentMessageCount}`);
+        console.log(
+          `[Watch Live App] ✅ 检测到新消息，消息数量从 ${this.lastMessageCount} 增加到 ${currentMessageCount}`,
+        );
         this.lastMessageCount = currentMessageCount;
 
+        // 如果正在等待直播间列表
+        if (this.liveApp.isWaitingForLiveList) {
+          console.log('[Watch Live App] 检测到直播间列表回复，更新列表');
+          this.liveApp.isWaitingForLiveList = false;
+          this.liveApp.updateAppContent();
+          return;
+        }
+
+        // 检查直播是否活跃
+        if (!this.liveApp || !this.liveApp.isLiveActive) {
+          console.log('[Watch Live App] 直播未激活，跳过处理');
+          return;
+        }
+
         // 触发数据解析
-        console.log('[Live App] 开始解析新的直播数据...');
+        console.log('[Watch Live App] 开始解析新的直播数据...');
         await this.liveApp.parseNewLiveData();
       } catch (error) {
-        console.error('[Live App] 处理消息接收事件失败:', error);
+        console.error('[Watch Live App] 处理消息接收事件失败:', error);
       }
     }
 
@@ -637,10 +647,10 @@ if (typeof window.LiveApp === 'undefined') {
 
         if (newDanmaku.length > 0) {
           this.danmakuList = this.danmakuList.concat(newDanmaku);
-          console.log(`[Live App] 添加 ${newDanmaku.length} 条新弹幕，总计 ${this.danmakuList.length} 条`);
+          console.log(`[Watch Live App] 添加 ${newDanmaku.length} 条新弹幕，总计 ${this.danmakuList.length} 条`);
 
           // 移除弹幕数量限制，保留所有历史弹幕
-          console.log(`[Live App] 保留所有弹幕，当前总数: ${this.danmakuList.length}`);
+          console.log(`[Watch Live App] 保留所有弹幕，当前总数: ${this.danmakuList.length}`);
         }
       }
 
@@ -691,10 +701,10 @@ if (typeof window.LiveApp === 'undefined') {
   }
 
   /**
-   * 直播应用主类
+   * 观看直播应用主类
    * 协调各个模块，提供统一的接口
    */
-  class LiveApp {
+  class WatchLiveApp {
     constructor() {
       this.eventListener = new LiveEventListener(this);
       this.dataParser = new LiveDataParser();
@@ -716,15 +726,15 @@ if (typeof window.LiveApp === 'undefined') {
      * 初始化应用
      */
     init() {
-      console.log('[Live App] 直播应用初始化开始');
+      console.log('[Watch Live App] 观看直播应用初始化开始');
 
       // 检查渲染权状态
       const renderingRight = this.getRenderingRight();
-      console.log('[Live App] 当前渲染权状态:', renderingRight);
+      console.log('[Watch Live App] 当前渲染权状态:', renderingRight);
 
-      // 如果渲染权不是live或end，不进行检测
-      if (renderingRight && renderingRight !== 'live' && renderingRight !== 'end') {
-        console.log('[Live App] 渲染权不匹配，跳过初始化检测');
+      // 如果渲染权不是watch或end，不进行检测
+      if (renderingRight && renderingRight !== 'watch' && renderingRight !== 'end') {
+        console.log('[Watch Live App] 渲染权不匹配，跳过初始化检测');
         this.isInitialized = true;
         return;
       }
@@ -733,7 +743,7 @@ if (typeof window.LiveApp === 'undefined') {
       this.detectActiveLive();
 
       this.isInitialized = true;
-      console.log('[Live App] 直播应用初始化完成');
+      console.log('[Watch Live App] 观看直播应用初始化完成');
     }
 
     /**
@@ -741,27 +751,27 @@ if (typeof window.LiveApp === 'undefined') {
      */
     detectActiveLive() {
       try {
-        console.log('[Live App] 检测活跃的直播数据...');
+        console.log('[Watch Live App] 检测活跃的直播数据...');
 
         // 检查渲染权
         const renderingRight = this.getRenderingRight();
-        if (renderingRight && renderingRight !== 'live' && renderingRight !== 'end') {
-          console.log(`[Live App] 渲染权被${renderingRight}占用，跳过检测`);
+        if (renderingRight && renderingRight !== 'watch' && renderingRight !== 'end') {
+          console.log(`[Watch Live App] 渲染权被${renderingRight}占用，跳过检测`);
           return;
         }
 
         // 获取聊天内容
         const chatContent = this.dataParser.getChatContent();
         if (!chatContent) {
-          console.log('[Live App] 没有聊天内容，保持开始直播状态');
+          console.log('[Watch Live App] 没有聊天内容，保持观看直播状态');
           return;
         }
 
         // 检查是否有活跃的直播格式（非历史格式）
         const hasActiveLive = this.hasActiveLiveFormats(chatContent);
 
-        if (hasActiveLive && renderingRight === 'live') {
-          console.log('[Live App] 🎯 检测到活跃的直播数据，自动进入直播中状态');
+        if (hasActiveLive && renderingRight === 'watch') {
+          console.log('[Watch Live App] 🎯 检测到活跃的直播数据，自动进入观看直播状态');
 
           // 设置为直播中状态
           this.stateManager.startLive();
@@ -774,7 +784,7 @@ if (typeof window.LiveApp === 'undefined') {
           // 开始监听新的消息
           this.eventListener.startListening();
 
-          console.log('[Live App] ✅ 已自动恢复直播状态，数据:', {
+          console.log('[Watch Live App] ✅ 已自动恢复观看直播状态，数据:', {
             viewerCount: this.stateManager.currentViewerCount,
             liveContent: this.stateManager.currentLiveContent
               ? this.stateManager.currentLiveContent.substring(0, 50) + '...'
@@ -784,10 +794,10 @@ if (typeof window.LiveApp === 'undefined') {
             interactionCount: this.stateManager.recommendedInteractions.length,
           });
         } else {
-          console.log('[Live App] 没有检测到活跃的直播数据或渲染权不匹配，保持开始直播状态');
+          console.log('[Watch Live App] 没有检测到活跃的直播数据或渲染权不匹配，保持观看直播选择状态');
         }
       } catch (error) {
-        console.error('[Live App] 检测活跃直播数据失败:', error);
+        console.error('[Watch Live App] 检测活跃直播数据失败:', error);
       }
     }
 
@@ -826,44 +836,11 @@ if (typeof window.LiveApp === 'undefined') {
     }
 
     /**
-     * 开始直播
-     * @param {string} initialInteraction - 初始互动内容
-     */
-    async startLive(initialInteraction) {
-      try {
-        console.log('[Live App] 开始直播，初始互动:', initialInteraction);
-
-        // 设置渲染权为live
-        await this.setRenderingRight('live');
-
-        // 更新状态
-        this.stateManager.startLive();
-        this.currentView = 'live';
-
-        // 开始监听事件
-        this.eventListener.startListening();
-
-        // 发送开始直播消息到SillyTavern
-        const message = `用户开始直播，初始互动为（${initialInteraction}），请按照正确的直播格式要求生成本场人数，直播内容，弹幕，打赏和推荐互动。此次回复内仅生成一次本场人数和直播内容格式，直播内容需要简洁。最后需要生成四条推荐互动。禁止使用错误格式。`;
-
-        await this.sendToSillyTavern(message);
-
-        // 更新界面
-        this.updateAppContent();
-
-        console.log('[Live App] 直播已开始');
-      } catch (error) {
-        console.error('[Live App] 开始直播失败:', error);
-        this.showToast('开始直播失败: ' + error.message, 'error');
-      }
-    }
-
-    /**
      * 结束直播
      */
     async endLive() {
       try {
-        console.log('[Live App] 结束直播');
+        console.log('[Watch Live App] 结束观看直播');
 
         // 设置渲染权为end，允许用户重新选择
         await this.setRenderingRight('end');
@@ -881,11 +858,11 @@ if (typeof window.LiveApp === 'undefined') {
         // 更新界面
         this.updateAppContent();
 
-        this.showToast('直播已结束', 'success');
-        console.log('[Live App] 直播已结束');
+        this.showToast('已退出直播间', 'success');
+        console.log('[Watch Live App] 已退出直播间');
       } catch (error) {
-        console.error('[Live App] 结束直播失败:', error);
-        this.showToast('结束直播失败: ' + error.message, 'error');
+        console.error('[Watch Live App] 退出直播间失败:', error);
+        this.showToast('退出直播间失败: ' + error.message, 'error');
       }
     }
 
@@ -1043,6 +1020,8 @@ if (typeof window.LiveApp === 'undefined') {
       switch (this.currentView) {
         case 'start':
           return this.renderStartView();
+        case 'list':
+          return this.renderListView();
         case 'live':
           return this.renderLiveView();
         default:
@@ -1051,76 +1030,88 @@ if (typeof window.LiveApp === 'undefined') {
     }
 
     /**
-     * 渲染开始直播界面
+     * 渲染观看直播界面
      */
     renderStartView() {
       return `
         <div class="live-app">
-          <div class="live-main-container">
-            <div class="live-main-header">
-              <h2>直播中心</h2>
-              <p>选择你想要的直播功能</p>
+          <div class="watch-live-container">
+            <div class="watch-live-header">
+              <h2>观看直播</h2>
+              <p>选择一种方式开始观看直播吧！</p>
             </div>
 
-            <div class="live-options">
-              <div class="live-option-card" id="start-streaming-option">
-                <div class="option-icon">🎥</div>
-                <div class="option-content">
-                  <h3>我要直播</h3>
-                  <p>开始你的直播之旅</p>
-                </div>
-                <div class="option-arrow">→</div>
+            <div class="watch-options">
+              <button class="watch-option-btn" id="current-live-list">
+                <div class="option-icon">📺</div>
+                <div class="option-title">当前开播列表</div>
+                <div class="option-desc">查看正在直播的主播</div>
+              </button>
+
+              <button class="watch-option-btn" id="specific-live-room">
+                <div class="option-icon">🔍</div>
+                <div class="option-title">进入指定直播间</div>
+                <div class="option-desc">输入主播名称观看</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * 渲染直播间列表界面
+     */
+    renderListView() {
+      // 如果正在等待直播间列表，显示加载状态
+      if (this.isWaitingForLiveList) {
+        return `
+          <div class="live-app">
+            <div class="live-list-container">
+              <div class="live-list-header">
+                <button class="back-btn" id="back-to-watch-options">← 返回</button>
+                <h2>当前开播列表</h2>
               </div>
 
-              <div class="live-option-card" id="watch-streaming-option">
-                <div class="option-icon">📺</div>
-                <div class="option-content">
-                  <h3>观看直播</h3>
-                  <p>观看其他主播的精彩直播</p>
-                </div>
-                <div class="option-arrow">→</div>
+              <div class="live-rooms-list">
+                <div class="live-loading">正在获取直播间列表...</div>
               </div>
             </div>
           </div>
+        `;
+      }
 
-          <!-- 开始直播弹窗 -->
-          <div class="modal" id="start-live-modal" style="display: none;">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3>开始直播</h3>
-                <button class="modal-close-btn">&times;</button>
-              </div>
-              <div class="modal-body">
-                <div class="custom-interaction-section">
-                  <textarea
-                    id="custom-interaction-input"
-                    placeholder="输入自定义互动内容..."
-                    rows="3"
-                  ></textarea>
-                </div>
+      // 解析直播间列表数据
+      const liveRooms = this.parseLiveRoomList();
 
-                <div class="preset-interactions">
-                  <h4>预设互动</h4>
-                  <div class="preset-buttons">
-                    <button class="preset-btn" data-interaction="和观众打个招呼">
-                      👋 和观众打个招呼
-                    </button>
-                    <button class="preset-btn" data-interaction="分享今天的心情">
-                      😊 分享今天的心情
-                    </button>
-                    <button class="preset-btn" data-interaction="聊聊最近的趣事">
-                      💬 聊聊最近的趣事
-                    </button>
-                    <button class="preset-btn" data-interaction="唱首歌给大家听">
-                      🎵 唱首歌给大家听
-                    </button>
-                  </div>
-                </div>
+      const roomsHtml = liveRooms
+        .map(
+          room => `
+        <div class="live-room-item">
+          <div class="room-info">
+            <div class="room-name">${room.name}</div>
+            <div class="room-details">
+              <span class="streamer-name">主播：${room.streamer}</span>
+              <span class="room-category">分类：${room.category}</span>
+              <span class="viewer-count">观看：${room.viewers}</span>
+            </div>
+          </div>
+          <button class="watch-room-btn" data-room='${JSON.stringify(room)}'>观看直播</button>
+        </div>
+      `,
+        )
+        .join('');
 
-                <button class="start-live-btn" id="start-custom-live">
-                  开始直播
-                </button>
-              </div>
+      return `
+        <div class="live-app">
+          <div class="live-list-container">
+            <div class="live-list-header">
+              <button class="back-btn" id="back-to-watch-options">← 返回</button>
+              <h2>当前开播列表</h2>
+            </div>
+
+            <div class="live-rooms-list">
+              ${roomsHtml || '<div class="no-rooms">暂无直播间数据，请稍后再试</div>'}
             </div>
           </div>
         </div>
@@ -1174,16 +1165,21 @@ if (typeof window.LiveApp === 'undefined') {
               </div>
             </div>
 
-            <!-- 推荐互动 -->
+            <!-- 观看直播互动 -->
             <div class="interaction-panel">
               <div class="interaction-header">
-                <h4>推荐互动：</h4>
-                <button class="interact-btn" id="custom-interact-btn">
-                  <i class="fas fa-pen-nib"></i> 自定义互动
-                </button>
+                <h4>推荐弹幕：</h4>
+                <div class="watch-actions">
+                  <button class="interact-btn" id="send-danmaku-btn">
+                    <i class="fas fa-comment"></i> 发送弹幕
+                  </button>
+                  <button class="interact-btn" id="send-gift-btn">
+                    <i class="fas fa-gift"></i> 打赏礼物
+                  </button>
+                </div>
               </div>
               <div class="recommended-interactions">
-                ${recommendedButtons || '<p class="no-interactions">等待推荐互动...</p>'}
+                ${recommendedButtons || '<p class="no-interactions">等待推荐弹幕...</p>'}
               </div>
             </div>
 
@@ -1195,21 +1191,414 @@ if (typeof window.LiveApp === 'undefined') {
             </div>
           </div>
 
-          <!-- 自定义互动弹窗 -->
-          <div id="interaction-modal" class="modal">
+          <!-- 发送弹幕弹窗 -->
+          <div id="danmaku-modal" class="modal">
             <div class="modal-content">
               <div class="modal-header">
-                <h3>自定义互动</h3>
+                <h3>发送弹幕</h3>
                 <button class="modal-close-btn">&times;</button>
               </div>
-              <form id="interaction-form">
-                <textarea id="custom-interaction-textarea" placeholder="输入你想说的内容..." rows="4"></textarea>
-                <button type="submit" class="submit-btn">发送</button>
+              <form id="danmaku-form">
+                <textarea id="custom-danmaku-textarea" placeholder="输入弹幕内容..." rows="4"></textarea>
+                <button type="submit" class="submit-btn">发送弹幕</button>
               </form>
             </div>
           </div>
 
-          <!-- 礼物列表弹窗 -->
+          <!-- 打赏礼物弹窗 -->
+          <div id="gift-send-modal" class="modal">
+            <div class="gift-modal-container">
+              <div class="gift-modal-header">
+                <div class="gift-modal-title">✨ 打赏礼物</div>
+                <button class="gift-modal-close" onclick="watchLiveAppHideModal('gift-send-modal')">&times;</button>
+              </div>
+
+              <div class="gift-modal-body">
+                <div class="gift-list-container">
+                    <!-- 所有礼物按价格排序，单列显示 -->
+                    <div class="gift-card" data-gift="应援话筒" data-price="1">
+                      <div class="gift-icon">🎤</div>
+                      <div class="gift-info">
+                        <div class="gift-name">应援话筒</div>
+                        <div class="gift-price">¥1</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="应援灯牌" data-price="3">
+                      <div class="gift-icon">💡</div>
+                      <div class="gift-info">
+                        <div class="gift-name">应援灯牌</div>
+                        <div class="gift-price">¥3</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="比个心" data-price="5">
+                      <div class="gift-icon">💖</div>
+                      <div class="gift-info">
+                        <div class="gift-name">比个心</div>
+                        <div class="gift-price">¥5</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="入场券" data-price="6">
+                      <div class="gift-icon">🎟️</div>
+                      <div class="gift-info">
+                        <div class="gift-name">入场券</div>
+                        <div class="gift-price">¥6</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="小金人" data-price="9">
+                      <div class="gift-icon">🏆</div>
+                      <div class="gift-info">
+                        <div class="gift-name">小金人</div>
+                        <div class="gift-price">¥9</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="庆功花束" data-price="18">
+                      <div class="gift-icon">💐</div>
+                      <div class="gift-info">
+                        <div class="gift-name">庆功花束</div>
+                        <div class="gift-price">¥18</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="秘密情书" data-price="28">
+                      <div class="gift-icon">💌</div>
+                      <div class="gift-info">
+                        <div class="gift-name">秘密情书</div>
+                        <div class="gift-price">¥28</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift=""卡！"" data-price="38">
+                      <div class="gift-icon">🎬</div>
+                      <div class="gift-info">
+                        <div class="gift-name">"卡！"</div>
+                        <div class="gift-price">¥38</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="闪耀星星" data-price="58">
+                      <div class="gift-icon">🌟</div>
+                      <div class="gift-info">
+                        <div class="gift-name">闪耀星星</div>
+                        <div class="gift-price">¥58</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="璀璨钻石" data-price="88">
+                      <div class="gift-icon">💎</div>
+                      <div class="gift-info">
+                        <div class="gift-name">璀璨钻石</div>
+                        <div class="gift-price">¥88</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="红毯口红" data-price="128">
+                      <div class="gift-icon">💄</div>
+                      <div class="gift-info">
+                        <div class="gift-name">红毯口红</div>
+                        <div class="gift-price">¥128</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="加冕皇冠" data-price="188">
+                      <div class="gift-icon">👑</div>
+                      <div class="gift-info">
+                        <div class="gift-name">加冕皇冠</div>
+                        <div class="gift-price">¥188</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift=""菲林"" data-price="288">
+                      <div class="gift-icon">📸</div>
+                      <div class="gift-info">
+                        <div class="gift-name">"菲林"</div>
+                        <div class="gift-price">¥288</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="白金唱片" data-price="388">
+                      <div class="gift-icon">🎶</div>
+                      <div class="gift-info">
+                        <div class="gift-name">白金唱片</div>
+                        <div class="gift-price">¥388</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="庆功香槟" data-price="488">
+                      <div class="gift-icon">🥂</div>
+                      <div class="gift-info">
+                        <div class="gift-name">庆功香槟</div>
+                        <div class="gift-price">¥488</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="巨星墨镜" data-price="588">
+                      <div class="gift-icon">🕶️</div>
+                      <div class="gift-info">
+                        <div class="gift-name">巨星墨镜</div>
+                        <div class="gift-price">¥588</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="人气喷射器" data-price="666">
+                      <div class="gift-icon">🚀</div>
+                      <div class="gift-info">
+                        <div class="gift-name">人气喷射器</div>
+                        <div class="gift-price">¥666</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="星际飞船" data-price="888">
+                      <div class="gift-icon">🚁</div>
+                      <div class="gift-info">
+                        <div class="gift-name">星际飞船</div>
+                        <div class="gift-price">¥888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="星光大道" data-price="999">
+                      <div class="gift-icon">📢</div>
+                      <div class="gift-info">
+                        <div class="gift-name">星光大道</div>
+                        <div class="gift-price">¥999</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="神谕剧本" data-price="1288">
+                      <div class="gift-icon">📜</div>
+                      <div class="gift-info">
+                        <div class="gift-name">神谕剧本</div>
+                        <div class="gift-price">¥1288</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="天空之城" data-price="1888">
+                      <div class="gift-icon">🏰</div>
+                      <div class="gift-info">
+                        <div class="gift-name">天空之城</div>
+                        <div class="gift-price">¥1888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="光速超跑" data-price="2888">
+                      <div class="gift-icon">🏎️</div>
+                      <div class="gift-info">
+                        <div class="gift-name">光速超跑</div>
+                        <div class="gift-price">¥2888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="宇宙巡回" data-price="3888">
+                      <div class="gift-icon">🌍</div>
+                      <div class="gift-info">
+                        <div class="gift-name">宇宙巡回</div>
+                        <div class="gift-price">¥3888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="梦幻游轮" data-price="4888">
+                      <div class="gift-icon">🛳️</div>
+                      <div class="gift-info">
+                        <div class="gift-name">梦幻游轮</div>
+                        <div class="gift-price">¥4888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="星河舰队" data-price="5888">
+                      <div class="gift-icon">🌌</div>
+                      <div class="gift-info">
+                        <div class="gift-name">星河舰队</div>
+                        <div class="gift-price">¥5888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="专属星球" data-price="6888">
+                      <div class="gift-icon">🪐</div>
+                      <div class="gift-info">
+                        <div class="gift-name">专属星球</div>
+                        <div class="gift-price">¥6888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="奇迹工厂" data-price="7888">
+                      <div class="gift-icon">✨</div>
+                      <div class="gift-info">
+                        <div class="gift-name">奇迹工厂</div>
+                        <div class="gift-price">¥7888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="永恒之星" data-price="8888">
+                      <div class="gift-icon">🌠</div>
+                      <div class="gift-info">
+                        <div class="gift-name">永恒之星</div>
+                        <div class="gift-price">¥8888</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="星辰主宰" data-price="9999">
+                      <div class="gift-icon">🔱</div>
+                      <div class="gift-info">
+                        <div class="gift-name">星辰主宰</div>
+                        <div class="gift-price">¥9999</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                    <div class="gift-card" data-gift="以你为名" data-price="10000">
+                      <div class="gift-icon">🔭</div>
+                      <div class="gift-info">
+                        <div class="gift-name">以你为名</div>
+                        <div class="gift-price">¥10000</div>
+                      </div>
+                      <div class="gift-controls">
+                        <button class="qty-btn minus">-</button>
+                        <input type="number" class="qty-input" value="0" min="0" max="999">
+                        <button class="qty-btn plus">+</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="gift-message-section">
+                  <div class="message-label">💬 打赏留言</div>
+                  <textarea id="gift-message-input" placeholder="说点什么吧..."></textarea>
+                </div>
+
+                <div class="gift-summary">
+                  <div class="total-amount">
+                    <span class="amount-label">总金额</span>
+                    <span class="amount-value">¥<span id="gift-total-amount">0</span></span>
+                  </div>
+                  <button class="send-gift-btn" id="confirm-send-gift">
+                    <span class="btn-icon">🎁</span>
+                    <span class="btn-text">送礼</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 礼物流水弹窗 -->
           <div id="gift-modal" class="modal">
             <div class="modal-content">
               <div class="modal-header">
@@ -1248,92 +1637,99 @@ if (typeof window.LiveApp === 'undefined') {
       }
 
       try {
-        // 开始直播相关事件
+        // 观看直播相关事件
         if (this.currentView === 'start') {
-          // 我要直播选项卡
-          const startStreamingOption = appContainer.querySelector('#start-streaming-option');
-          if (startStreamingOption) {
-            startStreamingOption.addEventListener('click', async () => {
-              // 设置渲染权为live
-              await this.setRenderingRight('live');
-              this.showModal('start-live-modal');
+          // 当前开播列表按钮
+          const currentLiveListBtn = appContainer.querySelector('#current-live-list');
+          if (currentLiveListBtn) {
+            currentLiveListBtn.addEventListener('click', () => {
+              this.requestCurrentLiveList();
             });
           }
 
-          // 观看直播选项卡
-          const watchStreamingOption = appContainer.querySelector('#watch-streaming-option');
-          if (watchStreamingOption) {
-            watchStreamingOption.addEventListener('click', async () => {
-              // 设置渲染权为watch
-              await this.setRenderingRight('watch');
-              // 跳转到观看直播应用
-              if (window.mobilePhone && window.mobilePhone.openApp) {
-                window.mobilePhone.openApp('watch-live');
-              }
+          // 进入指定直播间按钮
+          const specificLiveRoomBtn = appContainer.querySelector('#specific-live-room');
+          if (specificLiveRoomBtn) {
+            specificLiveRoomBtn.addEventListener('click', () => {
+              this.showSpecificLiveRoomModal();
+            });
+          }
+        }
+
+        // 直播间列表相关事件
+        if (this.currentView === 'list') {
+          // 返回按钮
+          const backBtn = appContainer.querySelector('#back-to-watch-options');
+          if (backBtn) {
+            backBtn.addEventListener('click', () => {
+              // 停止监听并重置状态
+              this.eventListener.stopListening();
+              this.isWaitingForLiveList = false;
+              this.currentView = 'start';
+              this.updateAppContent();
             });
           }
 
-          // 自定义开始直播按钮（在弹窗中）
-          const customStartBtn = appContainer.querySelector('#start-custom-live');
-          if (customStartBtn) {
-            customStartBtn.addEventListener('click', () => {
-              const input = appContainer.querySelector('#custom-interaction-input');
-              const interaction = input ? input.value.trim() : '';
-              if (interaction) {
-                this.hideModal('start-live-modal');
-                this.startLive(interaction);
-              } else {
-                this.showToast('请输入互动内容', 'warning');
-              }
-            });
-          }
-
-          // 预设互动按钮（在弹窗中）
-          appContainer.querySelectorAll('.preset-btn').forEach(btn => {
+          // 观看直播间按钮
+          appContainer.querySelectorAll('.watch-room-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-              const interaction = btn.dataset.interaction;
-              if (interaction) {
-                this.hideModal('start-live-modal');
-                this.startLive(interaction);
-              }
+              const roomData = JSON.parse(btn.dataset.room);
+              this.watchSelectedRoom(roomData);
             });
           });
         }
 
         // 直播中相关事件
         if (this.currentView === 'live') {
-          // 推荐互动按钮
+          // 推荐弹幕按钮
           appContainer.querySelectorAll('.rec-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-              const interaction = btn.dataset.interaction;
-              if (interaction) {
-                this.continueInteraction(interaction);
+              const danmaku = btn.dataset.interaction;
+              if (danmaku) {
+                this.sendDanmaku(danmaku);
               }
             });
           });
 
-          // 自定义互动按钮
-          const customInteractBtn = appContainer.querySelector('#custom-interact-btn');
-          if (customInteractBtn) {
-            customInteractBtn.addEventListener('click', () => {
-              this.showModal('interaction-modal');
+          // 发送弹幕按钮
+          const sendDanmakuBtn = appContainer.querySelector('#send-danmaku-btn');
+          if (sendDanmakuBtn) {
+            sendDanmakuBtn.addEventListener('click', () => {
+              this.showModal('danmaku-modal');
             });
           }
 
-          // 自定义互动表单
-          const interactionForm = appContainer.querySelector('#interaction-form');
-          if (interactionForm) {
-            interactionForm.addEventListener('submit', e => {
+          // 打赏礼物按钮
+          const sendGiftBtn = appContainer.querySelector('#send-gift-btn');
+          if (sendGiftBtn) {
+            sendGiftBtn.addEventListener('click', () => {
+              this.showModal('gift-send-modal');
+              this.initGiftModal();
+            });
+          }
+
+          // 发送弹幕表单
+          const danmakuForm = appContainer.querySelector('#danmaku-form');
+          if (danmakuForm) {
+            danmakuForm.addEventListener('submit', e => {
               e.preventDefault();
-              const textarea = appContainer.querySelector('#custom-interaction-textarea');
-              const interaction = textarea ? textarea.value.trim() : '';
-              if (interaction) {
-                this.continueInteraction(interaction);
+              const textarea = appContainer.querySelector('#custom-danmaku-textarea');
+              const danmaku = textarea ? textarea.value.trim() : '';
+              if (danmaku) {
+                this.sendCustomDanmaku(danmaku);
                 textarea.value = '';
                 this.hideAllModals();
               } else {
-                this.showToast('请输入互动内容', 'warning');
+                this.showToast('请输入弹幕内容', 'warning');
               }
+            });
+          }
+
+          // 打赏礼物表单
+          const giftSubmitBtn = appContainer.querySelector('#confirm-send-gift');
+          if (giftSubmitBtn) {
+            giftSubmitBtn.addEventListener('click', () => {
+              this.sendGifts();
             });
           }
 
@@ -1378,6 +1774,401 @@ if (typeof window.LiveApp === 'undefined') {
     }
 
     /**
+     * 请求当前开播列表
+     */
+    async requestCurrentLiveList() {
+      try {
+        console.log('[Watch Live App] 请求当前开播列表...');
+
+        const message =
+          '用户希望观看直播，请按照正确格式生成5-10个当前可能正在开播的直播间，每个直播间的格式为[直播|直播间名称|主播用户名|直播类别|观看人数]。主播可能是角色，NPC或者是无关路人。每个直播间格式之间需要正确换行';
+
+        // 先切换到列表视图并显示加载状态
+        this.currentView = 'list';
+        this.isWaitingForLiveList = true;
+        this.updateAppContent();
+
+        // 开始监听AI回复
+        this.eventListener.startListening();
+
+        await this.sendToSillyTavern(message);
+
+        console.log('[Watch Live App] 已发送开播列表请求，等待AI回复...');
+      } catch (error) {
+        console.error('[Watch Live App] 请求开播列表失败:', error);
+        this.showToast('请求开播列表失败: ' + error.message, 'error');
+        this.isWaitingForLiveList = false;
+      }
+    }
+
+    /**
+     * 显示指定直播间弹窗
+     */
+    showSpecificLiveRoomModal() {
+      // 创建弹窗HTML
+      const modalHtml = `
+        <div class="modal-overlay" id="specific-live-modal" style="display: flex;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>进入指定直播间</h3>
+              <button class="modal-close" onclick="watchLiveAppHideModal('specific-live-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="input-section">
+                <label for="streamer-name-input">请输入想要观看的主播名称：</label>
+                <input type="text" id="streamer-name-input" placeholder="输入主播名称..." />
+              </div>
+              <button class="watch-live-btn" id="watch-specific-live">观看直播</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // 添加到页面
+      const appContainer = document.getElementById('app-content');
+      if (appContainer) {
+        appContainer.insertAdjacentHTML('beforeend', modalHtml);
+
+        // 绑定观看直播按钮事件
+        const watchBtn = document.getElementById('watch-specific-live');
+        if (watchBtn) {
+          watchBtn.addEventListener('click', () => {
+            const input = document.getElementById('streamer-name-input');
+            const streamerName = input ? input.value.trim() : '';
+            if (streamerName) {
+              this.watchSpecificLive(streamerName);
+            } else {
+              this.showToast('请输入主播名称', 'warning');
+            }
+          });
+        }
+      }
+    }
+
+    /**
+     * 观看指定直播
+     */
+    async watchSpecificLive(streamerName) {
+      try {
+        console.log('[Watch Live App] 观看指定直播:', streamerName);
+
+        // 设置渲染权为watch
+        await this.setRenderingRight('watch');
+
+        const message = `用户选择观看${streamerName}的直播，请按照正确的直播格式要求生成本场人数，直播内容，弹幕，打赏和推荐互动。此次回复内仅生成一次本场人数和直播内容格式，直播内容需要简洁。最后需要生成四条推荐互动。禁止使用错误格式。当前用户正在观看直播，推荐互动需要是用户可能会发送的弹幕。`;
+
+        // 隐藏弹窗
+        this.hideModal('specific-live-modal');
+
+        // 切换到直播间视图
+        this.currentView = 'live';
+        this.stateManager.startLive();
+        this.eventListener.startListening();
+
+        await this.sendToSillyTavern(message);
+        this.updateAppContent();
+
+        console.log('[Watch Live App] 已进入指定直播间');
+      } catch (error) {
+        console.error('[Watch Live App] 观看指定直播失败:', error);
+        this.showToast('进入直播间失败: ' + error.message, 'error');
+      }
+    }
+
+    /**
+     * 解析直播间列表数据
+     * 参考live-app的解析方式，支持解析多个直播间格式
+     */
+    parseLiveRoomList() {
+      try {
+        // 获取最新的聊天内容
+        const chatContent = this.dataParser.getChatContent();
+        if (!chatContent) {
+          console.log('[Watch Live App] 没有聊天内容可解析');
+          return [];
+        }
+
+        console.log('[Watch Live App] 开始解析直播间列表，内容长度:', chatContent.length);
+
+        // 匹配直播间格式：[直播|直播间名称|主播用户名|直播类别|观看人数]
+        // 使用更严格的正则表达式，确保正确匹配
+        const liveRoomRegex = /\[直播\|([^|\]]+)\|([^|\]]+)\|([^|\]]+)\|([^|\]]+)\]/g;
+        const rooms = [];
+        let match;
+        let matchCount = 0;
+
+        // 重置正则表达式的lastIndex
+        liveRoomRegex.lastIndex = 0;
+
+        while ((match = liveRoomRegex.exec(chatContent)) !== null) {
+          matchCount++;
+          const roomData = {
+            name: match[1].trim(),
+            streamer: match[2].trim(),
+            category: match[3].trim(),
+            viewers: match[4].trim(),
+          };
+
+          // 验证数据有效性
+          if (roomData.name && roomData.streamer && roomData.category && roomData.viewers) {
+            rooms.push(roomData);
+            console.log(`[Watch Live App] 解析到直播间 ${matchCount}:`, roomData);
+          } else {
+            console.warn('[Watch Live App] 跳过无效的直播间数据:', roomData);
+          }
+
+          // 防止无限循环
+          if (matchCount > 50) {
+            console.warn('[Watch Live App] 达到最大解析数量限制，停止解析');
+            break;
+          }
+        }
+
+        console.log(`[Watch Live App] 解析完成，共找到 ${rooms.length} 个有效直播间`);
+        return rooms;
+      } catch (error) {
+        console.error('[Watch Live App] 解析直播间列表失败:', error);
+        return [];
+      }
+    }
+
+    /**
+     * 观看选中的直播间
+     */
+    async watchSelectedRoom(roomData) {
+      try {
+        console.log('[Watch Live App] 观看选中的直播间:', roomData);
+
+        // 设置渲染权为watch
+        await this.setRenderingRight('watch');
+
+        const message = `用户选择观看直播：直播间名称：${roomData.name}，主播用户名：${roomData.streamer}，直播类别：${roomData.category}，本次观看人数：${roomData.viewers}。请按照正确的直播格式要求生成本场人数，直播内容，弹幕，打赏和推荐互动。此次回复内仅生成一次本场人数和直播内容格式，直播内容需要简洁，当前直播可以是刚开播或者已经直播一段时间了。最后需要生成四条推荐互动。禁止使用错误格式。当前用户正在观看直播，推荐互动需要是用户可能会发送的弹幕。`;
+
+        // 切换到直播间视图
+        this.currentView = 'live';
+        this.stateManager.startLive();
+        this.eventListener.startListening();
+
+        await this.sendToSillyTavern(message);
+        this.updateAppContent();
+
+        console.log('[Watch Live App] 已进入选中的直播间');
+      } catch (error) {
+        console.error('[Watch Live App] 观看选中直播间失败:', error);
+        this.showToast('进入直播间失败: ' + error.message, 'error');
+      }
+    }
+
+    /**
+     * 发送推荐弹幕
+     */
+    async sendDanmaku(danmaku) {
+      try {
+        console.log('[Watch Live App] 发送推荐弹幕:', danmaku);
+
+        const message = `用户正在观看直播，并发送弹幕"${danmaku}"，请勿重复或替用户发送弹幕。请按照正确的直播格式要求生成本场人数，直播内容，其余弹幕，打赏和推荐互动。此次回复内仅生成一次本场人数和直播内容格式，直播内容需要简洁。最后需要生成四条推荐互动，内容为用户可能会发送的弹幕。禁止使用错误格式。
+[直播|{{user}}|弹幕|${danmaku}]`;
+
+        await this.sendToSillyTavern(message);
+        console.log('[Watch Live App] 推荐弹幕已发送');
+      } catch (error) {
+        console.error('[Watch Live App] 发送推荐弹幕失败:', error);
+        this.showToast('发送弹幕失败: ' + error.message, 'error');
+      }
+    }
+
+    /**
+     * 发送自定义弹幕
+     */
+    async sendCustomDanmaku(danmaku) {
+      try {
+        console.log('[Watch Live App] 发送自定义弹幕:', danmaku);
+
+        const message = `用户正在观看直播，并发送弹幕"${danmaku}"，请勿重复或替用户发送弹幕。请按照正确的直播格式要求生成本场人数，直播内容，其余弹幕，打赏和推荐互动。此次回复内仅生成一次本场人数和直播内容格式，直播内容需要简洁。最后需要生成四条推荐互动，内容为用户可能会发送的弹幕。禁止使用错误格式。
+[直播|{{user}}|弹幕|${danmaku}]`;
+
+        await this.sendToSillyTavern(message);
+        console.log('[Watch Live App] 自定义弹幕已发送');
+      } catch (error) {
+        console.error('[Watch Live App] 发送自定义弹幕失败:', error);
+        this.showToast('发送弹幕失败: ' + error.message, 'error');
+      }
+    }
+
+    /**
+     * 初始化礼物弹窗
+     */
+    initGiftModal() {
+      // 绑定礼物数量调整按钮
+      const giftCards = document.querySelectorAll('.gift-card');
+      giftCards.forEach(card => {
+        const minusBtn = card.querySelector('.qty-btn.minus');
+        const plusBtn = card.querySelector('.qty-btn.plus');
+        const quantityInput = card.querySelector('.qty-input');
+
+        if (minusBtn && plusBtn && quantityInput) {
+          minusBtn.addEventListener('click', () => {
+            let quantity = parseInt(quantityInput.value) || 0;
+            if (quantity > 0) {
+              quantity--;
+              quantityInput.value = quantity;
+              this.updateGiftTotal();
+              this.updateGiftCardState(card, quantity);
+            }
+          });
+
+          plusBtn.addEventListener('click', () => {
+            let quantity = parseInt(quantityInput.value) || 0;
+            quantity++;
+            quantityInput.value = quantity;
+            this.updateGiftTotal();
+            this.updateGiftCardState(card, quantity);
+          });
+
+          // 监听输入框变化
+          quantityInput.addEventListener('input', () => {
+            let quantity = parseInt(quantityInput.value) || 0;
+            if (quantity < 0) {
+              quantity = 0;
+              quantityInput.value = quantity;
+            }
+            if (quantity > 999) {
+              quantity = 999;
+              quantityInput.value = quantity;
+            }
+            this.updateGiftTotal();
+            this.updateGiftCardState(card, quantity);
+          });
+        }
+      });
+
+      // 初始化总金额
+      this.updateGiftTotal();
+    }
+
+    /**
+     * 更新礼物卡片状态
+     */
+    updateGiftCardState(card, quantity) {
+      if (quantity > 0) {
+        card.classList.add('selected');
+      } else {
+        card.classList.remove('selected');
+      }
+    }
+
+    /**
+     * 更新礼物总金额
+     */
+    updateGiftTotal() {
+      let total = 0;
+      const giftCards = document.querySelectorAll('.gift-card');
+
+      giftCards.forEach(card => {
+        const quantity = parseInt(card.querySelector('.qty-input').value) || 0;
+        const price = parseInt(card.dataset.price);
+        total += quantity * price;
+      });
+
+      const totalAmountSpan = document.getElementById('gift-total-amount');
+      if (totalAmountSpan) {
+        totalAmountSpan.textContent = total;
+      }
+    }
+
+    /**
+     * 发送礼物
+     */
+    async sendGifts() {
+      try {
+        const selectedGifts = [];
+        const giftCards = document.querySelectorAll('.gift-card');
+
+        giftCards.forEach(card => {
+          const quantity = parseInt(card.querySelector('.qty-input').value) || 0;
+          if (quantity > 0) {
+            const giftName = card.dataset.gift;
+            const price = parseInt(card.dataset.price);
+            selectedGifts.push({
+              name: giftName,
+              quantity: quantity,
+              price: price,
+              total: quantity * price,
+            });
+          }
+        });
+
+        if (selectedGifts.length === 0) {
+          this.showToast('请选择要打赏的礼物', 'warning');
+          return;
+        }
+
+        const totalAmount = selectedGifts.reduce((sum, gift) => sum + gift.total, 0);
+        const giftMessage = document.getElementById('gift-message-input')?.value.trim() || '';
+
+        console.log('[Watch Live App] 发送礼物:', selectedGifts);
+
+        // 构建礼物描述
+        const giftDescriptions = selectedGifts
+          .map(gift => (gift.quantity === 1 ? gift.name : `${gift.name}*${gift.quantity}`))
+          .join('，');
+
+        // 构建消息
+        let message = `用户正在观看直播，并打赏礼物"${giftDescriptions}"，花费"${totalAmount}元"`;
+        if (giftMessage) {
+          message += `，用户打赏留言为"${giftMessage}"`;
+        }
+        message += `，请勿重复或替用户发送弹幕。请按照正确的直播格式要求生成本场人数，直播内容，其余弹幕，打赏和推荐互动。此次回复内仅生成一次本场人数和直播内容格式，直播内容需要简洁。最后需要生成四条推荐互动，内容为用户可能会发送的弹幕。禁止使用错误格式。
+`;
+
+        // 添加打赏格式 - 每种礼物一条记录
+        selectedGifts.forEach(gift => {
+          const giftFormat = gift.quantity === 1 ? gift.name : `${gift.name}*${gift.quantity}`;
+          message += `[直播|{{user}}|打赏|${giftFormat}]\n`;
+        });
+
+        // 如果有留言，添加弹幕格式
+        if (giftMessage) {
+          message += `[直播|{{user}}|弹幕|${giftMessage}]`;
+        }
+
+        await this.sendToSillyTavern(message);
+
+        // 重置礼物选择
+        this.resetGiftModal();
+        this.hideAllModals();
+
+        console.log('[Watch Live App] 礼物已发送');
+        this.showToast('礼物发送成功！', 'success');
+      } catch (error) {
+        console.error('[Watch Live App] 发送礼物失败:', error);
+        this.showToast('发送礼物失败: ' + error.message, 'error');
+      }
+    }
+
+    /**
+     * 重置礼物弹窗
+     */
+    resetGiftModal() {
+      const giftCards = document.querySelectorAll('.gift-card');
+      giftCards.forEach(card => {
+        const quantityInput = card.querySelector('.qty-input');
+        if (quantityInput) {
+          quantityInput.value = '0';
+        }
+        card.classList.remove('selected');
+      });
+
+      // 清空留言
+      const messageInput = document.getElementById('gift-message-input');
+      if (messageInput) {
+        messageInput.value = '';
+      }
+
+      this.updateGiftTotal();
+    }
+
+    /**
      * 显示弹窗
      */
     showModal(modalId) {
@@ -1396,6 +2187,10 @@ if (typeof window.LiveApp === 'undefined') {
       if (modal) {
         modal.style.display = 'none';
         modal.classList.remove('active');
+        // 如果是动态创建的弹窗，移除它
+        if (modalId === 'specific-live-modal') {
+          modal.remove();
+        }
       }
     }
 
@@ -1405,7 +2200,6 @@ if (typeof window.LiveApp === 'undefined') {
     hideAllModals() {
       const modals = document.querySelectorAll('.modal');
       modals.forEach(modal => {
-        modal.style.display = 'none';
         modal.classList.remove('active');
       });
     }
@@ -1415,16 +2209,16 @@ if (typeof window.LiveApp === 'undefined') {
      */
     async setRenderingRight(type) {
       try {
-        console.log(`[Live App] 设置渲染权为: ${type}`);
+        console.log(`[Watch Live App] 设置渲染权为: ${type}`);
 
         if (!window.mobileContextEditor) {
-          console.warn('[Live App] 上下文编辑器未就绪，无法设置渲染权');
+          console.warn('[Watch Live App] 上下文编辑器未就绪，无法设置渲染权');
           return false;
         }
 
         const chatData = window.mobileContextEditor.getCurrentChatData();
         if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-          console.warn('[Live App] 无聊天数据，无法设置渲染权');
+          console.warn('[Watch Live App] 无聊天数据，无法设置渲染权');
           return false;
         }
 
@@ -1446,14 +2240,14 @@ if (typeof window.LiveApp === 'undefined') {
         // 更新第1楼层
         const success = await window.mobileContextEditor.modifyMessage(0, originalContent);
         if (success) {
-          console.log(`[Live App] ✅ 渲染权已设置为: ${type}`);
+          console.log(`[Watch Live App] ✅ 渲染权已设置为: ${type}`);
           return true;
         } else {
-          console.error('[Live App] 设置渲染权失败');
+          console.error('[Watch Live App] 设置渲染权失败');
           return false;
         }
       } catch (error) {
-        console.error('[Live App] 设置渲染权时出错:', error);
+        console.error('[Watch Live App] 设置渲染权时出错:', error);
         return false;
       }
     }
@@ -1481,7 +2275,7 @@ if (typeof window.LiveApp === 'undefined') {
 
         return match ? match[1] : null;
       } catch (error) {
-        console.error('[Live App] 获取渲染权时出错:', error);
+        console.error('[Watch Live App] 获取渲染权时出错:', error);
         return null;
       }
     }
@@ -1491,16 +2285,16 @@ if (typeof window.LiveApp === 'undefined') {
      */
     async clearRenderingRight() {
       try {
-        console.log('[Live App] 清除渲染权');
+        console.log('[Watch Live App] 清除渲染权');
 
         if (!window.mobileContextEditor) {
-          console.warn('[Live App] 上下文编辑器未就绪，无法清除渲染权');
+          console.warn('[Watch Live App] 上下文编辑器未就绪，无法清除渲染权');
           return false;
         }
 
         const chatData = window.mobileContextEditor.getCurrentChatData();
         if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-          console.warn('[Live App] 无聊天数据，无法清除渲染权');
+          console.warn('[Watch Live App] 无聊天数据，无法清除渲染权');
           return false;
         }
 
@@ -1516,18 +2310,18 @@ if (typeof window.LiveApp === 'undefined') {
           // 更新第1楼层
           const success = await window.mobileContextEditor.modifyMessage(0, originalContent);
           if (success) {
-            console.log('[Live App] ✅ 渲染权已清除');
+            console.log('[Watch Live App] ✅ 渲染权已清除');
             return true;
           } else {
-            console.error('[Live App] 清除渲染权失败');
+            console.error('[Watch Live App] 清除渲染权失败');
             return false;
           }
         } else {
-          console.log('[Live App] 没有找到渲染权标记');
+          console.log('[Watch Live App] 没有找到渲染权标记');
           return true;
         }
       } catch (error) {
-        console.error('[Live App] 清除渲染权时出错:', error);
+        console.error('[Watch Live App] 清除渲染权时出错:', error);
         return false;
       }
     }
@@ -2115,118 +2909,112 @@ if (typeof window.LiveApp === 'undefined') {
   }
 
   // 创建全局实例
-  window.LiveApp = LiveApp;
-  window.liveApp = new LiveApp();
+  window.WatchLiveApp = WatchLiveApp;
+  window.watchLiveApp = new WatchLiveApp();
 } // 结束类定义检查
 
 // 全局函数供调用
-window.getLiveAppContent = function () {
-  console.log('[Live App] 获取直播应用内容');
+window.getWatchLiveAppContent = function () {
+  console.log('[Watch Live App] 获取观看直播应用内容');
 
-  if (!window.liveApp) {
-    console.error('[Live App] liveApp实例不存在');
-    return '<div class="error-message">直播应用加载失败</div>';
+  if (!window.watchLiveApp) {
+    console.error('[Watch Live App] watchLiveApp实例不存在');
+    return '<div class="error-message">观看直播应用加载失败</div>';
   }
 
   try {
     // 每次获取内容时都重新检测活跃直播状态
-    window.liveApp.detectActiveLive();
-    return window.liveApp.getAppContent();
+    window.watchLiveApp.detectActiveLive();
+    return window.watchLiveApp.getAppContent();
   } catch (error) {
-    console.error('[Live App] 获取应用内容失败:', error);
-    return '<div class="error-message">直播应用内容加载失败</div>';
+    console.error('[Watch Live App] 获取应用内容失败:', error);
+    return '<div class="error-message">观看直播应用内容加载失败</div>';
   }
 };
 
-window.bindLiveAppEvents = function () {
-  console.log('[Live App] 绑定直播应用事件');
+window.bindWatchLiveAppEvents = function () {
+  console.log('[Watch Live App] 绑定观看直播应用事件');
 
-  if (!window.liveApp) {
-    console.error('[Live App] liveApp实例不存在');
+  if (!window.watchLiveApp) {
+    console.error('[Watch Live App] watchLiveApp实例不存在');
     return;
   }
 
   try {
     // 延迟绑定，确保DOM完全加载
     setTimeout(() => {
-      window.liveApp.bindEvents();
-      window.liveApp.updateHeader();
+      window.watchLiveApp.bindEvents();
+      window.watchLiveApp.updateHeader();
     }, 100);
   } catch (error) {
-    console.error('[Live App] 绑定事件失败:', error);
+    console.error('[Watch Live App] 绑定事件失败:', error);
   }
 };
 
 // 其他全局函数
-window.liveAppStartLive = function (interaction) {
-  if (window.liveApp) {
-    window.liveApp.startLive(interaction);
+window.watchLiveAppEndLive = function () {
+  if (window.watchLiveApp) {
+    window.watchLiveApp.endLive();
   }
 };
 
-window.liveAppEndLive = function () {
-  if (window.liveApp) {
-    window.liveApp.endLive();
+window.watchLiveAppShowModal = function (modalId) {
+  if (window.watchLiveApp) {
+    window.watchLiveApp.showModal(modalId);
   }
 };
 
-window.liveAppShowModal = function (modalId) {
-  if (window.liveApp) {
-    window.liveApp.showModal(modalId);
+window.watchLiveAppHideModal = function (modalId) {
+  if (window.watchLiveApp) {
+    window.watchLiveApp.hideModal(modalId);
   }
 };
 
-window.liveAppHideModal = function (modalId) {
-  if (window.liveApp) {
-    window.liveApp.hideModal(modalId);
+window.watchLiveAppDestroy = function () {
+  if (window.watchLiveApp) {
+    window.watchLiveApp.destroy();
+    console.log('[Watch Live App] 应用已销毁');
   }
 };
 
-window.liveAppDestroy = function () {
-  if (window.liveApp) {
-    window.liveApp.destroy();
-    console.log('[Live App] 应用已销毁');
-  }
-};
-
-window.liveAppDetectActive = function () {
-  if (window.liveApp) {
-    console.log('[Live App] 🔍 手动检测活跃直播状态...');
-    window.liveApp.detectActiveLive();
+window.watchLiveAppDetectActive = function () {
+  if (window.watchLiveApp) {
+    console.log('[Watch Live App] 🔍 手动检测活跃直播状态...');
+    window.watchLiveApp.detectActiveLive();
 
     // 更新界面
-    if (typeof window.bindLiveAppEvents === 'function') {
-      window.bindLiveAppEvents();
+    if (typeof window.bindWatchLiveAppEvents === 'function') {
+      window.bindWatchLiveAppEvents();
     }
 
-    console.log('[Live App] ✅ 检测完成，当前状态:', {
-      view: window.liveApp.currentView,
-      isLiveActive: window.liveApp.isLiveActive,
+    console.log('[Watch Live App] ✅ 检测完成，当前状态:', {
+      view: window.watchLiveApp.currentView,
+      isLiveActive: window.watchLiveApp.isLiveActive,
     });
   } else {
-    console.error('[Live App] liveApp实例不存在');
+    console.error('[Watch Live App] watchLiveApp实例不存在');
   }
 };
 
-window.liveAppForceReload = function () {
-  console.log('[Live App] 🔄 强制重新加载应用...');
+window.watchLiveAppForceReload = function () {
+  console.log('[Watch Live App] 🔄 强制重新加载应用...');
 
   // 先销毁旧实例
-  if (window.liveApp) {
-    window.liveApp.destroy();
+  if (window.watchLiveApp) {
+    window.watchLiveApp.destroy();
   }
 
   // 创建新实例
-  window.liveApp = new LiveApp();
-  console.log('[Live App] ✅ 应用已重新加载');
+  window.watchLiveApp = new WatchLiveApp();
+  console.log('[Watch Live App] ✅ 应用已重新加载');
 };
 
 // 测试转换功能
-window.liveAppTestConversion = function () {
-  console.log('[Live App] 🧪 测试转换功能...');
+window.watchLiveAppTestConversion = function () {
+  console.log('[Watch Live App] 🧪 测试转换功能...');
 
-  if (!window.liveApp) {
-    console.error('[Live App] liveApp实例不存在');
+  if (!window.watchLiveApp) {
+    console.error('[Watch Live App] watchLiveApp实例不存在');
     return;
   }
 
@@ -2240,19 +3028,19 @@ window.liveAppTestConversion = function () {
 测试结束`;
 
   console.log('原始内容:', testContent);
-  const converted = window.liveApp.convertLiveFormats(testContent);
+  const converted = window.watchLiveApp.convertLiveFormats(testContent);
   console.log('转换后内容:', converted);
 
   return converted;
 };
 
 // 测试布局高度
-window.liveAppTestLayout = function () {
-  console.log('[Live App] 📐 测试布局高度...');
+window.watchLiveAppTestLayout = function () {
+  console.log('[Watch Live App] 📐 测试布局高度...');
 
   const appContent = document.getElementById('app-content');
   if (!appContent) {
-    console.error('[Live App] app-content元素不存在');
+    console.error('[Watch Live App] app-content元素不存在');
     return;
   }
 
@@ -2308,7 +3096,7 @@ window.liveAppTestLayout = function () {
     measurements.danmakuContainer &&
     measurements.danmakuContainer.scrollHeight > measurements.danmakuContainer.clientHeight;
 
-  console.log('[Live App] 📐 布局检查:');
+  console.log('[Watch Live App] 📐 布局检查:');
   console.log(`- 容器是否溢出: ${hasOverflow ? '❌ 是' : '✅ 否'}`);
   console.log(`- 弹幕是否可滚动: ${danmakuCanScroll ? '✅ 是' : '❌ 否'}`);
 
@@ -2316,26 +3104,27 @@ window.liveAppTestLayout = function () {
 };
 
 // 测试函数
-window.liveAppTest = function () {
-  console.log('[Live App] 🧪 开始测试直播应用...');
+window.watchLiveAppTest = function () {
+  console.log('[Watch Live App] 🧪 开始测试观看直播应用...');
 
   const tests = [
     {
-      name: '检查LiveApp类是否存在',
-      test: () => typeof window.LiveApp === 'function',
+      name: '检查WatchLiveApp类是否存在',
+      test: () => typeof window.WatchLiveApp === 'function',
     },
     {
-      name: '检查liveApp实例是否存在',
-      test: () => window.liveApp instanceof window.LiveApp,
+      name: '检查watchLiveApp实例是否存在',
+      test: () => window.watchLiveApp instanceof window.WatchLiveApp,
     },
     {
       name: '检查全局函数是否存在',
-      test: () => typeof window.getLiveAppContent === 'function' && typeof window.bindLiveAppEvents === 'function',
+      test: () =>
+        typeof window.getWatchLiveAppContent === 'function' && typeof window.bindWatchLiveAppEvents === 'function',
     },
     {
       name: '检查数据解析器',
       test: () => {
-        const parser = new window.LiveApp().dataParser;
+        const parser = new window.WatchLiveApp().dataParser;
         const testData = parser.parseLiveData('[直播|本场人数|1234][直播|直播内容|测试内容][直播|用户1|弹幕|测试弹幕]');
         return (
           testData.viewerCount === '1.2K' && testData.liveContent === '测试内容' && testData.danmakuList.length === 1
@@ -2345,14 +3134,14 @@ window.liveAppTest = function () {
     {
       name: '检查应用内容生成',
       test: () => {
-        const content = window.getLiveAppContent();
+        const content = window.getWatchLiveAppContent();
         return typeof content === 'string' && content.includes('live-app');
       },
     },
     {
       name: '检查活跃直播检测',
       test: () => {
-        const app = new window.LiveApp();
+        const app = new window.WatchLiveApp();
         const testContent1 = '[直播|本场人数|1234][直播|直播内容|测试内容]';
         const testContent2 = '[直播历史|本场人数|1234][直播历史|直播内容|测试内容]';
         const testContent3 = '没有直播内容的普通聊天';
@@ -2385,21 +3174,21 @@ window.liveAppTest = function () {
     }
   });
 
-  console.log(`[Live App] 🧪 测试完成: ${passed} 通过, ${failed} 失败`);
+  console.log(`[Watch Live App] 🧪 测试完成: ${passed} 通过, ${failed} 失败`);
 
   if (failed === 0) {
-    console.log('[Live App] 🎉 所有测试通过！直播应用已准备就绪');
+    console.log('[Watch Live App] 🎉 所有测试通过！观看直播应用已准备就绪');
   } else {
-    console.log('[Live App] ⚠️ 部分测试失败，请检查相关功能');
+    console.log('[Watch Live App] ⚠️ 部分测试失败，请检查相关功能');
   }
 
   return { passed, failed, total: tests.length };
 };
 
-console.log('[Live App] 直播应用模块加载完成');
-console.log('[Live App] 💡 可用的函数:');
-console.log('[Live App] - liveAppTest() 测试应用功能');
-console.log('[Live App] - liveAppTestConversion() 测试格式转换功能');
-console.log('[Live App] - liveAppTestLayout() 测试布局高度');
-console.log('[Live App] - liveAppDetectActive() 手动检测活跃直播状态');
-console.log('[Live App] - liveAppForceReload() 强制重新加载应用');
+console.log('[Watch Live App] 观看直播应用模块加载完成');
+console.log('[Watch Live App] 💡 可用的函数:');
+console.log('[Watch Live App] - watchLiveAppTest() 测试应用功能');
+console.log('[Watch Live App] - watchLiveAppTestConversion() 测试格式转换功能');
+console.log('[Watch Live App] - watchLiveAppTestLayout() 测试布局高度');
+console.log('[Watch Live App] - watchLiveAppDetectActive() 手动检测活跃直播状态');
+console.log('[Watch Live App] - watchLiveAppForceReload() 强制重新加载应用');

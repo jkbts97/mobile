@@ -1,0 +1,251 @@
+       // 将直播格式转换为直播历史格式
+        async convertLiveToHistory() {
+            try {
+                console.log('[Live App] 开始转换直播格式为直播历史格式');
+
+                // 获取当前聊天数据
+                const contextData = this.getChatData();
+                if (!contextData || contextData.length === 0) {
+                    console.log('[Live App] 没有找到聊天数据');
+                    return;
+                }
+
+                // 查找包含直播内容的消息
+                let hasLiveContent = false;
+                let updatedCount = 0;
+
+                for (let i = 0; i < contextData.length; i++) {
+                    const message = contextData[i];
+                    const content = message.mes || message.content || '';
+
+                    if (content.includes('[直播|')) {
+                        hasLiveContent = true;
+                        // 转换格式
+                        const convertedContent = this.convertLiveFormats(content);
+
+                        if (convertedContent !== content) {
+                            // 尝试通过编辑器功能更新消息
+                            const success = await this.updateMessageContent(i, convertedContent);
+                            if (success) {
+                                updatedCount++;
+                                console.log(`[Live App] 已转换消息 ${i}，原始长度: ${content.length}，转换后长度: ${convertedContent.length}`);
+                            }
+                        }
+                    }
+                }
+
+                if (!hasLiveContent) {
+                    console.log('[Live App] 没有找到需要转换的直播内容');
+                } else {
+                    console.log(`[Live App] 直播格式转换完成，共更新了 ${updatedCount} 条消息`);
+
+                    // 保存聊天数据
+                    if (updatedCount > 0) {
+                        await this.saveChatData();
+                        console.log('[Live App] 转换完成并已保存聊天数据');
+                    }
+                }
+
+            } catch (error) {
+                console.error('[Live App] 转换直播格式失败:', error);
+                // 显示错误提示
+                this.showToast('转换直播格式失败: ' + error.message, 'error');
+            }
+        }
+
+        // 转换直播格式字符串
+        convertLiveFormats(content) {
+            // 转换所有直播格式
+            let convertedContent = content;
+            let conversionCount = 0;
+
+            // 转换弹幕格式: [直播|用户|弹幕|内容] -> [直播历史|用户|弹幕|内容]
+            const danmuMatches = convertedContent.match(/\[直播\|([^|]+)\|弹幕\|([^\]]+)\]/g);
+            if (danmuMatches) {
+                convertedContent = convertedContent.replace(/\[直播\|([^|]+)\|弹幕\|([^\]]+)\]/g, '[直播历史|$1|弹幕|$2]');
+                conversionCount += danmuMatches.length;
+            }
+
+                    // 转换礼物格式: [直播|用户|礼物|内容] -> [直播历史|用户|礼物|内容]
+        // 转换打赏格式: [直播|用户|打赏|内容] -> [直播历史|用户|打赏|内容]
+        const giftMatches = convertedContent.match(/\[直播\|([^|]+)\|(?:礼物|打赏)\|([^\]]+)\]/g);
+        if (giftMatches) {
+            convertedContent = convertedContent.replace(/\[直播\|([^|]+)\|礼物\|([^\]]+)\]/g, '[直播历史|$1|礼物|$2]');
+            convertedContent = convertedContent.replace(/\[直播\|([^|]+)\|打赏\|([^\]]+)\]/g, '[直播历史|$1|打赏|$2]');
+            conversionCount += giftMatches.length;
+        }
+
+            // 转换推荐互动格式: [直播|推荐互动|内容] -> [直播历史|推荐互动|内容]
+            const recommendMatches = convertedContent.match(/\[直播\|推荐互动\|([^\]]+)\]/g);
+            if (recommendMatches) {
+                convertedContent = convertedContent.replace(/\[直播\|推荐互动\|([^\]]+)\]/g, '[直播历史|推荐互动|$1]');
+                conversionCount += recommendMatches.length;
+            }
+
+            // 转换本场人数格式: [直播|本场人数|数字] -> [直播历史|本场人数|数字]
+            const audienceMatches = convertedContent.match(/\[直播\|本场人数\|(\d+)\]/g);
+            if (audienceMatches) {
+                convertedContent = convertedContent.replace(/\[直播\|本场人数\|(\d+)\]/g, '[直播历史|本场人数|$1]');
+                conversionCount += audienceMatches.length;
+            }
+
+                    // 转换其他可能的直播格式 (兼容旧格式)
+        const otherMatches = convertedContent.match(/\[直播\|([^|]+)\|([^\]]+)\]/g);
+        if (otherMatches) {
+            // 排除已经处理过的格式
+            const filteredMatches = otherMatches.filter(match =>
+                !match.includes('弹幕|') &&
+                !match.includes('礼物|') &&
+                !match.includes('打赏|') &&
+                !match.includes('推荐互动|') &&
+                !match.includes('本场人数|')
+            );
+            if (filteredMatches.length > 0) {
+                convertedContent = convertedContent.replace(/\[直播\|([^|]+)\|([^\]]+)\]/g, (match, p1, p2) => {
+                    if (!match.includes('弹幕|') &&
+                        !match.includes('礼物|') &&
+                        !match.includes('打赏|') &&
+                        !match.includes('推荐互动|') &&
+                        !match.includes('本场人数|')) {
+                        return `[直播历史|${p1}|${p2}]`;
+                    }
+                    return match;
+                });
+                conversionCount += filteredMatches.length;
+            }
+        }
+
+            if (conversionCount > 0) {
+                console.log(`[Live App] 转换了 ${conversionCount} 个直播格式`);
+            }
+
+            return convertedContent;
+        }
+
+        // 更新消息内容
+        async updateMessageContent(messageIndex, newContent) {
+            try {
+                console.log(`[Live App] 正在更新消息 ${messageIndex}:`, newContent.substring(0, 100) + '...');
+
+                // 方法1: 使用全局chat数组直接更新
+                const chat = window['chat'];
+                if (chat && Array.isArray(chat) && chat[messageIndex]) {
+                    const originalContent = chat[messageIndex].mes;
+                    chat[messageIndex].mes = newContent;
+
+                    // 如果消息有swipes，也需要更新
+                    if (chat[messageIndex].swipes && chat[messageIndex].swipe_id !== undefined) {
+                        chat[messageIndex].swipes[chat[messageIndex].swipe_id] = newContent;
+                    }
+
+                    // 标记聊天数据已被修改
+                    if (window.chat_metadata) {
+                        window.chat_metadata.tainted = true;
+                    }
+
+                    console.log(`[Live App] 已更新消息 ${messageIndex}，原内容长度:${originalContent.length}，新内容长度:${newContent.length}`);
+                    return true;
+                }
+
+                // 方法2: 尝试通过编辑器功能更新
+                if (window.mobileContextEditor && window.mobileContextEditor.modifyMessage) {
+                    await window.mobileContextEditor.modifyMessage(messageIndex, newContent);
+                    return true;
+                }
+
+                // 方法3: 尝试通过context-editor更新
+                if (window.contextEditor && window.contextEditor.modifyMessage) {
+                    await window.contextEditor.modifyMessage(messageIndex, newContent);
+                    return true;
+                }
+
+                console.warn('[Live App] 没有找到有效的消息更新方法');
+                return false;
+            } catch (error) {
+                console.error('[Live App] 更新消息内容失败:', error);
+                return false;
+            }
+        }
+
+        // 保存聊天数据
+        async saveChatData() {
+            try {
+                console.log('[Live App] 开始保存聊天数据...');
+
+                // 方法1: 使用SillyTavern的保存函数
+                if (typeof window.saveChatConditional === 'function') {
+                    await window.saveChatConditional();
+                    console.log('[Live App] 已通过saveChatConditional保存聊天数据');
+                    return true;
+                }
+
+                // 方法2: 使用延迟保存
+                if (typeof window.saveChatDebounced === 'function') {
+                    window.saveChatDebounced();
+                    console.log('[Live App] 已通过saveChatDebounced保存聊天数据');
+                    // 等待一下确保保存完成
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return true;
+                }
+
+                // 方法3: 使用编辑器的保存功能
+                if (window.mobileContextEditor && typeof window.mobileContextEditor.saveChatData === 'function') {
+                    await window.mobileContextEditor.saveChatData();
+                    console.log('[Live App] 已通过mobileContextEditor保存聊天数据');
+                    return true;
+                }
+
+                // 方法4: 使用context-editor的保存功能
+                if (window.contextEditor && typeof window.contextEditor.saveChatData === 'function') {
+                    await window.contextEditor.saveChatData();
+                    console.log('[Live App] 已通过contextEditor保存聊天数据');
+                    return true;
+                }
+
+                // 方法5: 尝试手动保存
+                try {
+                    if (window.jQuery && window.chat && window.this_chid) {
+                        const response = await window.jQuery.ajax({
+                            type: 'POST',
+                            url: '/api/chats/save',
+                            data: JSON.stringify({
+                                ch_name: window.characters[window.this_chid]?.name || 'unknown',
+                                file_name: window.chat_metadata?.file_name || 'default',
+                                chat: window.chat,
+                                avatar_url: window.characters[window.this_chid]?.avatar || 'none'
+                            }),
+                            cache: false,
+                            dataType: 'json',
+                            contentType: 'application/json'
+                        });
+                        console.log('[Live App] 已通过手动AJAX保存聊天数据');
+                        return true;
+                    }
+                } catch (ajaxError) {
+                    console.warn('[Live App] 手动AJAX保存失败:', ajaxError);
+                }
+
+                console.warn('[Live App] 没有找到有效的保存方法');
+                return false;
+            } catch (error) {
+                console.error('[Live App] 保存聊天数据失败:', error);
+                return false;
+            }
+        }
+
+        // 测试转换功能
+        testConversion() {
+            const testContent = `这是一条测试消息
+[直播|小明|弹幕|主播你好！今天吃的什么呀？]
+[直播|小红|礼物|璀璨火箭*2]
+[直播|推荐互动|回答小明的弹幕问题]
+[直播|推荐互动|感谢小红的礼物]
+[直播|本场人数|55535]
+测试结束`;
+
+            console.log('原始内容:', testContent);
+            const converted = this.convertLiveFormats(testContent);
+            console.log('转换后内容:', converted);
+
+            return converted;
+        }

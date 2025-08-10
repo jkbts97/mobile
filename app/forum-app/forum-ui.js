@@ -391,14 +391,27 @@ class ForumUI {
      * 绑定事件
      */
     bindEvents() {
+        // 移除之前的事件监听器（如果存在）
+        if (this.clickHandler) {
+            document.removeEventListener('click', this.clickHandler);
+        }
+
         // 帖子点击事件
-        document.addEventListener('click', (e) => {
+        this.clickHandler = (e) => {
+            // 只处理论坛内容区域的点击事件
+            const forumContent = document.getElementById('forum-content');
+            if (!forumContent || !forumContent.contains(e.target)) {
+                return;
+            }
+
             if (e.target.closest('.thread-item')) {
                 const threadItem = e.target.closest('.thread-item');
                 const threadId = threadItem.dataset.threadId;
                 this.showThreadDetail(threadId);
             }
-        });
+        };
+
+        document.addEventListener('click', this.clickHandler);
 
         // 发帖按钮
         const newPostBtn = document.getElementById('new-post-btn');
@@ -475,11 +488,17 @@ class ForumUI {
                     threadId: threadId
                 };
                 window.mobilePhone.pushAppState(state);
+                console.log('[Forum UI] 推送帖子详情状态:', state);
             }
         }
 
         // 更新内容
-        document.getElementById('forum-content').innerHTML = this.getThreadDetailHTML(threadId);
+        const forumContent = document.getElementById('forum-content');
+        if (forumContent) {
+            forumContent.innerHTML = this.getThreadDetailHTML(threadId);
+        } else {
+            console.error('[Forum UI] 找不到forum-content元素');
+        }
 
         // 绑定回复事件
         this.bindReplyEvents();
@@ -834,7 +853,31 @@ class ForumUI {
      */
     showMainList() {
         this.currentThreadId = null;
-        document.getElementById('forum-content').innerHTML = this.getThreadListHTML();
+
+        // 更新状态到论坛主列表
+        if (window.mobilePhone) {
+            const currentState = window.mobilePhone.currentAppState;
+            if (currentState && currentState.app === 'forum' && currentState.view !== 'main') {
+                const mainState = {
+                    app: 'forum',
+                    title: '论坛',
+                    view: 'main'
+                };
+                // 替换当前状态而不是推送新状态
+                window.mobilePhone.currentAppState = mainState;
+                window.mobilePhone.updateAppHeader(mainState);
+                console.log('[Forum UI] 更新状态到论坛主列表:', mainState);
+            }
+        }
+
+        const forumContent = document.getElementById('forum-content');
+        if (forumContent) {
+            forumContent.innerHTML = this.getThreadListHTML();
+            // 重新绑定主列表事件
+            if (window.bindForumEvents) {
+                window.bindForumEvents();
+            }
+        }
     }
 
     /**
@@ -855,6 +898,18 @@ class ForumUI {
         if (!window.mobilePhone && window.forumManager) {
             window.forumManager.showForumPanel();
         }
+    }
+
+    // 重置论坛UI状态
+    resetState() {
+        console.log('[Forum UI] 重置论坛UI状态');
+        this.currentThreadId = null;
+        this.currentView = 'main';
+
+        // 重置到主列表视图
+        this.showMainList();
+
+        console.log('[Forum UI] 论坛UI状态重置完成');
     }
 }
 

@@ -574,7 +574,7 @@ if (typeof window.LiveApp === 'undefined') {
       this.danmakuList = [];
       this.giftList = [];
       this.recommendedInteractions = [];
-      // 移除弹幕数量限制，显示所有历史弹幕
+      this.maxDanmakuCount = 100; // 最大弹幕数量
     }
 
     /**
@@ -639,8 +639,12 @@ if (typeof window.LiveApp === 'undefined') {
           this.danmakuList = this.danmakuList.concat(newDanmaku);
           console.log(`[Live App] 添加 ${newDanmaku.length} 条新弹幕，总计 ${this.danmakuList.length} 条`);
 
-          // 移除弹幕数量限制，保留所有历史弹幕
-          console.log(`[Live App] 保留所有弹幕，当前总数: ${this.danmakuList.length}`);
+          // 限制弹幕数量
+          if (this.danmakuList.length > this.maxDanmakuCount) {
+            const removed = this.danmakuList.length - this.maxDanmakuCount;
+            this.danmakuList = this.danmakuList.slice(-this.maxDanmakuCount);
+            console.log(`[Live App] 移除 ${removed} 条旧弹幕，保持最大数量 ${this.maxDanmakuCount}`);
+          }
         }
       }
 
@@ -718,17 +722,6 @@ if (typeof window.LiveApp === 'undefined') {
     init() {
       console.log('[Live App] 直播应用初始化开始');
 
-      // 检查渲染权状态
-      const renderingRight = this.getRenderingRight();
-      console.log('[Live App] 当前渲染权状态:', renderingRight);
-
-      // 如果渲染权不是live或end，不进行检测
-      if (renderingRight && renderingRight !== 'live' && renderingRight !== 'end') {
-        console.log('[Live App] 渲染权不匹配，跳过初始化检测');
-        this.isInitialized = true;
-        return;
-      }
-
       // 检测是否有活跃的直播数据
       this.detectActiveLive();
 
@@ -743,10 +736,10 @@ if (typeof window.LiveApp === 'undefined') {
       try {
         console.log('[Live App] 检测活跃的直播数据...');
 
-        // 检查渲染权
-        const renderingRight = this.getRenderingRight();
-        if (renderingRight && renderingRight !== 'live' && renderingRight !== 'end') {
-          console.log(`[Live App] 渲染权被${renderingRight}占用，跳过检测`);
+        // 检查渲染权限
+        const renderPermission = this.getRenderPermission();
+        if (renderPermission && renderPermission !== 'live') {
+          console.log('[Live App] 渲染权限被其他应用占用:', renderPermission, '跳过检测');
           return;
         }
 
@@ -760,8 +753,11 @@ if (typeof window.LiveApp === 'undefined') {
         // 检查是否有活跃的直播格式（非历史格式）
         const hasActiveLive = this.hasActiveLiveFormats(chatContent);
 
-        if (hasActiveLive && renderingRight === 'live') {
+        if (hasActiveLive) {
           console.log('[Live App] 🎯 检测到活跃的直播数据，自动进入直播中状态');
+
+          // 设置渲染权限为live
+          this.setRenderPermission('live');
 
           // 设置为直播中状态
           this.stateManager.startLive();
@@ -771,8 +767,10 @@ if (typeof window.LiveApp === 'undefined') {
           const liveData = this.dataParser.parseLiveData(chatContent);
           this.stateManager.updateLiveData(liveData);
 
-          // 开始监听新的消息
-          this.eventListener.startListening();
+          // 只有当渲染权限确实是live时才开始监听
+          if (this.getRenderPermission() === 'live') {
+            this.eventListener.startListening();
+          }
 
           console.log('[Live App] ✅ 已自动恢复直播状态，数据:', {
             viewerCount: this.stateManager.currentViewerCount,
@@ -784,7 +782,7 @@ if (typeof window.LiveApp === 'undefined') {
             interactionCount: this.stateManager.recommendedInteractions.length,
           });
         } else {
-          console.log('[Live App] 没有检测到活跃的直播数据或渲染权不匹配，保持开始直播状态');
+          console.log('[Live App] 没有检测到活跃的直播数据，保持开始直播状态');
         }
       } catch (error) {
         console.error('[Live App] 检测活跃直播数据失败:', error);
@@ -833,8 +831,8 @@ if (typeof window.LiveApp === 'undefined') {
       try {
         console.log('[Live App] 开始直播，初始互动:', initialInteraction);
 
-        // 设置渲染权为live
-        await this.setRenderingRight('live');
+        // 设置渲染权限为live
+        this.setRenderPermission('live');
 
         // 更新状态
         this.stateManager.startLive();
@@ -865,14 +863,14 @@ if (typeof window.LiveApp === 'undefined') {
       try {
         console.log('[Live App] 结束直播');
 
-        // 设置渲染权为end，允许用户重新选择
-        await this.setRenderingRight('end');
-
         // 停止监听事件
         this.eventListener.stopListening();
 
         // 转换历史弹幕格式
         await this.convertLiveToHistory();
+
+        // 清除渲染权限
+        this.clearRenderPermission();
 
         // 更新状态
         this.stateManager.endLive();
@@ -1056,39 +1054,45 @@ if (typeof window.LiveApp === 'undefined') {
     renderStartView() {
       return `
         <div class="live-app">
-          <div class="live-main-container">
-            <div class="live-main-header">
-              <h2>直播中心</h2>
+          <div class="start-live-container">
+            <div class="start-live-header">
+              <h2>直播平台</h2>
               <p>选择你想要的直播功能</p>
             </div>
 
-            <div class="live-options">
-              <div class="live-option-card" id="start-streaming-option">
-                <div class="option-icon">🎥</div>
-                <div class="option-content">
+            <div class="live-modules-container">
+              <!-- 我要直播模块 -->
+              <div class="live-module start-streaming-module">
+                <div class="module-icon">📺</div>
+                <div class="module-content">
                   <h3>我要直播</h3>
                   <p>开始你的直播之旅</p>
+                  <button class="module-btn start-streaming-btn" id="start-streaming-btn">
+                    开始直播
+                  </button>
                 </div>
-                <div class="option-arrow">→</div>
               </div>
 
-              <div class="live-option-card" id="watch-streaming-option">
-                <div class="option-icon">📺</div>
-                <div class="option-content">
+              <!-- 观看直播模块 -->
+              <div class="live-module watch-streaming-module">
+                <div class="module-icon">👀</div>
+                <div class="module-content">
                   <h3>观看直播</h3>
-                  <p>观看其他主播的精彩直播</p>
+                  <p>发现精彩的直播内容</p>
+                  <button class="module-btn watch-streaming-btn" id="watch-streaming-btn">
+                    观看直播
+                  </button>
                 </div>
-                <div class="option-arrow">→</div>
               </div>
             </div>
           </div>
 
           <!-- 开始直播弹窗 -->
-          <div class="modal" id="start-live-modal" style="display: none;">
+          <div class="live-modal" id="start-live-modal" style="display: none;">
             <div class="modal-content">
               <div class="modal-header">
                 <h3>开始直播</h3>
-                <button class="modal-close-btn">&times;</button>
+                <button class="modal-close" id="close-start-modal">&times;</button>
               </div>
               <div class="modal-body">
                 <div class="custom-interaction-section">
@@ -1098,7 +1102,6 @@ if (typeof window.LiveApp === 'undefined') {
                     rows="3"
                   ></textarea>
                 </div>
-
                 <div class="preset-interactions">
                   <h4>预设互动</h4>
                   <div class="preset-buttons">
@@ -1116,7 +1119,6 @@ if (typeof window.LiveApp === 'undefined') {
                     </button>
                   </div>
                 </div>
-
                 <button class="start-live-btn" id="start-custom-live">
                   开始直播
                 </button>
@@ -1250,30 +1252,34 @@ if (typeof window.LiveApp === 'undefined') {
       try {
         // 开始直播相关事件
         if (this.currentView === 'start') {
-          // 我要直播选项卡
-          const startStreamingOption = appContainer.querySelector('#start-streaming-option');
-          if (startStreamingOption) {
-            startStreamingOption.addEventListener('click', async () => {
-              // 设置渲染权为live
-              await this.setRenderingRight('live');
+          // 开始直播模块按钮
+          const startStreamingBtn = appContainer.querySelector('#start-streaming-btn');
+          if (startStreamingBtn) {
+            startStreamingBtn.addEventListener('click', () => {
               this.showModal('start-live-modal');
             });
           }
 
-          // 观看直播选项卡
-          const watchStreamingOption = appContainer.querySelector('#watch-streaming-option');
-          if (watchStreamingOption) {
-            watchStreamingOption.addEventListener('click', async () => {
-              // 设置渲染权为watch
-              await this.setRenderingRight('watch');
-              // 跳转到观看直播应用
+          // 观看直播模块按钮
+          const watchStreamingBtn = appContainer.querySelector('#watch-streaming-btn');
+          if (watchStreamingBtn) {
+            watchStreamingBtn.addEventListener('click', () => {
+              // 打开观看直播应用
               if (window.mobilePhone && window.mobilePhone.openApp) {
                 window.mobilePhone.openApp('watch-live');
               }
             });
           }
 
-          // 自定义开始直播按钮（在弹窗中）
+          // 弹窗关闭按钮
+          const closeStartModal = appContainer.querySelector('#close-start-modal');
+          if (closeStartModal) {
+            closeStartModal.addEventListener('click', () => {
+              this.hideModal('start-live-modal');
+            });
+          }
+
+          // 自定义开始直播按钮
           const customStartBtn = appContainer.querySelector('#start-custom-live');
           if (customStartBtn) {
             customStartBtn.addEventListener('click', () => {
@@ -1288,7 +1294,7 @@ if (typeof window.LiveApp === 'undefined') {
             });
           }
 
-          // 预设互动按钮（在弹窗中）
+          // 预设互动按钮
           appContainer.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', () => {
               const interaction = btn.dataset.interaction;
@@ -1408,128 +1414,6 @@ if (typeof window.LiveApp === 'undefined') {
         modal.style.display = 'none';
         modal.classList.remove('active');
       });
-    }
-
-    /**
-     * 设置渲染权
-     */
-    async setRenderingRight(type) {
-      try {
-        console.log(`[Live App] 设置渲染权为: ${type}`);
-
-        if (!window.mobileContextEditor) {
-          console.warn('[Live App] 上下文编辑器未就绪，无法设置渲染权');
-          return false;
-        }
-
-        const chatData = window.mobileContextEditor.getCurrentChatData();
-        if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-          console.warn('[Live App] 无聊天数据，无法设置渲染权');
-          return false;
-        }
-
-        const firstMessage = chatData.messages[0];
-        let originalContent = firstMessage.mes || '';
-
-        // 检查是否已经包含渲染权标记
-        const renderingRightRegex = /<!-- LIVE_RENDERING_RIGHT_START -->([\s\S]*?)<!-- LIVE_RENDERING_RIGHT_END -->/;
-        const renderingRightSection = `<!-- LIVE_RENDERING_RIGHT_START -->\n[直播渲染权: ${type}]\n<!-- LIVE_RENDERING_RIGHT_END -->`;
-
-        if (renderingRightRegex.test(originalContent)) {
-          // 更新现有的渲染权标记
-          originalContent = originalContent.replace(renderingRightRegex, renderingRightSection);
-        } else {
-          // 在内容开头添加渲染权标记
-          originalContent = renderingRightSection + '\n\n' + originalContent;
-        }
-
-        // 更新第1楼层
-        const success = await window.mobileContextEditor.modifyMessage(0, originalContent);
-        if (success) {
-          console.log(`[Live App] ✅ 渲染权已设置为: ${type}`);
-          return true;
-        } else {
-          console.error('[Live App] 设置渲染权失败');
-          return false;
-        }
-      } catch (error) {
-        console.error('[Live App] 设置渲染权时出错:', error);
-        return false;
-      }
-    }
-
-    /**
-     * 获取当前渲染权
-     */
-    getRenderingRight() {
-      try {
-        if (!window.mobileContextEditor) {
-          return null;
-        }
-
-        const chatData = window.mobileContextEditor.getCurrentChatData();
-        if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-          return null;
-        }
-
-        const firstMessage = chatData.messages[0];
-        const content = firstMessage.mes || '';
-
-        const renderingRightRegex =
-          /<!-- LIVE_RENDERING_RIGHT_START -->\s*\[直播渲染权:\s*(\w+)\]\s*<!-- LIVE_RENDERING_RIGHT_END -->/;
-        const match = content.match(renderingRightRegex);
-
-        return match ? match[1] : null;
-      } catch (error) {
-        console.error('[Live App] 获取渲染权时出错:', error);
-        return null;
-      }
-    }
-
-    /**
-     * 清除渲染权
-     */
-    async clearRenderingRight() {
-      try {
-        console.log('[Live App] 清除渲染权');
-
-        if (!window.mobileContextEditor) {
-          console.warn('[Live App] 上下文编辑器未就绪，无法清除渲染权');
-          return false;
-        }
-
-        const chatData = window.mobileContextEditor.getCurrentChatData();
-        if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-          console.warn('[Live App] 无聊天数据，无法清除渲染权');
-          return false;
-        }
-
-        const firstMessage = chatData.messages[0];
-        let originalContent = firstMessage.mes || '';
-
-        // 移除渲染权标记
-        const renderingRightRegex =
-          /<!-- LIVE_RENDERING_RIGHT_START -->([\s\S]*?)<!-- LIVE_RENDERING_RIGHT_END -->\s*\n*/;
-        if (renderingRightRegex.test(originalContent)) {
-          originalContent = originalContent.replace(renderingRightRegex, '').trim();
-
-          // 更新第1楼层
-          const success = await window.mobileContextEditor.modifyMessage(0, originalContent);
-          if (success) {
-            console.log('[Live App] ✅ 渲染权已清除');
-            return true;
-          } else {
-            console.error('[Live App] 清除渲染权失败');
-            return false;
-          }
-        } else {
-          console.log('[Live App] 没有找到渲染权标记');
-          return true;
-        }
-      } catch (error) {
-        console.error('[Live App] 清除渲染权时出错:', error);
-        return false;
-      }
     }
 
     /**
@@ -1969,6 +1853,54 @@ if (typeof window.LiveApp === 'undefined') {
     }
 
     /**
+     * 设置渲染权限
+     */
+    setRenderPermission(permission) {
+      try {
+        // 获取当前聊天的元数据
+        const context = window.SillyTavern?.getContext?.();
+        if (context && context.chat_metadata) {
+          context.chat_metadata.live_render_permission = permission;
+          console.log('[Live App] 设置渲染权限为:', permission);
+        } else {
+          console.warn('[Live App] 无法设置渲染权限，chat_metadata不可用');
+        }
+      } catch (error) {
+        console.error('[Live App] 设置渲染权限失败:', error);
+      }
+    }
+
+    /**
+     * 获取渲染权限
+     */
+    getRenderPermission() {
+      try {
+        const context = window.SillyTavern?.getContext?.();
+        if (context && context.chat_metadata) {
+          return context.chat_metadata.live_render_permission || null;
+        }
+      } catch (error) {
+        console.error('[Live App] 获取渲染权限失败:', error);
+      }
+      return null;
+    }
+
+    /**
+     * 清除渲染权限
+     */
+    clearRenderPermission() {
+      try {
+        const context = window.SillyTavern?.getContext?.();
+        if (context && context.chat_metadata) {
+          delete context.chat_metadata.live_render_permission;
+          console.log('[Live App] 已清除渲染权限');
+        }
+      } catch (error) {
+        console.error('[Live App] 清除渲染权限失败:', error);
+      }
+    }
+
+    /**
      * 销毁应用，清理资源
      */
     destroy() {
@@ -2173,12 +2105,6 @@ window.liveAppEndLive = function () {
 window.liveAppShowModal = function (modalId) {
   if (window.liveApp) {
     window.liveApp.showModal(modalId);
-  }
-};
-
-window.liveAppHideModal = function (modalId) {
-  if (window.liveApp) {
-    window.liveApp.hideModal(modalId);
   }
 };
 
