@@ -810,7 +810,7 @@ ${itemsList}
           .join('');
 
         // 拼接最终消息
-        const finalMessage = `我花费${totalPrice}元，获得了${itemNames}。${bagMessages}`;
+        const finalMessage = `用户在商城购买物品，花费${totalPrice}元（请正确更新用户账户余额变量，扣除用户本次的购物花费），获得了${itemNames}。${bagMessages}`;
         console.log('[Shop App] 最终发送消息:', finalMessage);
 
         // 使用与消息app相同的发送方式

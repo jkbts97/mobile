@@ -1337,28 +1337,28 @@ if (typeof window.LiveApp === 'undefined') {
             });
           }
 
-          // 弹窗关闭按钮
-          appContainer.querySelectorAll('.modal-close-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-              this.hideAllModals();
-            });
-          });
-
-          // 点击弹窗背景关闭
-          appContainer.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', e => {
-              if (e.target === modal) {
-                this.hideAllModals();
-              }
-            });
-          });
-
           // 自动"跳转"弹幕到底部（瞬时、仅在未在底部时触发）
           const danmakuContainer = appContainer.querySelector('#danmaku-container');
           if (danmakuContainer) {
             this.jumpToBottomIfNeeded(danmakuContainer);
           }
         }
+
+        // 弹窗关闭按钮（适用于所有视图）
+        appContainer.querySelectorAll('.modal-close-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            this.hideAllModals();
+          });
+        });
+
+        // 点击弹窗背景关闭（适用于所有视图）
+        appContainer.querySelectorAll('.modal').forEach(modal => {
+          modal.addEventListener('click', e => {
+            if (e.target === modal) {
+              this.hideAllModals();
+            }
+          });
+        });
 
         console.log('[Live App] 事件绑定完成');
       } catch (error) {

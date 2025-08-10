@@ -610,7 +610,33 @@ class MobilePhone {
       });
       headerRight.appendChild(viewBtn);
     } else if (state.app === 'backpack') {
-      // 背包应用：添加刷新和使用按钮
+      // 背包应用：添加分类、搜索和刷新按钮
+
+      // 分类按钮
+      const categoryBtn = document.createElement('button');
+      categoryBtn.className = 'app-header-btn';
+      categoryBtn.innerHTML = '分类';
+      categoryBtn.title = '展开分类';
+      categoryBtn.addEventListener('click', () => {
+        if (window.backpackAppToggleCategories) {
+          window.backpackAppToggleCategories();
+        }
+      });
+      headerRight.appendChild(categoryBtn);
+
+      // 搜索按钮
+      const searchBtn = document.createElement('button');
+      searchBtn.className = 'app-header-btn';
+      searchBtn.innerHTML = '🔍';
+      searchBtn.title = '搜索物品';
+      searchBtn.addEventListener('click', () => {
+        if (window.backpackAppToggleSearch) {
+          window.backpackAppToggleSearch();
+        }
+      });
+      headerRight.appendChild(searchBtn);
+
+      // 刷新按钮
       const refreshBtn = document.createElement('button');
       refreshBtn.className = 'app-header-btn';
       refreshBtn.innerHTML = '🔄';
