@@ -7,6 +7,11 @@ class ForumUI {
     this.currentThreadId = null;
     this.clickHandler = null;
     this.subReplyEventsbound = false;
+    this.likeClickHandler = null;
+    // 点赞数据存储 - 格式: { threadId: { likes: number, isLiked: boolean }, ... }
+    this.likesData = {};
+    // 回复点赞数据存储 - 格式: { replyId: { likes: number, isLiked: boolean }, ... }
+    this.replyLikesData = {};
 
     // 头像颜色数组
     this.avatarColors = [
@@ -286,9 +291,9 @@ class ForumUI {
                 </div>
                 <div class="thread-stats">
                     <div class="thread-actions">
-                        <button class="action-btn like-btn"><i class="far fa-heart"></i> ${
-                          Math.floor(Math.random() * 50) + 10
-                        }</button>
+                        <button class="action-btn like-btn" data-thread-id="${thread.id}">
+                            <i class="${this.getLikeIconClass(thread.id)} fa-heart"></i> ${this.getLikeCount(thread.id)}
+                        </button>
                         <button class="action-btn"><i class="far fa-comment-dots"></i> ${thread.replies.length}</button>
                     </div>
                 </div>
@@ -347,9 +352,9 @@ class ForumUI {
                     </div>
                     <p class="post-full-content">${this.formatContent(thread.content)}</p>
                     <div class="post-actions">
-                        <button class="action-btn like-btn"><i class="far fa-heart"></i> ${
-                          Math.floor(Math.random() * 50) + 10
-                        }</button>
+                        <button class="action-btn like-btn" data-thread-id="${thread.id}">
+                            <i class="${this.getLikeIconClass(thread.id)} fa-heart"></i> ${this.getLikeCount(thread.id)}
+                        </button>
                         <button class="action-btn"><i class="far fa-comment-dots"></i> ${replies.length}</button>
                     </div>
                 </div>
@@ -364,7 +369,7 @@ class ForumUI {
 
                 <!-- 回复输入框 -->
                 <div class="comment-input-bar">
-                    <input type="text" class="reply-input" id="reply-input" placeholder="留下你的可爱想法吧~">
+                    <input type="text" class="reply-input" id="reply-input" placeholder="留下你的想法吧">
                     <button class="action-btn submit-reply-btn" id="submit-reply-btn" style="color: var(--accent-pink); font-size: 16px;"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -403,9 +408,11 @@ class ForumUI {
                     </div>
                     <div class="reply-content">${this.formatContent(reply.content)}</div>
                     <div class="reply-actions">
-                        <button class="action-btn like-reply"><i class="far fa-heart"></i> ${Math.floor(
-                          Math.random() * 10,
-                        )}</button>
+                        <button class="action-btn like-reply" data-reply-id="${reply.id}">
+                            <i class="${this.getReplyLikeIconClass(reply.id)} fa-heart"></i> ${this.getReplyLikeCount(
+          reply.id,
+        )}
+                        </button>
                         <button class="action-btn reply-to-reply" data-reply-to="${
                           reply.author
                         }" data-floor="${floorNumber}" data-reply-id="${
@@ -551,6 +558,9 @@ class ForumUI {
 
     // 主回复按钮事件
     this.bindMainReplyEvents();
+
+    // 点赞按钮事件
+    this.bindLikeEvents();
   }
 
   /**
@@ -622,6 +632,46 @@ class ForumUI {
     // submit-reply-btn 的事件已在 bindMainReplyEvents() 中处理
     // 楼中楼事件已在 bindEvents() 中绑定，无需重复绑定
     // this.bindSubReplyEvents();
+  }
+
+  /**
+   * 绑定点赞事件
+   */
+  bindLikeEvents() {
+    // 移除之前的事件监听器（如果存在）
+    if (this.likeClickHandler) {
+      document.removeEventListener('click', this.likeClickHandler);
+    }
+
+    this.likeClickHandler = e => {
+      // 处理帖子点赞按钮点击
+      if (e.target.closest('.like-btn[data-thread-id]')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const button = e.target.closest('.like-btn[data-thread-id]');
+        const threadId = button.dataset.threadId;
+
+        if (threadId) {
+          this.toggleThreadLike(threadId);
+        }
+      }
+
+      // 处理回复点赞按钮点击
+      if (e.target.closest('.like-reply[data-reply-id]')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const button = e.target.closest('.like-reply[data-reply-id]');
+        const replyId = button.dataset.replyId;
+
+        if (replyId) {
+          this.toggleReplyLike(replyId);
+        }
+      }
+    };
+
+    document.addEventListener('click', this.likeClickHandler);
   }
 
   /**
@@ -1174,10 +1224,232 @@ class ForumUI {
     this.currentThreadId = null;
     this.currentView = 'main';
 
+    // 清理事件监听器
+    if (this.clickHandler) {
+      document.removeEventListener('click', this.clickHandler);
+      this.clickHandler = null;
+    }
+    if (this.likeClickHandler) {
+      document.removeEventListener('click', this.likeClickHandler);
+      this.likeClickHandler = null;
+    }
+    if (this.mainReplyClickHandler) {
+      document.removeEventListener('click', this.mainReplyClickHandler);
+      this.mainReplyClickHandler = null;
+    }
+
     // 重置到主列表视图
     this.showMainList();
 
     console.log('[Forum UI] 论坛UI状态重置完成');
+  }
+
+  /**
+   * 初始化帖子点赞数据
+   */
+  initThreadLikeData(threadId) {
+    if (!this.likesData[threadId]) {
+      this.likesData[threadId] = {
+        likes: Math.floor(Math.random() * 50) + 10, // 随机初始点赞数
+        isLiked: false,
+      };
+    }
+  }
+
+  /**
+   * 初始化回复点赞数据
+   */
+  initReplyLikeData(replyId) {
+    if (!this.replyLikesData[replyId]) {
+      this.replyLikesData[replyId] = {
+        likes: Math.floor(Math.random() * 10) + 1, // 随机初始点赞数
+        isLiked: false,
+      };
+    }
+  }
+
+  /**
+   * 获取帖子点赞数
+   */
+  getLikeCount(threadId) {
+    this.initThreadLikeData(threadId);
+    return this.likesData[threadId].likes;
+  }
+
+  /**
+   * 获取帖子点赞图标类名
+   */
+  getLikeIconClass(threadId) {
+    this.initThreadLikeData(threadId);
+    return this.likesData[threadId].isLiked ? 'fas' : 'far';
+  }
+
+  /**
+   * 获取回复点赞数
+   */
+  getReplyLikeCount(replyId) {
+    this.initReplyLikeData(replyId);
+    return this.replyLikesData[replyId].likes;
+  }
+
+  /**
+   * 获取回复点赞图标类名
+   */
+  getReplyLikeIconClass(replyId) {
+    this.initReplyLikeData(replyId);
+    return this.replyLikesData[replyId].isLiked ? 'fas' : 'far';
+  }
+
+  /**
+   * 切换帖子点赞状态
+   */
+  toggleThreadLike(threadId) {
+    this.initThreadLikeData(threadId);
+    const likeData = this.likesData[threadId];
+
+    if (likeData.isLiked) {
+      // 取消点赞
+      likeData.likes--;
+      likeData.isLiked = false;
+    } else {
+      // 点赞
+      likeData.likes++;
+      likeData.isLiked = true;
+    }
+
+    // 更新所有相关的点赞按钮
+    this.updateAllThreadLikeButtons(threadId);
+
+    return likeData;
+  }
+
+  /**
+   * 切换回复点赞状态
+   */
+  toggleReplyLike(replyId) {
+    this.initReplyLikeData(replyId);
+    const likeData = this.replyLikesData[replyId];
+
+    if (likeData.isLiked) {
+      // 取消点赞
+      likeData.likes--;
+      likeData.isLiked = false;
+    } else {
+      // 点赞
+      likeData.likes++;
+      likeData.isLiked = true;
+    }
+
+    // 更新所有相关的点赞按钮
+    this.updateAllReplyLikeButtons(replyId);
+
+    return likeData;
+  }
+
+  /**
+   * 更新所有帖子点赞按钮
+   */
+  updateAllThreadLikeButtons(threadId) {
+    const buttons = document.querySelectorAll(`.like-btn[data-thread-id="${threadId}"]`);
+    const likeData = this.likesData[threadId];
+
+    buttons.forEach(button => {
+      const icon = button.querySelector('i');
+      const textNode = button.childNodes[button.childNodes.length - 1];
+
+      if (icon) {
+        icon.className = likeData.isLiked ? 'fas fa-heart' : 'far fa-heart';
+        icon.style.color = likeData.isLiked ? '#e74c3c' : '';
+      }
+
+      if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+        textNode.textContent = ` ${likeData.likes}`;
+      }
+
+      // 添加点赞动画效果
+      if (likeData.isLiked) {
+        button.classList.add('liked');
+        this.addLikeAnimation(button);
+      } else {
+        button.classList.remove('liked');
+      }
+    });
+  }
+
+  /**
+   * 更新所有回复点赞按钮
+   */
+  updateAllReplyLikeButtons(replyId) {
+    const buttons = document.querySelectorAll(`.like-reply[data-reply-id="${replyId}"]`);
+    const likeData = this.replyLikesData[replyId];
+
+    buttons.forEach(button => {
+      const icon = button.querySelector('i');
+      const textNode = button.childNodes[button.childNodes.length - 1];
+
+      if (icon) {
+        icon.className = likeData.isLiked ? 'fas fa-heart' : 'far fa-heart';
+        icon.style.color = likeData.isLiked ? '#e74c3c' : '';
+      }
+
+      if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+        textNode.textContent = ` ${likeData.likes}`;
+      }
+
+      // 添加点赞动画效果
+      if (likeData.isLiked) {
+        button.classList.add('liked');
+        this.addLikeAnimation(button);
+      } else {
+        button.classList.remove('liked');
+      }
+    });
+  }
+
+  /**
+   * 添加点赞动画效果
+   */
+  addLikeAnimation(button) {
+    // 添加缩放动画
+    button.style.transform = 'scale(1.2)';
+    button.style.transition = 'transform 0.2s ease';
+
+    setTimeout(() => {
+      button.style.transform = 'scale(1)';
+    }, 200);
+
+    // 创建飘心动画
+    const heart = document.createElement('div');
+    heart.innerHTML = '❤️';
+    heart.style.cssText = `
+      position: absolute;
+      pointer-events: none;
+      font-size: 16px;
+      z-index: 1000;
+      animation: heartFloat 1s ease-out forwards;
+    `;
+
+    // 获取按钮位置
+    const rect = button.getBoundingClientRect();
+    const phoneContainer = document.querySelector('.mobile-phone-container');
+    const phoneRect = phoneContainer ? phoneContainer.getBoundingClientRect() : { left: 0, top: 0 };
+
+    heart.style.left = rect.left - phoneRect.left + rect.width / 2 + 'px';
+    heart.style.top = rect.top - phoneRect.top + 'px';
+
+    // 添加到手机容器而不是body
+    if (phoneContainer) {
+      phoneContainer.appendChild(heart);
+    } else {
+      document.body.appendChild(heart);
+    }
+
+    // 移除动画元素
+    setTimeout(() => {
+      if (heart.parentNode) {
+        heart.parentNode.removeChild(heart);
+      }
+    }, 1000);
   }
 }
 

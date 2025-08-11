@@ -1194,6 +1194,15 @@ class MobilePhone {
         }
       }
 
+      // 确保风格选择器被正确初始化
+      setTimeout(() => {
+        const forumStyleSelect = document.getElementById('forum-style-select');
+        if (forumStyleSelect) {
+          this.initializeForumStyleSelector(forumStyleSelect);
+          console.log('[Mobile Phone] 论坛风格选择器初始化完成');
+        }
+      }, 500);
+
       console.log('[Mobile Phone] ✅ 论坛应用加载完成');
     } catch (error) {
       console.error('[Mobile Phone] 处理论坛应用失败:', error);
@@ -1755,6 +1764,15 @@ class MobilePhone {
       console.log('[Mobile Phone] 绑定统一API设置事件...');
       this.bindUnifiedApiEvents();
 
+      // 确保风格选择器被正确初始化
+      setTimeout(() => {
+        const forumStyleSelect = document.getElementById('forum-style-select');
+        if (forumStyleSelect) {
+          this.initializeForumStyleSelector(forumStyleSelect);
+          console.log('[Mobile Phone] API设置页面风格选择器初始化完成');
+        }
+      }, 500);
+
       console.log('[Mobile Phone] ✅ 统一API设置应用加载完成');
     } catch (error) {
       console.error('[Mobile Phone] 处理统一API设置应用失败:', error);
@@ -2278,6 +2296,9 @@ class MobilePhone {
     // 论坛风格选择
     const forumStyleSelect = document.getElementById('forum-style-select');
     if (forumStyleSelect) {
+      // 初始化风格选择器内容
+      this.initializeForumStyleSelector(forumStyleSelect);
+
       forumStyleSelect.addEventListener('change', e => {
         if (window.forumManager) {
           window.forumManager.currentSettings.selectedStyle = e.target.value;
@@ -2417,6 +2438,9 @@ class MobilePhone {
 
     // 加载并显示现有的自定义风格
     this.loadAndDisplayCustomStyles();
+
+    // 更新风格选择器
+    this.updateStyleSelectors();
   }
 
   // 绑定微博设置事件
@@ -3659,11 +3683,70 @@ class MobilePhone {
     }
   }
 
+  // 初始化论坛风格选择器
+  initializeForumStyleSelector(selectElement) {
+    if (!selectElement) {
+      console.warn('[Mobile Phone] 风格选择器元素不存在');
+      return;
+    }
+
+    console.log('[Mobile Phone] 开始初始化论坛风格选择器...');
+
+    // 等待ForumStyles初始化完成
+    const initializeSelector = () => {
+      if (!window.forumStyles) {
+        console.log('[Mobile Phone] 等待ForumStyles初始化...');
+        // 如果ForumStyles还没有初始化，等待一下再试
+        setTimeout(initializeSelector, 100);
+        return;
+      }
+
+      console.log('[Mobile Phone] ForumStyles已初始化，开始更新选择器');
+
+      // 获取当前选中的风格
+      let currentStyle = '贴吧老哥'; // 默认风格
+      if (window.forumManager && window.forumManager.currentSettings) {
+        currentStyle = window.forumManager.currentSettings.selectedStyle || '贴吧老哥';
+        console.log('[Mobile Phone] 从ForumManager获取当前风格:', currentStyle);
+      }
+
+      // 获取自定义风格数量
+      const customStyles = window.forumStyles.getAllCustomStyles();
+      console.log('[Mobile Phone] 发现自定义风格数量:', customStyles.length);
+
+      // 更新选择器内容
+      this.updateSingleStyleSelector(selectElement);
+
+      // 设置当前选中的风格
+      if (selectElement.querySelector(`option[value="${currentStyle}"]`)) {
+        selectElement.value = currentStyle;
+        console.log('[Mobile Phone] 成功设置当前风格:', currentStyle);
+      } else {
+        // 如果当前风格不存在，回退到默认风格
+        console.warn('[Mobile Phone] 当前风格不存在，回退到默认风格:', currentStyle);
+        selectElement.value = '贴吧老哥';
+        if (window.forumManager) {
+          window.forumManager.currentSettings.selectedStyle = '贴吧老哥';
+          window.forumManager.saveSettings();
+        }
+      }
+
+      console.log('[Mobile Phone] 论坛风格选择器初始化完成，当前风格:', selectElement.value);
+      console.log('[Mobile Phone] 选择器选项数量:', selectElement.options.length);
+    };
+
+    initializeSelector();
+  }
+
   // 更新单个风格选择器
   updateSingleStyleSelector(selectElement) {
     if (!selectElement || !window.forumStyles) return;
 
-    const currentValue = selectElement.value;
+    // 获取当前实际应用的风格
+    let currentValue = selectElement.value;
+    if (window.forumManager && window.forumManager.currentSettings) {
+      currentValue = window.forumManager.currentSettings.selectedStyle || currentValue;
+    }
 
     // 清空现有选项
     selectElement.innerHTML = '';
@@ -3700,9 +3783,14 @@ class MobilePhone {
       selectElement.appendChild(customGroup);
     }
 
-    // 恢复之前的选择
+    // 设置当前选中的风格
     if (currentValue && selectElement.querySelector(`option[value="${currentValue}"]`)) {
       selectElement.value = currentValue;
+      console.log('[Mobile Phone] 风格选择器已设置为:', currentValue);
+    } else {
+      // 如果当前风格不存在，回退到默认风格
+      selectElement.value = '贴吧老哥';
+      console.log('[Mobile Phone] 风格选择器回退到默认风格: 贴吧老哥');
     }
   }
 
