@@ -470,6 +470,7 @@ class MobilePhone {
     // 标记当前app与view，便于样式与导航判断
     const appScreen = document.getElementById('app-screen');
     const appContent = document.getElementById('app-content');
+    const appHeader = document.getElementById('app-header');
     if (appScreen) {
       appScreen.setAttribute('data-app', state.app || '');
       appScreen.setAttribute('data-view', state.view || 'main');
@@ -484,6 +485,10 @@ class MobilePhone {
     if (appContent) {
       appContent.setAttribute('data-app', state.app || '');
       appContent.setAttribute('data-view', state.view || 'main');
+    }
+    if (appHeader) {
+      appHeader.setAttribute('data-app', state.app || '');
+      appHeader.setAttribute('data-view', state.view || 'main');
     }
 
     // 清除旧的功能按钮
@@ -530,8 +535,10 @@ class MobilePhone {
         // 帖子详情页面：添加刷新按钮
         const refreshBtn = document.createElement('button');
         refreshBtn.className = 'app-header-btn';
-        refreshBtn.innerHTML = '🔄';
+        refreshBtn.innerHTML = '刷新';
         refreshBtn.title = '刷新';
+        refreshBtn.style.background = '#e5c9c7';
+        refreshBtn.style.color = 'white';
         refreshBtn.addEventListener('click', () => {
           if (window.forumUI) {
             window.forumUI.refreshForum();
@@ -539,11 +546,46 @@ class MobilePhone {
         });
         headerRight.appendChild(refreshBtn);
       } else {
-        // 论坛主页：添加发帖和刷新按钮
+        // 论坛主页：添加生成、发帖和刷新按钮
+        const generateBtn = document.createElement('button');
+        generateBtn.className = 'app-header-btn';
+        generateBtn.innerHTML = '生成';
+        generateBtn.title = '立即生成论坛';
+        generateBtn.style.background = '#e5c9c7';
+        generateBtn.style.color = 'white';
+        generateBtn.addEventListener('click', () => {
+          if (window.forumManager) {
+            console.log('[Mobile Phone] 🔘 头部生成按钮被点击');
+
+            // 显示生成状态提示
+            if (window.showMobileToast) {
+              window.showMobileToast('🚀 正在生成论坛内容...', 'info');
+            }
+
+            // 调用生成方法
+            window.forumManager
+              .generateForumContent(true) // 强制生成，不检查消息增量
+              .then(() => {
+                if (window.showMobileToast) {
+                  window.showMobileToast('✅ 论坛内容生成完成', 'success');
+                }
+              })
+              .catch(error => {
+                console.error('[Mobile Phone] 生成论坛内容失败:', error);
+                if (window.showMobileToast) {
+                  window.showMobileToast('❌ 生成失败: ' + error.message, 'error');
+                }
+              });
+          }
+        });
+        headerRight.appendChild(generateBtn);
+
         const postBtn = document.createElement('button');
         postBtn.className = 'app-header-btn';
-        postBtn.innerHTML = '✏️';
+        postBtn.innerHTML = '发帖';
         postBtn.title = '发帖';
+        postBtn.style.background = '#e5c9c7';
+        postBtn.style.color = 'white';
         postBtn.addEventListener('click', () => {
           if (window.forumUI) {
             window.forumUI.showPostDialog();
@@ -551,10 +593,35 @@ class MobilePhone {
         });
         headerRight.appendChild(postBtn);
 
+        const styleBtn = document.createElement('button');
+        styleBtn.className = 'app-header-btn';
+        styleBtn.innerHTML = '风格';
+        styleBtn.title = '论坛风格设置';
+        styleBtn.style.background = '#e5c9c7';
+        styleBtn.style.color = 'white';
+        styleBtn.addEventListener('click', () => {
+          console.log('[Mobile Phone] 🎨 风格按钮被点击，跳转到论坛风格设置');
+          // 切换到API设置应用的论坛风格标签页
+          window.mobilePhone.openApp('api');
+          // 延迟一下确保页面切换完成，然后激活论坛风格标签
+          setTimeout(() => {
+            const forumStylesTab = document.querySelector('[data-tab="forum-styles"]');
+            if (forumStylesTab) {
+              forumStylesTab.click();
+              console.log('[Mobile Phone] 已切换到论坛风格设置页面');
+            } else {
+              console.warn('[Mobile Phone] 未找到论坛风格设置标签页');
+            }
+          }, 300);
+        });
+        headerRight.appendChild(styleBtn);
+
         const refreshBtn = document.createElement('button');
         refreshBtn.className = 'app-header-btn';
-        refreshBtn.innerHTML = '🔄';
+        refreshBtn.innerHTML = '刷新';
         refreshBtn.title = '刷新';
+        refreshBtn.style.background = '#e5c9c7';
+        refreshBtn.style.color = 'white';
         refreshBtn.addEventListener('click', () => {
           if (window.forumUI) {
             window.forumUI.refreshForum();
@@ -1728,6 +1795,7 @@ class MobilePhone {
                 <div class="settings-tabs">
                     <div class="tab-buttons">
                         <button class="tab-btn active" data-tab="forum">论坛</button>
+                        <button class="tab-btn" data-tab="forum-styles">论坛风格</button>
                         <button class="tab-btn" data-tab="weibo">微博</button>
                         <button class="tab-btn" data-tab="api">API</button>
                     </div>
@@ -1795,6 +1863,51 @@ class MobilePhone {
                         <div class="action-buttons">
                             <button id="generate-forum-now" class="btn-primary">🚀 立即生成论坛</button>
                             <button id="clear-forum-content" class="btn-danger">🗑️ 清除论坛内容</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="forum-styles-tab" style="display: none;">
+                        <div class="forum-styles-container">
+                            <div class="styles-header">
+                                <h3>🎨 论坛风格管理</h3>
+                                <p>创建和管理你的自定义论坛风格</p>
+                            </div>
+
+                            <div class="styles-actions">
+                                <button id="create-custom-style-btn" class="btn-primary">
+                                    <i class="fas fa-plus"></i> 创建自定义风格
+                                </button>
+                                <div class="import-export-actions">
+                                    <button id="export-styles-btn" class="btn-secondary">
+                                        <i class="fas fa-download"></i> 导出风格
+                                    </button>
+                                    <button id="import-styles-btn" class="btn-secondary">
+                                        <i class="fas fa-upload"></i> 导入风格
+                                    </button>
+                                    <input type="file" id="import-styles-input" accept=".json" style="display: none;">
+                                </div>
+                            </div>
+
+                            <div class="custom-styles-list">
+                                <h4>自定义风格列表</h4>
+                                <div id="custom-styles-container">
+                                    <div class="no-styles-placeholder">
+                                        <div class="placeholder-icon">🎭</div>
+                                        <div class="placeholder-text">还没有自定义风格</div>
+                                        <div class="placeholder-hint">点击上方按钮创建你的第一个风格</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="styles-info">
+                                <h4>使用说明</h4>
+                                <ul>
+                                    <li>自定义风格会出现在论坛风格选择器中</li>
+                                    <li>可以导出风格文件在其他设备上使用</li>
+                                    <li>编辑风格时请保持格式的完整性</li>
+                                    <li>风格内容支持所有论坛功能和格式</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -2125,6 +2238,9 @@ class MobilePhone {
     // 论坛设置事件
     this.bindForumSettingsEvents();
 
+    // 论坛风格设置事件
+    this.bindForumStylesEvents();
+
     // 微博设置事件
     this.bindWeiboSettingsEvents();
 
@@ -2261,6 +2377,46 @@ class MobilePhone {
         }
       });
     }
+  }
+
+  // 绑定论坛风格设置事件
+  bindForumStylesEvents() {
+    // 创建自定义风格按钮
+    const createStyleBtn = document.getElementById('create-custom-style-btn');
+    if (createStyleBtn) {
+      createStyleBtn.addEventListener('click', () => {
+        this.showCreateStyleModal();
+      });
+    }
+
+    // 导出风格按钮
+    const exportStylesBtn = document.getElementById('export-styles-btn');
+    if (exportStylesBtn) {
+      exportStylesBtn.addEventListener('click', () => {
+        this.exportCustomStyles();
+      });
+    }
+
+    // 导入风格按钮
+    const importStylesBtn = document.getElementById('import-styles-btn');
+    if (importStylesBtn) {
+      importStylesBtn.addEventListener('click', () => {
+        document.getElementById('import-styles-input').click();
+      });
+    }
+
+    // 导入文件选择
+    const importInput = document.getElementById('import-styles-input');
+    if (importInput) {
+      importInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) {
+          this.importCustomStyles(e.target.files[0]);
+        }
+      });
+    }
+
+    // 加载并显示现有的自定义风格
+    this.loadAndDisplayCustomStyles();
   }
 
   // 绑定微博设置事件
@@ -2656,6 +2812,993 @@ class MobilePhone {
 
     console.log(`[Mobile Phone] Toast显示: ${type} - ${message}`);
     return toast;
+  }
+
+  // 显示创建风格弹窗
+  showCreateStyleModal() {
+    console.log('[Mobile Phone] 显示创建风格弹窗');
+
+    // 创建弹窗HTML
+    const modalHTML = `
+      <div class="modal" id="create-style-modal" style="display: none;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>🎨 创建自定义风格</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="create-style-form">
+              <div class="form-group">
+                <label for="style-name-input">风格名称</label>
+                <input
+                  type="text"
+                  id="style-name-input"
+                  placeholder="例如：温柔小姐姐、霸道总裁、二次元宅男..."
+                  maxlength="20"
+                  required
+                >
+                <div class="input-hint">建议使用简洁明了的名称</div>
+              </div>
+
+              <div class="form-group">
+                <label for="style-description-input">风格描述</label>
+                <textarea
+                  id="style-description-input"
+                  placeholder="描述你想要的论坛风格，ai将会根据你的描述帮你完善并生成对应的论坛风格。例如：小红书的论坛风格，R18论坛风格等。你也可以描述该论坛的语言习惯，用户名特征，语气等。"
+                  rows="6"
+                  maxlength="500"
+                  required
+                ></textarea>
+                <div class="input-hint">
+                  <span class="char-count">0/500</span> - 描述越详细，AI生成的风格越准确
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn-secondary" id="cancel-create-style">取消</button>
+                <button type="submit" class="btn-primary" id="generate-style-btn">
+                  <i class="fas fa-magic"></i> 生成风格
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 移除已存在的弹窗
+    const existingModal = document.getElementById('create-style-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // 添加弹窗到手机容器
+    const phoneContainer = document.querySelector('.mobile-phone-container');
+    if (phoneContainer) {
+      phoneContainer.insertAdjacentHTML('beforeend', modalHTML);
+    } else {
+      // 如果找不到手机容器，回退到body
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    // 绑定事件
+    this.bindCreateStyleModalEvents();
+
+    // 显示弹窗
+    this.showModal('create-style-modal');
+  }
+
+  // 导出自定义风格
+  exportCustomStyles() {
+    try {
+      if (!window.forumStyles) {
+        throw new Error('ForumStyles未初始化');
+      }
+
+      const customStyles = window.forumStyles.getAllCustomStyles();
+      if (customStyles.length === 0) {
+        MobilePhone.showToast('没有自定义风格可导出', 'warning');
+        return;
+      }
+
+      const exportData = window.forumStyles.exportCustomStyles();
+
+      // 创建下载链接
+      const blob = new Blob([exportData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `forum-styles-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      MobilePhone.showToast(`✅ 已导出 ${customStyles.length} 个自定义风格`, 'success');
+      console.log('[Mobile Phone] 导出自定义风格成功');
+    } catch (error) {
+      console.error('[Mobile Phone] 导出自定义风格失败:', error);
+      MobilePhone.showToast('导出失败: ' + error.message, 'error');
+    }
+  }
+
+  // 导入自定义风格
+  importCustomStyles(file) {
+    try {
+      if (!window.forumStyles) {
+        throw new Error('ForumStyles未初始化');
+      }
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const jsonData = e.target.result;
+          const results = window.forumStyles.importCustomStyles(jsonData, { overwrite: false });
+
+          let message = `导入完成: 成功${results.success}个`;
+          if (results.skipped > 0) {
+            message += `, 跳过${results.skipped}个`;
+          }
+          if (results.failed > 0) {
+            message += `, 失败${results.failed}个`;
+          }
+
+          if (results.success > 0) {
+            // 刷新显示
+            this.loadAndDisplayCustomStyles();
+            this.updateStyleSelectors();
+            MobilePhone.showToast('✅ ' + message, 'success');
+          } else if (results.skipped > 0) {
+            MobilePhone.showToast('⚠️ ' + message + ' (已存在同名风格)', 'warning');
+          } else {
+            MobilePhone.showToast('❌ ' + message, 'error');
+          }
+
+          // 显示详细错误信息
+          if (results.errors.length > 0) {
+            console.warn('[Mobile Phone] 导入错误详情:', results.errors);
+          }
+        } catch (error) {
+          console.error('[Mobile Phone] 解析导入文件失败:', error);
+          MobilePhone.showToast('导入失败: 文件格式错误', 'error');
+        }
+      };
+
+      reader.onerror = () => {
+        console.error('[Mobile Phone] 读取文件失败');
+        MobilePhone.showToast('读取文件失败', 'error');
+      };
+
+      reader.readAsText(file);
+    } catch (error) {
+      console.error('[Mobile Phone] 导入自定义风格失败:', error);
+      MobilePhone.showToast('导入失败: ' + error.message, 'error');
+    }
+  }
+
+  // 加载并显示自定义风格
+  loadAndDisplayCustomStyles() {
+    const container = document.getElementById('custom-styles-container');
+    if (!container) return;
+
+    try {
+      if (!window.forumStyles) {
+        throw new Error('ForumStyles未初始化');
+      }
+
+      const customStyles = window.forumStyles.getAllCustomStyles();
+
+      if (customStyles.length === 0) {
+        // 显示占位符
+        container.innerHTML = `
+          <div class="no-styles-placeholder">
+            <div class="placeholder-icon">🎭</div>
+            <div class="placeholder-text">还没有自定义风格</div>
+            <div class="placeholder-hint">点击上方按钮创建你的第一个风格</div>
+          </div>
+        `;
+        return;
+      }
+
+      // 显示自定义风格列表
+      const stylesHTML = customStyles
+        .map(style => {
+          const createdDate = new Date(style.createdAt).toLocaleDateString();
+          const updatedDate = new Date(style.updatedAt).toLocaleDateString();
+
+          return `
+          <div class="custom-style-item" data-style-id="${style.id}">
+            <div class="style-info">
+              <div class="style-name">${this.escapeHtml(style.name)}</div>
+              <div class="style-description">${this.escapeHtml(style.description || '无描述')}</div>
+              <div class="style-meta">
+                创建: ${createdDate} | 更新: ${updatedDate} | ${style.prompt.length} 字符
+              </div>
+            </div>
+            <div class="style-actions">
+              <button class="style-action-btn edit" onclick="mobilePhone.editCustomStyle('${style.name}')">
+                <i class="fas fa-edit"></i> 编辑
+              </button>
+              <button class="style-action-btn copy" onclick="mobilePhone.copyCustomStyle('${style.name}')">
+                <i class="fas fa-copy"></i> 复制
+              </button>
+              <button class="style-action-btn delete" onclick="mobilePhone.deleteCustomStyle('${style.name}')">
+                <i class="fas fa-trash"></i> 删除
+              </button>
+            </div>
+          </div>
+        `;
+        })
+        .join('');
+
+      container.innerHTML = stylesHTML;
+
+      console.log(`[Mobile Phone] 显示了 ${customStyles.length} 个自定义风格`);
+    } catch (error) {
+      console.error('[Mobile Phone] 加载自定义风格失败:', error);
+      container.innerHTML = `
+        <div class="no-styles-placeholder">
+          <div class="placeholder-icon">❌</div>
+          <div class="placeholder-text">加载风格失败</div>
+          <div class="placeholder-hint">${error.message}</div>
+        </div>
+      `;
+    }
+  }
+
+  // 绑定创建风格弹窗事件
+  bindCreateStyleModalEvents() {
+    const modal = document.getElementById('create-style-modal');
+    if (!modal) return;
+
+    // 关闭按钮
+    const closeBtn = modal.querySelector('.modal-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        this.hideModal('create-style-modal');
+      });
+    }
+
+    // 取消按钮
+    const cancelBtn = modal.querySelector('#cancel-create-style');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        this.hideModal('create-style-modal');
+      });
+    }
+
+    // 点击背景关闭
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        this.hideModal('create-style-modal');
+      }
+    });
+
+    // 字符计数
+    const textarea = modal.querySelector('#style-description-input');
+    const charCount = modal.querySelector('.char-count');
+    if (textarea && charCount) {
+      textarea.addEventListener('input', () => {
+        const count = textarea.value.length;
+        charCount.textContent = `${count}/500`;
+        if (count > 450) {
+          charCount.style.color = '#ff4757';
+        } else {
+          charCount.style.color = 'var(--text-light)';
+        }
+      });
+    }
+
+    // 表单提交
+    const form = modal.querySelector('#create-style-form');
+    if (form) {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        this.handleCreateStyleSubmit();
+      });
+    }
+  }
+
+  // 处理创建风格表单提交
+  handleCreateStyleSubmit() {
+    const modal = document.getElementById('create-style-modal');
+    if (!modal) return;
+
+    const nameInput = modal.querySelector('#style-name-input');
+    const descriptionInput = modal.querySelector('#style-description-input');
+    const generateBtn = modal.querySelector('#generate-style-btn');
+
+    const name = nameInput?.value.trim();
+    const description = descriptionInput?.value.trim();
+
+    if (!name || !description) {
+      MobilePhone.showToast('请填写完整的风格信息', 'warning');
+      return;
+    }
+
+    // 显示加载状态
+    if (generateBtn) {
+      generateBtn.disabled = true;
+      generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+    }
+
+    // 调用AI生成风格
+    this.generateCustomStyle(name, description)
+      .then(generatedStyle => {
+        this.hideModal('create-style-modal');
+        this.showStylePreviewModal(name, description, generatedStyle);
+      })
+      .catch(error => {
+        console.error('[Mobile Phone] 生成风格失败:', error);
+        MobilePhone.showToast('生成风格失败: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // 恢复按钮状态
+        if (generateBtn) {
+          generateBtn.disabled = false;
+          generateBtn.innerHTML = '<i class="fas fa-magic"></i> 生成风格';
+        }
+      });
+  }
+
+  // 显示弹窗
+  showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+      // 防止背景滚动
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // 隐藏弹窗
+  hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+      // 恢复背景滚动
+      document.body.style.overflow = '';
+
+      // 延迟移除DOM元素，避免动画中断
+      setTimeout(() => {
+        modal.remove();
+      }, 300);
+    }
+  }
+
+  // 生成自定义风格（调用AI）
+  async generateCustomStyle(name, description) {
+    console.log('[Mobile Phone] 生成自定义风格:', { name, description });
+
+    try {
+      // 检查API配置
+      if (!window.mobileCustomAPIConfig) {
+        throw new Error('API配置未初始化');
+      }
+
+      // 构建风格生成提示词
+      const styleGenerationPrompt = this.buildStyleGenerationPrompt(description);
+
+      console.log('[Mobile Phone] 风格生成提示词:', styleGenerationPrompt);
+
+      // 构建API请求消息
+      const messages = [
+        {
+          role: 'system',
+          content: styleGenerationPrompt,
+        },
+        {
+          role: 'user',
+          content: `请为"${name}"风格创建完整的论坛风格定义。用户描述：${description}`,
+        },
+      ];
+
+      console.log('[Mobile Phone] 发送风格生成请求...');
+
+      // 调用API
+      const response = await window.mobileCustomAPIConfig.callAPI(messages);
+
+      if (!response || !response.content) {
+        throw new Error('API返回内容为空');
+      }
+
+      const generatedStyle = response.content.trim();
+
+      console.log('[Mobile Phone] 风格生成成功，长度:', generatedStyle.length);
+
+      return generatedStyle;
+    } catch (error) {
+      console.error('[Mobile Phone] 生成自定义风格失败:', error);
+      throw new Error(`生成失败: ${error.message}`);
+    }
+  }
+
+  // 构建风格生成提示词
+  buildStyleGenerationPrompt(userDescription) {
+    return `论坛风格生成规范:
+#总要求
+你是一个精通在线社区文化和用户画像（Persona）构建的AI。
+你的任务是根据用户提出的**[论坛主题或社群名称]，创建一个详细、具体、可执行的"论坛风格画像提示词（Forum Style Persona Prompt）"**。
+这个由你生成的"风格画像提示词"将会被用于指导AI模型，以模拟该特定社群的口吻、风格和内容，生成高度逼真的帖子、回复和用户互动。
+
+#生成"论坛风格画像提示词"的结构要求
+你生成的每一个"风格画像提示词"都必须包含以下几个核心部分，请严格遵循此结构。你可以参考用户提供的"贴吧老哥"、"知乎精英"、"小红书种草"的范例格式。
+
+1. 核心用户画像 (Persona Definition)
+格式: 以 你是一位... 开头。
+
+内容: 这是对该论坛典型用户的核心描述。你需要定义：
+
+身份与背景: 他们是谁？（例如：资深玩家、新手妈妈、技术宅、意见领袖）
+
+性格与态度: 他们的说话风格和心态是怎样的？（例如：热情友好、冷静客观、愤世嫉俗、充满优越感、爱分享、爱抬杠）
+
+专长与行为: 他们擅长做什么？（例如：擅长深入分析、发布评测、情感吐槽、制造争议、玩梗）
+
+2. 具体生成任务 (Task Instruction)
+格式: 以 请根据提供的[信息源]，生成[数量]个[内容形式]... 的格式来写。
+
+内容: 明确指示最终使用此画像的AI需要完成什么任务。
+
+信息源: 通常是 提供的聊天记录 或 指定的主题。
+
+数量: 例如 3-5个。
+
+内容形式: 例如 帖子讨论、问答、笔记 等。
+
+结构: 明确每个生成内容包含的元素，例如 每个帖子包含标题、正文和2-3条回复。
+
+3. 风格要求 (Style Requirements)
+格式: 使用无序列表（-）详细列出风格细则。
+
+内容: 这是最关键的部分，需要将风格拆解得足够细致，以便AI模仿。必须包含以下几点:
+
+标题 (Titles): 描述标题的典型风格。（例如：挑衅性、专业性、悬念式、情绪化、包含Emoji等）
+
+内容 (Content): 描述帖子正文的语言、结构和口吻。（例如：结构清晰、逻辑严谨、情绪饱满、多用黑话/梗、分段清晰等）
+
+回复 (Replies): 描述评论区的互动风格。（例如：互相抬杠、理性探讨、共情支持、抖机灵）
+
+用户名 (Usernames): 提供3-5个符合该社区风格的用户名范例。
+
+特殊元素 (Special Elements): 描述该社区特有的语言习惯或格式。（例如：开头说"谢邀"、结尾带#话题标签、大量使用特定Emoji、黑话词汇解释等）
+
+4. 最终指令 (Final Command)
+格式: 请直接生成论坛内容，不要解释。
+
+内容: 这是一个收尾指令，确保最终的输出是纯粹的内容，而非对内容的解释。
+
+#生成风格示例：
+贴吧老哥: \`你是一位常年混迹于百度贴吧，等级很高，说话自带阴阳怪气和优越感的老哥/老姐。你是吧里的"意见领袖"（自封的），擅长一针见血地评论、抬杠、以及用各种网络黑话和烂梗带节奏。
+
+请根据提供的聊天记录，生成3-5个贴吧风格的帖子讨论，每个帖子包含标题、正文和2-3条回复。
+
+风格要求：
+- 标题要有挑衅性、争议性，如"不是，就这也能吵起来？"、"我真是服了某些人了"
+- 内容犀利毒舌，充满优越感，大量使用贴吧黑话、烂梗
+- 回复要互相抬杠、阴阳怪气，如"乐"、"急了急了"、"典中典"、"孝"、"就这？"
+- 用户名要体现老油条气质，如"专业抬杠二十年"、"键盘侠本侠"
+
+请直接生成论坛内容，不要解释。\`,
+
+#风格生成格式要求
+你的回复需要是一段完整的论坛风格文本，请勿生成任何风格文本以外的信息。
+你生成的风格文本禁止携带编号和标题，请直接按照核心部分的说明生成适当的内容。
+
+#工作流程示例
+用户输入: "帮我创建一个B站游戏区的论坛风格。"
+
+你的输出: 你需要根据以上结构，生成一个完整的"B站游戏区风格画像提示词"，可能包含"UP主"、"三连"、"弹幕文化"、"游戏黑话"等要素。
+
+最终应用: 其他AI或用户将使用你生成的这个提示词，来创造出B站游戏区风格的虚拟内容。
+
+现在，你已经理解了你的任务。请准备好，等待用户输入**[论坛主题或社群名称]**。`;
+  }
+
+  // 显示风格预览弹窗
+  showStylePreviewModal(name, description, generatedStyle) {
+    console.log('[Mobile Phone] 显示风格预览弹窗:', { name, description, generatedStyle });
+
+    // 创建预览弹窗HTML
+    const modalHTML = `
+      <div class="modal" id="style-preview-modal" style="display: none;">
+        <div class="modal-content style-preview-content">
+          <div class="modal-header">
+            <h3>📝 编辑风格: ${this.escapeHtml(name)}</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="style-info">
+              <div class="style-meta-info">
+                <div class="meta-item">
+                  <span class="meta-label">风格名称:</span>
+                  <span class="meta-value">${this.escapeHtml(name)}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">原始描述:</span>
+                  <span class="meta-value">${this.escapeHtml(description)}</span>
+                </div>
+              </div>
+            </div>
+
+            <form id="style-preview-form">
+              <div class="form-group">
+                <label for="style-content-editor">AI生成的风格内容</label>
+                <div class="editor-toolbar">
+                  <button type="button" class="toolbar-btn" id="format-style-btn" title="格式化内容">
+                    <i class="fas fa-magic"></i> 格式化
+                  </button>
+                  <button type="button" class="toolbar-btn" id="validate-style-btn" title="验证格式">
+                    <i class="fas fa-check-circle"></i> 验证
+                  </button>
+                </div>
+                <textarea
+                  id="style-content-editor"
+                  class="style-editor"
+                  rows="12"
+                  placeholder="AI生成的风格内容将显示在这里..."
+                >${this.escapeHtml(generatedStyle)}</textarea>
+                <div class="editor-hint">
+                  <div class="hint-text">
+                    <i class="fas fa-info-circle"></i>
+                    你可以编辑AI生成的内容，确保风格符合你的需求
+                  </div>
+                  <div class="char-count-preview">
+                    <span id="preview-char-count">${generatedStyle.length}</span> 字符
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-actions">
+                <div class="action-group">
+                  <button type="button" class="btn-secondary" id="regenerate-style-btn">
+                    <i class="fas fa-redo"></i> 重新生成
+                  </button>
+                  <button type="button" class="btn-secondary" id="cancel-preview-btn">
+                    取消
+                  </button>
+                </div>
+                <div class="action-group">
+                  <button type="submit" class="btn-primary" id="save-style-btn">
+                    <i class="fas fa-save"></i> 保存风格
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 移除已存在的弹窗
+    const existingModal = document.getElementById('style-preview-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // 添加弹窗到手机容器
+    const phoneContainer = document.querySelector('.mobile-phone-container');
+    if (phoneContainer) {
+      phoneContainer.insertAdjacentHTML('beforeend', modalHTML);
+    } else {
+      // 如果找不到手机容器，回退到body
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    // 绑定事件
+    this.bindStylePreviewModalEvents(name, description);
+
+    // 显示弹窗
+    this.showModal('style-preview-modal');
+  }
+
+  // HTML转义函数
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // 绑定风格预览弹窗事件
+  bindStylePreviewModalEvents(styleName, styleDescription) {
+    const modal = document.getElementById('style-preview-modal');
+    if (!modal) return;
+
+    // 关闭按钮
+    const closeBtn = modal.querySelector('.modal-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        this.hideModal('style-preview-modal');
+      });
+    }
+
+    // 取消按钮
+    const cancelBtn = modal.querySelector('#cancel-preview-btn');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        this.hideModal('style-preview-modal');
+      });
+    }
+
+    // 点击背景关闭
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        this.hideModal('style-preview-modal');
+      }
+    });
+
+    // 字符计数
+    const editor = modal.querySelector('#style-content-editor');
+    const charCount = modal.querySelector('#preview-char-count');
+    if (editor && charCount) {
+      editor.addEventListener('input', () => {
+        charCount.textContent = editor.value.length;
+      });
+    }
+
+    // 格式化按钮
+    const formatBtn = modal.querySelector('#format-style-btn');
+    if (formatBtn) {
+      formatBtn.addEventListener('click', () => {
+        this.formatStyleContent();
+      });
+    }
+
+    // 验证按钮
+    const validateBtn = modal.querySelector('#validate-style-btn');
+    if (validateBtn) {
+      validateBtn.addEventListener('click', () => {
+        this.validateStyleContent();
+      });
+    }
+
+    // 重新生成按钮
+    const regenerateBtn = modal.querySelector('#regenerate-style-btn');
+    if (regenerateBtn) {
+      regenerateBtn.addEventListener('click', () => {
+        this.handleRegenerateStyle(styleName, styleDescription);
+      });
+    }
+
+    // 表单提交（保存风格）
+    const form = modal.querySelector('#style-preview-form');
+    if (form) {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        this.handleSaveCustomStyle(styleName, styleDescription);
+      });
+    }
+  }
+
+  // 格式化风格内容
+  formatStyleContent() {
+    const editor = document.getElementById('style-content-editor');
+    if (!editor) return;
+
+    let content = editor.value;
+
+    // 基本格式化：确保段落间有适当的空行
+    content = content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .join('\n\n');
+
+    editor.value = content;
+
+    // 更新字符计数
+    const charCount = document.getElementById('preview-char-count');
+    if (charCount) {
+      charCount.textContent = content.length;
+    }
+
+    MobilePhone.showToast('内容已格式化', 'success');
+  }
+
+  // 验证风格内容
+  validateStyleContent() {
+    const editor = document.getElementById('style-content-editor');
+    if (!editor) return;
+
+    const content = editor.value.trim();
+    const issues = [];
+
+    // 基本验证
+    if (content.length < 50) {
+      issues.push('内容过短，建议至少50个字符');
+    }
+
+    if (!content.includes('你是一位')) {
+      issues.push('建议以"你是一位..."开头设定角色');
+    }
+
+    if (!content.includes('请直接生成论坛内容，不要解释')) {
+      issues.push('建议以"请直接生成论坛内容，不要解释。"结尾');
+    }
+
+    if (issues.length === 0) {
+      MobilePhone.showToast('✅ 风格格式验证通过', 'success');
+    } else {
+      const message = '格式建议：\n' + issues.join('\n');
+      MobilePhone.showToast(message, 'warning');
+    }
+  }
+
+  // 处理重新生成风格
+  handleRegenerateStyle(styleName, styleDescription) {
+    const regenerateBtn = document.getElementById('regenerate-style-btn');
+    if (!regenerateBtn) return;
+
+    // 显示加载状态
+    regenerateBtn.disabled = true;
+    regenerateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 重新生成中...';
+
+    // 调用AI重新生成
+    this.generateCustomStyle(styleName, styleDescription)
+      .then(newStyle => {
+        const editor = document.getElementById('style-content-editor');
+        if (editor) {
+          editor.value = newStyle;
+
+          // 更新字符计数
+          const charCount = document.getElementById('preview-char-count');
+          if (charCount) {
+            charCount.textContent = newStyle.length;
+          }
+        }
+        MobilePhone.showToast('风格已重新生成', 'success');
+      })
+      .catch(error => {
+        console.error('[Mobile Phone] 重新生成风格失败:', error);
+        MobilePhone.showToast('重新生成失败: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // 恢复按钮状态
+        regenerateBtn.disabled = false;
+        regenerateBtn.innerHTML = '<i class="fas fa-redo"></i> 重新生成';
+      });
+  }
+
+  // 处理保存自定义风格
+  handleSaveCustomStyle(styleName, styleDescription) {
+    const editor = document.getElementById('style-content-editor');
+    const saveBtn = document.getElementById('save-style-btn');
+
+    if (!editor) return;
+
+    const content = editor.value.trim();
+    if (!content) {
+      MobilePhone.showToast('风格内容不能为空', 'warning');
+      return;
+    }
+
+    // 显示保存状态
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+    }
+
+    try {
+      // 创建风格数据
+      const styleData = {
+        id: 'custom_' + Date.now(),
+        name: styleName,
+        description: styleDescription,
+        prompt: content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isCustom: true,
+      };
+
+      // 保存到localStorage（这个方法将在后续任务中实现）
+      this.saveCustomStyleToStorage(styleData);
+
+      // 隐藏弹窗
+      this.hideModal('style-preview-modal');
+
+      // 刷新风格列表
+      this.loadAndDisplayCustomStyles();
+
+      // 更新风格选择器（这个方法将在后续任务中实现）
+      this.updateStyleSelectors();
+
+      MobilePhone.showToast('✅ 风格保存成功', 'success');
+    } catch (error) {
+      console.error('[Mobile Phone] 保存风格失败:', error);
+      MobilePhone.showToast('保存失败: ' + error.message, 'error');
+    } finally {
+      // 恢复按钮状态
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> 保存风格';
+      }
+    }
+  }
+
+  // 保存自定义风格到存储
+  saveCustomStyleToStorage(styleData) {
+    try {
+      if (window.forumStyles) {
+        return window.forumStyles.saveCustomStyle(styleData);
+      } else {
+        throw new Error('ForumStyles未初始化');
+      }
+    } catch (error) {
+      console.error('[Mobile Phone] 保存风格到存储失败:', error);
+      throw error;
+    }
+  }
+
+  // 更新风格选择器
+  updateStyleSelectors() {
+    try {
+      // 更新论坛控制面板的风格选择器
+      if (window.forumControlApp && window.forumControlApp.refreshStyleSelector) {
+        window.forumControlApp.refreshStyleSelector();
+      }
+
+      // 更新论坛控制面板的风格选择器（备用方法）
+      const forumStyleSelect = document.getElementById('forum-style-select');
+      if (forumStyleSelect && window.forumStyles) {
+        this.updateSingleStyleSelector(forumStyleSelect);
+      }
+
+      // 更新其他可能的风格选择器
+      const allStyleSelects = document.querySelectorAll('select[id*="style"]');
+      allStyleSelects.forEach(select => {
+        if (select.id.includes('forum') || select.id.includes('style')) {
+          this.updateSingleStyleSelector(select);
+        }
+      });
+
+      console.log('[Mobile Phone] 风格选择器已更新');
+    } catch (error) {
+      console.error('[Mobile Phone] 更新风格选择器失败:', error);
+    }
+  }
+
+  // 更新单个风格选择器
+  updateSingleStyleSelector(selectElement) {
+    if (!selectElement || !window.forumStyles) return;
+
+    const currentValue = selectElement.value;
+
+    // 清空现有选项
+    selectElement.innerHTML = '';
+
+    // 添加预设风格
+    const presetStyles = Object.keys(window.forumStyles.styles);
+    if (presetStyles.length > 0) {
+      const presetGroup = document.createElement('optgroup');
+      presetGroup.label = '预设风格';
+
+      presetStyles.forEach(styleName => {
+        const option = document.createElement('option');
+        option.value = styleName;
+        option.textContent = styleName;
+        presetGroup.appendChild(option);
+      });
+
+      selectElement.appendChild(presetGroup);
+    }
+
+    // 添加自定义风格
+    const customStyles = window.forumStyles.getAllCustomStyles();
+    if (customStyles.length > 0) {
+      const customGroup = document.createElement('optgroup');
+      customGroup.label = '自定义风格';
+
+      customStyles.forEach(style => {
+        const option = document.createElement('option');
+        option.value = style.name;
+        option.textContent = `${style.name} (自定义)`;
+        customGroup.appendChild(option);
+      });
+
+      selectElement.appendChild(customGroup);
+    }
+
+    // 恢复之前的选择
+    if (currentValue && selectElement.querySelector(`option[value="${currentValue}"]`)) {
+      selectElement.value = currentValue;
+    }
+  }
+
+  // 编辑自定义风格
+  editCustomStyle(styleName) {
+    try {
+      if (!window.forumStyles) {
+        throw new Error('ForumStyles未初始化');
+      }
+
+      const style = window.forumStyles.getCustomStyle(styleName);
+      if (!style) {
+        throw new Error('风格不存在');
+      }
+
+      // 显示编辑弹窗
+      this.showStylePreviewModal(style.name, style.description, style.prompt);
+    } catch (error) {
+      console.error('[Mobile Phone] 编辑自定义风格失败:', error);
+      MobilePhone.showToast('编辑失败: ' + error.message, 'error');
+    }
+  }
+
+  // 复制自定义风格
+  copyCustomStyle(styleName) {
+    try {
+      if (!window.forumStyles) {
+        throw new Error('ForumStyles未初始化');
+      }
+
+      const style = window.forumStyles.getCustomStyle(styleName);
+      if (!style) {
+        throw new Error('风格不存在');
+      }
+
+      // 创建副本
+      const copyName = `${style.name} - 副本`;
+      const copyData = {
+        name: copyName,
+        description: style.description,
+        prompt: style.prompt,
+      };
+
+      // 检查副本名称是否已存在
+      let counter = 1;
+      let finalName = copyName;
+      while (window.forumStyles.getCustomStyle(finalName) || window.forumStyles.styles[finalName]) {
+        finalName = `${copyName} (${counter})`;
+        counter++;
+      }
+      copyData.name = finalName;
+
+      // 保存副本
+      window.forumStyles.saveCustomStyle(copyData);
+
+      // 刷新显示
+      this.loadAndDisplayCustomStyles();
+      this.updateStyleSelectors();
+
+      MobilePhone.showToast(`✅ 已复制为 "${finalName}"`, 'success');
+    } catch (error) {
+      console.error('[Mobile Phone] 复制自定义风格失败:', error);
+      MobilePhone.showToast('复制失败: ' + error.message, 'error');
+    }
+  }
+
+  // 删除自定义风格
+  deleteCustomStyle(styleName) {
+    try {
+      if (!window.forumStyles) {
+        throw new Error('ForumStyles未初始化');
+      }
+
+      const style = window.forumStyles.getCustomStyle(styleName);
+      if (!style) {
+        throw new Error('风格不存在');
+      }
+
+      // 确认删除
+      const confirmed = confirm(`确定要删除风格 "${styleName}" 吗？\n\n此操作不可撤销。`);
+      if (!confirmed) {
+        return;
+      }
+
+      // 删除风格
+      window.forumStyles.deleteCustomStyle(styleName);
+
+      // 刷新显示
+      this.loadAndDisplayCustomStyles();
+      this.updateStyleSelectors();
+
+      MobilePhone.showToast(`✅ 已删除风格 "${styleName}"`, 'success');
+    } catch (error) {
+      console.error('[Mobile Phone] 删除自定义风格失败:', error);
+      MobilePhone.showToast('删除失败: ' + error.message, 'error');
+    }
   }
 
   // 重置所有API设置
