@@ -629,6 +629,102 @@ class MobilePhone {
         });
         headerRight.appendChild(refreshBtn);
       }
+    } else if (state.app === 'weibo') {
+      // 微博应用：添加生成、刷新、发博、切小号按钮
+      const generateBtn = document.createElement('button');
+      generateBtn.className = 'app-header-btn';
+      generateBtn.innerHTML = '生成';
+      generateBtn.title = '立即生成微博';
+      generateBtn.style.background = '#ff8500';
+      generateBtn.style.color = 'white';
+      generateBtn.addEventListener('click', async () => {
+        if (window.weiboManager) {
+          console.log('[Mobile Phone] 触发立即生成微博');
+
+          // 显示处理中提示
+          MobilePhone.showToast('🔄 开始生成微博内容...', 'processing');
+
+          try {
+            const result = await window.weiboManager.generateWeiboContent(true);
+            if (result) {
+              MobilePhone.showToast('✅ 微博内容生成成功！已插入到第1楼层', 'success');
+            } else {
+              MobilePhone.showToast('⚠️ 微博内容生成失败或被跳过', 'warning');
+            }
+          } catch (error) {
+            console.error('[Mobile Phone] 生成微博内容出错:', error);
+            MobilePhone.showToast(`❌ 生成失败: ${error.message}`, 'error');
+          }
+        } else {
+          console.error('[Mobile Phone] 微博管理器未找到');
+        }
+      });
+      headerRight.appendChild(generateBtn);
+
+      const refreshBtn = document.createElement('button');
+      refreshBtn.className = 'app-header-btn';
+      refreshBtn.innerHTML = '刷新';
+      refreshBtn.title = '刷新';
+      refreshBtn.style.background = '#ff8500';
+      refreshBtn.style.color = 'white';
+      refreshBtn.addEventListener('click', () => {
+        if (window.weiboUI && window.weiboUI.refreshWeiboList) {
+          window.weiboUI.refreshWeiboList();
+        } else {
+          console.error('[Mobile Phone] 微博UI未找到');
+        }
+      });
+      headerRight.appendChild(refreshBtn);
+
+      // 发博按钮
+      const postBtn = document.createElement('button');
+      postBtn.className = 'app-header-btn';
+      postBtn.innerHTML = '发博';
+      postBtn.title = '发博';
+      postBtn.style.background = '#ff8500';
+      postBtn.style.color = 'white';
+      postBtn.addEventListener('click', () => {
+        if (window.weiboControlApp && window.weiboControlApp.showPostDialog) {
+          window.weiboControlApp.showPostDialog();
+        } else {
+          console.error('[Mobile Phone] 微博控制应用未就绪');
+        }
+      });
+      headerRight.appendChild(postBtn);
+
+      // 切小号按钮
+      const switchAccountBtn = document.createElement('button');
+      switchAccountBtn.className = 'app-header-btn';
+      const isMainAccount = window.weiboManager ? window.weiboManager.currentAccount.isMainAccount : true;
+      switchAccountBtn.innerHTML = isMainAccount ? '切小号' : '切大号';
+      switchAccountBtn.title = isMainAccount ? '切换到小号' : '切换到大号';
+      switchAccountBtn.style.background = '#ff8500';
+      switchAccountBtn.style.color = 'white';
+      switchAccountBtn.addEventListener('click', () => {
+        if (window.weiboManager && window.weiboManager.switchAccount) {
+          const newIsMainAccount = window.weiboManager.switchAccount();
+
+          // 更新按钮文本
+          switchAccountBtn.innerHTML = newIsMainAccount ? '切小号' : '切大号';
+          switchAccountBtn.title = newIsMainAccount ? '切换到小号' : '切换到大号';
+
+          // 立即更新用户名显示
+          if (window.weiboUI && window.weiboUI.updateUsernameDisplay) {
+            window.weiboUI.updateUsernameDisplay();
+          }
+
+          // 刷新当前页面
+          if (window.weiboUI) {
+            window.weiboUI.refreshWeiboList();
+          }
+
+          MobilePhone.showToast(`✅ 已切换到${newIsMainAccount ? '大号' : '小号'}`, 'success');
+          console.log('[Mobile Phone] 账户已切换:', newIsMainAccount ? '大号' : '小号');
+        } else {
+          console.error('[Mobile Phone] 微博管理器未就绪');
+        }
+      });
+      headerRight.appendChild(switchAccountBtn);
     } else if (state.app === 'settings') {
       // 设置应用：添加搜索按钮
       const searchBtn = document.createElement('button');
@@ -1801,7 +1897,6 @@ class MobilePhone {
     const weiboSettings = window.weiboManager
       ? window.weiboManager.currentSettings
       : {
-          selectedStyle: '微博网友',
           autoUpdate: true,
           threshold: 10,
         };
@@ -1930,41 +2025,7 @@ class MobilePhone {
                     </div>
 
                     <div class="tab-content" id="weibo-tab" style="display: none;">
-                        <div class="setting-group">
-                            <label>微博风格:</label>
-                            <select id="weibo-style-select">
-                                <option value="微博网友" ${
-                                  weiboSettings.selectedStyle === '微博网友' ? 'selected' : ''
-                                }>微博网友</option>
-                                <option value="娱乐博主" ${
-                                  weiboSettings.selectedStyle === '娱乐博主' ? 'selected' : ''
-                                }>娱乐博主</option>
-                                <option value="时尚达人" ${
-                                  weiboSettings.selectedStyle === '时尚达人' ? 'selected' : ''
-                                }>时尚达人</option>
-                                <option value="美食博主" ${
-                                  weiboSettings.selectedStyle === '美食博主' ? 'selected' : ''
-                                }>美食博主</option>
-                                <option value="旅游博主" ${
-                                  weiboSettings.selectedStyle === '旅游博主' ? 'selected' : ''
-                                }>旅游博主</option>
-                                <option value="科技博主" ${
-                                  weiboSettings.selectedStyle === '科技博主' ? 'selected' : ''
-                                }>科技博主</option>
-                                <option value="搞笑博主" ${
-                                  weiboSettings.selectedStyle === '搞笑博主' ? 'selected' : ''
-                                }>搞笑博主</option>
-                                <option value="情感博主" ${
-                                  weiboSettings.selectedStyle === '情感博主' ? 'selected' : ''
-                                }>情感博主</option>
-                                <option value="生活记录" ${
-                                  weiboSettings.selectedStyle === '生活记录' ? 'selected' : ''
-                                }>生活记录</option>
-                                <option value="热点讨论" ${
-                                  weiboSettings.selectedStyle === '热点讨论' ? 'selected' : ''
-                                }>热点讨论</option>
-                            </select>
-                        </div>
+
 
                         <div class="setting-group">
                             <label>自定义前缀:</label>
@@ -2445,18 +2506,6 @@ class MobilePhone {
 
   // 绑定微博设置事件
   bindWeiboSettingsEvents() {
-    // 微博风格选择
-    const weiboStyleSelect = document.getElementById('weibo-style-select');
-    if (weiboStyleSelect) {
-      weiboStyleSelect.addEventListener('change', e => {
-        if (window.weiboManager) {
-          window.weiboManager.currentSettings.selectedStyle = e.target.value;
-          window.weiboManager.saveSettings();
-          console.log('[Mobile Phone] 微博风格已更新:', e.target.value);
-        }
-      });
-    }
-
     // 微博自定义前缀
     const weiboPrefixTextarea = document.getElementById('weibo-custom-prefix');
     if (weiboPrefixTextarea) {
@@ -3913,7 +3962,6 @@ class MobilePhone {
       if (window.weiboManager) {
         window.weiboManager.currentSettings = {
           enabled: true,
-          selectedStyle: '微博网友',
           autoUpdate: true,
           threshold: 10,
           apiConfig: {
@@ -4066,7 +4114,7 @@ class MobilePhone {
     // 标记正在加载
     window._forumAppLoading = new Promise((resolve, reject) => {
       let loadedCount = 0;
-      const totalFiles = 7; // forum-ui.css + forum-control-app.css + forum-manager.js + forum-styles.js + forum-ui.js + forum-control-app.js + forum-auto-listener.js
+      const totalFiles = 8; // Font Awesome + forum-ui.css + forum-control-app.css + forum-manager.js + forum-styles.js + forum-ui.js + forum-control-app.js + forum-auto-listener.js
 
       const checkComplete = () => {
         loadedCount++;
@@ -4111,6 +4159,23 @@ class MobilePhone {
         window._forumAppLoading = null;
         reject(new Error(`${name} 加载失败`));
       };
+
+      // 首先加载 Font Awesome（如果还没有加载）
+      if (!document.querySelector('link[href*="font-awesome"]')) {
+        const fontAwesomeLink = document.createElement('link');
+        fontAwesomeLink.rel = 'stylesheet';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        fontAwesomeLink.onload = () => {
+          console.log('[Mobile Phone] Font Awesome 加载完成（论坛应用）');
+          checkComplete();
+        };
+        fontAwesomeLink.onerror = () => handleError('Font Awesome');
+        document.head.appendChild(fontAwesomeLink);
+      } else {
+        // 如果已经加载了，直接计数
+        console.log('[Mobile Phone] Font Awesome 已存在，跳过加载（论坛应用）');
+        checkComplete();
+      }
 
       // 加载CSS文件
       const cssLink = document.createElement('link');
@@ -4215,7 +4280,7 @@ class MobilePhone {
     // 标记正在加载
     window._weiboAppLoading = new Promise((resolve, reject) => {
       let loadedCount = 0;
-      const totalFiles = 7; // weibo-ui.css + weibo-control-app.css + weibo-manager.js + weibo-styles.js + weibo-ui.js + weibo-control-app.js + weibo-auto-listener.js
+      const totalFiles = 9; // Font Awesome + weibo-ui.css + weibo-control-app.css + weibo-manager.js + weibo-styles.js + weibo-styles-fix.js + weibo-ui.js + weibo-control-app.js + weibo-auto-listener.js
 
       const checkComplete = () => {
         loadedCount++;
@@ -4257,9 +4322,26 @@ class MobilePhone {
 
       const handleError = name => {
         console.error(`[Mobile Phone] ${name} 加载失败`);
-        window._weiboAppLoading = null;
-        reject(new Error(`${name} 加载失败`));
+        // 不要立即 reject，而是继续加载其他文件
+        checkComplete(); // 仍然计数，但标记为失败
       };
+
+      // 首先加载 Font Awesome（如果还没有加载）
+      if (!document.querySelector('link[href*="font-awesome"]')) {
+        const fontAwesomeLink = document.createElement('link');
+        fontAwesomeLink.rel = 'stylesheet';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        fontAwesomeLink.onload = () => {
+          console.log('[Mobile Phone] Font Awesome 加载完成');
+          checkComplete();
+        };
+        fontAwesomeLink.onerror = () => handleError('Font Awesome');
+        document.head.appendChild(fontAwesomeLink);
+      } else {
+        // 如果已经加载了，直接计数
+        console.log('[Mobile Phone] Font Awesome 已存在，跳过加载');
+        checkComplete();
+      }
 
       // 加载CSS文件
       const cssLink = document.createElement('link');
@@ -4298,10 +4380,35 @@ class MobilePhone {
       stylesScript.src = './scripts/extensions/third-party/mobile/app/weibo-app/weibo-styles.js';
       stylesScript.onload = () => {
         console.log('[Mobile Phone] weibo-styles.js 加载完成');
+        // 验证是否正确创建了全局变量
+        if (typeof window.WeiboStyles !== 'undefined' && typeof window.weiboStyles !== 'undefined') {
+          console.log('[Mobile Phone] ✅ WeiboStyles 类和实例已正确创建');
+        } else {
+          console.warn('[Mobile Phone] ⚠️ weibo-styles.js 加载完成但全局变量未创建');
+          console.log('[Mobile Phone] WeiboStyles 类型:', typeof window.WeiboStyles);
+          console.log('[Mobile Phone] weiboStyles 类型:', typeof window.weiboStyles);
+        }
         checkComplete();
       };
-      stylesScript.onerror = () => handleError('weibo-styles.js');
+      stylesScript.onerror = error => {
+        console.error('[Mobile Phone] weibo-styles.js 加载失败:', error);
+        handleError('weibo-styles.js');
+      };
+      console.log('[Mobile Phone] 开始加载 weibo-styles.js:', stylesScript.src);
       document.head.appendChild(stylesScript);
+
+      // 加载微博样式修复脚本（确保 weiboStyles 可用）
+      const fixScript = document.createElement('script');
+      fixScript.src = './scripts/extensions/third-party/mobile/weibo-styles-fix.js';
+      fixScript.onload = () => {
+        console.log('[Mobile Phone] weibo-styles-fix.js 加载完成');
+        checkComplete();
+      };
+      fixScript.onerror = () => {
+        console.warn('[Mobile Phone] weibo-styles-fix.js 加载失败，但不影响主要功能');
+        checkComplete();
+      };
+      document.head.appendChild(fixScript);
 
       // 加载主UI JS文件
       const jsScript = document.createElement('script');

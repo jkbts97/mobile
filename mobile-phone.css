@@ -503,6 +503,62 @@
   }
 }
 
+/* 微博应用特殊响应式优化 - 4个按钮需要更紧凑的布局 */
+@media (max-width: 480px) {
+  .app-header[data-app='weibo'] .app-header-btn {
+    font-size: 9px;
+    padding: 2px 3px;
+    min-width: 26px;
+    margin-left: 1px;
+  }
+
+  .app-header[data-app='weibo'] .app-header-btn span {
+    font-size: 8px;
+  }
+
+  .app-header[data-app='weibo'] .app-title {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-header[data-app='weibo'] .app-header-btn {
+    font-size: 8px;
+    padding: 1px 2px;
+    min-width: 24px;
+    margin-left: 1px;
+  }
+
+  .app-header[data-app='weibo'] .app-header-btn span {
+    font-size: 7px;
+  }
+
+  .app-header[data-app='weibo'] .app-title {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-header[data-app='weibo'] .app-header-btn {
+    font-size: 7px;
+    padding: 1px 2px;
+    min-width: 22px;
+    margin-left: 1px;
+  }
+
+  .app-header[data-app='weibo'] .app-header-btn span {
+    display: none; /* 在最小屏幕上隐藏文字，只显示图标 */
+  }
+
+  .app-header[data-app='weibo'] .app-header-btn i {
+    font-size: 10px;
+  }
+
+  .app-header[data-app='weibo'] .app-title {
+    font-size: 12px;
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 480px) {
   .app-header-btn {

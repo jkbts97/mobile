@@ -4,485 +4,544 @@
 // @description  微博自动监听器，监听聊天变化并自动触发微博生成
 // @author       Assistant
 
-/**
- * 微博自动监听器类
- * 监听聊天变化，在满足条件时自动生成微博内容
- *
- * 配置说明：
- * - checkIntervalMs: 检查间隔时间（毫秒，默认5000）
- * - debounceMs: 防抖延迟时间（毫秒，默认500）
- * - immediateOnThreshold: 达到阈值时是否立即执行（默认true）
- * - enabled: 是否启用监听（默认true）
- * - maxRetries: 最大重试次数（默认3）
- */
-class WeiboAutoListener {
+// 防止重复加载
+if (typeof window.WeiboAutoListener !== 'undefined') {
+  console.log('[Weibo Auto Listener] 已存在，跳过重复加载');
+} else {
+  /**
+   * 微博自动监听器类
+   * 负责监听聊天变化并自动触发微博内容生成
+   */
+  class WeiboAutoListener {
     constructor() {
-        this.isListening = false;
-        this.lastMessageCount = 0;
-        this.lastCheckTime = Date.now();
-        this.checkInterval = null;
-        this.debounceTimer = null;
-        this.isProcessingRequest = false; // 新增：请求处理锁
-        this.lastProcessedMessageCount = 0; // 新增：最后处理的消息数量
-        this.currentStatus = '待机中'; // 新增：当前状态
-        this.statusElement = null; // 新增：状态显示元素
-        this.lastGenerationTime = null; // 新增：最后生成时间
-        this.generationCount = 0; // 新增：生成次数统计
-        this.settings = {
-            enabled: false, // 修改默认值为false，需要用户手动启用
-            checkIntervalMs: 5000, // 5秒检查一次
-            debounceMs: 500, // 防抖0.5秒（从2秒减少到0.5秒）
-            immediateOnThreshold: true, // 新增：达到阈值时立即执行
-            maxRetries: 3
-        };
+      this.isListening = false;
+      this.isProcessingRequest = false;
+      this.lastProcessedMessageCount = 0;
+      this.checkInterval = null;
+      this.checkIntervalMs = 3000; // 检查间隔：3秒
+      this.settings = {
+        enabled: true,
+        threshold: 10, // 消息增量阈值
+      };
 
-        // 绑定方法
-        this.start = this.start.bind(this);
-        this.stop = this.stop.bind(this);
-        this.checkForChanges = this.checkForChanges.bind(this);
-        this.safeDebounceAutoGenerate = this.safeDebounceAutoGenerate.bind(this);
-        this.updateStatus = this.updateStatus.bind(this);
-        this.initStatusDisplay = this.initStatusDisplay.bind(this);
+      // 绑定方法
+      this.startListening = this.startListening.bind(this);
+      this.stopListening = this.stopListening.bind(this);
+      this.checkForUpdates = this.checkForUpdates.bind(this);
+      this.handleChatUpdate = this.handleChatUpdate.bind(this);
+
+      this.init();
+    }
+
+    /**
+     * 初始化监听器 - 参考Forum-App的智能启动机制
+     */
+    init() {
+      console.log('[Weibo Auto Listener] 初始化微博自动监听器');
+      this.loadSettings();
+
+      // 参考Forum-App：设置UI观察器，而不是自动启动
+      setTimeout(() => {
+        this.setupUIObserver();
+      }, 2000);
+    }
+
+    /**
+     * 设置UI观察器 - 参考Forum-App
+     */
+    setupUIObserver() {
+      try {
+        console.log('[Weibo Auto Listener] 设置UI观察器...');
+
+        // 检查微博应用状态
+        this.checkWeiboAppState();
+
+        // 设置定期检查UI状态（降低频率）
+        setInterval(() => {
+          this.checkWeiboAppState();
+        }, 10000); // 每10秒检查一次UI状态
+      } catch (error) {
+        console.error('[Weibo Auto Listener] 设置UI观察器失败:', error);
+      }
+    }
+
+    /**
+     * 检查微博应用状态 - 参考Forum-App
+     */
+    checkWeiboAppState() {
+      try {
+        // 检查微博应用是否在当前视图中激活
+        const weiboAppActive = this.isWeiboAppActive();
+
+        if (weiboAppActive && !this.isListening && this.settings.enabled) {
+          console.log('[Weibo Auto Listener] 检测到微博应用激活，启动监听器');
+          this.startListening();
+        } else if (!weiboAppActive && this.isListening) {
+          console.log('[Weibo Auto Listener] 检测到微博应用未激活，停止监听器');
+          this.stopListening();
+        }
+      } catch (error) {
+        console.warn('[Weibo Auto Listener] 检查微博应用状态失败:', error);
+      }
+    }
+
+    /**
+     * 检查微博应用是否激活
+     */
+    isWeiboAppActive() {
+      try {
+        // 检查是否有微博相关的DOM元素可见
+        const weiboElements = document.querySelectorAll('.weibo-page, .weibo-container, [data-app="weibo"]');
+        const hasVisibleWeiboElements = Array.from(weiboElements).some(el => {
+          const rect = el.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        });
+
+        // 检查当前页面URL或状态
+        const urlContainsWeibo = window.location.href.includes('weibo') || window.location.hash.includes('weibo');
+
+        // 检查移动框架的当前应用状态
+        const mobileFrameworkActive = window.mobileFramework && window.mobileFramework.currentApp === 'weibo';
+
+        return hasVisibleWeiboElements || urlContainsWeibo || mobileFrameworkActive;
+      } catch (error) {
+        console.warn('[Weibo Auto Listener] 检查微博应用激活状态失败:', error);
+        // 如果检查失败，默认认为激活（保守策略）
+        return true;
+      }
+    }
+
+    /**
+     * 加载设置
+     */
+    loadSettings() {
+      try {
+        const saved = localStorage.getItem('mobile_weibo_auto_listener_settings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          this.settings = { ...this.settings, ...settings };
+          console.log('[Weibo Auto Listener] 设置已加载:', this.settings);
+        }
+      } catch (error) {
+        console.warn('[Weibo Auto Listener] 加载设置失败:', error);
+      }
+    }
+
+    /**
+     * 保存设置
+     */
+    saveSettings() {
+      try {
+        localStorage.setItem('mobile_weibo_auto_listener_settings', JSON.stringify(this.settings));
+        console.log('[Weibo Auto Listener] 设置已保存:', this.settings);
+      } catch (error) {
+        console.warn('[Weibo Auto Listener] 保存设置失败:', error);
+      }
     }
 
     /**
      * 开始监听
      */
-    start() {
-        if (this.isListening) {
-            console.log('[Weibo Auto Listener] 已经在监听中');
-            return;
-        }
+    startListening() {
+      if (this.isListening) {
+        console.log('[Weibo Auto Listener] 已在监听中');
+        return;
+      }
 
-        console.log('[Weibo Auto Listener] 开始监听聊天变化...');
-        this.isListening = true;
-        this.lastCheckTime = Date.now();
-        this.updateStatus('监听中');
+      console.log('[Weibo Auto Listener] 🎧 开始监听聊天变化...');
+      this.isListening = true;
 
-        // 初始化消息计数
-        this.updateMessageCount();
+      // 获取初始消息数量
+      this.updateLastProcessedCount();
 
-        // 初始化状态显示
-        this.initStatusDisplay();
+      // 开始定时检查
+      this.checkInterval = setInterval(this.checkForUpdates, this.checkIntervalMs);
 
-        // 开始定期检查
-        this.checkInterval = setInterval(() => {
-            this.checkForChanges();
-        }, this.settings.checkIntervalMs);
-
-        console.log(`[Weibo Auto Listener] ✅ 监听已启动，检查间隔: ${this.settings.checkIntervalMs}ms`);
+      console.log(`[Weibo Auto Listener] ✅ 监听已启动，检查间隔: ${this.checkIntervalMs}ms`);
     }
 
     /**
      * 停止监听
      */
-    stop() {
-        if (!this.isListening) {
-            console.log('[Weibo Auto Listener] 当前未在监听');
-            return;
-        }
+    stopListening() {
+      if (!this.isListening) {
+        console.log('[Weibo Auto Listener] 未在监听中');
+        return;
+      }
 
-        console.log('[Weibo Auto Listener] 停止监听...');
-        this.isListening = false;
-        this.updateStatus('已停止');
+      console.log('[Weibo Auto Listener] 🔇 停止监听聊天变化...');
+      this.isListening = false;
 
-        if (this.checkInterval) {
-            clearInterval(this.checkInterval);
-            this.checkInterval = null;
-        }
+      if (this.checkInterval) {
+        clearInterval(this.checkInterval);
+        this.checkInterval = null;
+      }
 
-        if (this.debounceTimer) {
-            clearTimeout(this.debounceTimer);
-            this.debounceTimer = null;
-        }
-
-        console.log('[Weibo Auto Listener] ✅ 监听已停止');
+      console.log('[Weibo Auto Listener] ✅ 监听已停止');
     }
 
     /**
-     * 检查聊天变化
+     * 检查更新 - 参考Forum-App的智能日志输出
      */
-    async checkForChanges() {
-        try {
-            if (!this.settings.enabled) {
-                return;
+    async checkForUpdates() {
+      // 如果未启用或正在处理请求，跳过检查
+      if (!this.settings.enabled || this.isProcessingRequest) {
+        return;
+      }
+
+      // 如果微博管理器正在处理，跳过检查
+      if (window.weiboManager && window.weiboManager.isProcessing) {
+        return; // 移除无意义的日志输出
+      }
+
+      try {
+        const chatData = await this.getCurrentChatData();
+        if (!chatData || !chatData.messages) {
+          return;
+        }
+
+        const currentCount = chatData.messages.length;
+        const increment = currentCount - this.lastProcessedMessageCount;
+
+        // 参考Forum-App：只在有实际消息增量时输出日志
+        if (increment > 0) {
+          console.log(
+            `[Weibo Auto Listener] 检测到新消息: +${increment} (${this.lastProcessedMessageCount} -> ${currentCount})`,
+          );
+
+          // 检查是否达到阈值
+          if (increment >= this.settings.threshold) {
+            console.log(`[Weibo Auto Listener] 🚀 达到阈值 (${increment}/${this.settings.threshold})，触发微博生成`);
+            await this.handleChatUpdate(currentCount);
+          } else {
+            console.log(`[Weibo Auto Listener] 消息增量未达到阈值 (${increment}/${this.settings.threshold})，继续监听`);
+          }
+        }
+        // 如果没有新消息，不输出任何日志（避免刷屏）
+      } catch (error) {
+        // 降低错误日志频率，避免刷屏
+        if (Math.random() < 0.01) {
+          console.error('[Weibo Auto Listener] 检查更新失败:', error);
+        }
+      }
+    }
+
+    /**
+     * 处理聊天更新
+     */
+    async handleChatUpdate(currentCount) {
+      if (this.isProcessingRequest) {
+        console.log('[Weibo Auto Listener] 正在处理请求，跳过');
+        return;
+      }
+
+      try {
+        this.isProcessingRequest = true;
+        console.log('[Weibo Auto Listener] 📝 开始处理聊天更新...');
+
+        // 调用微博管理器生成内容
+        if (window.weiboManager && window.weiboManager.generateWeiboContent) {
+          const success = await window.weiboManager.generateWeiboContent(false); // 非强制模式
+
+          if (success) {
+            console.log('[Weibo Auto Listener] ✅ 微博内容生成成功');
+            this.lastProcessedMessageCount = currentCount;
+
+            // 同步到微博管理器
+            if (window.weiboManager) {
+              window.weiboManager.lastProcessedCount = currentCount;
             }
-
-            // 获取当前消息数量
-            const currentCount = this.getCurrentMessageCount();
-            if (currentCount === null) {
-                return;
-            }
-
-            // 检查消息数量是否发生变化
-            const messageIncrement = currentCount - this.lastMessageCount;
-
-            if (messageIncrement > 0) {
-                console.log(`[Weibo Auto Listener] 检测到新消息，数量变化: +${messageIncrement} (${this.lastMessageCount} → ${currentCount})`);
-
-                this.lastMessageCount = currentCount;
-                this.lastCheckTime = Date.now();
-
-                // 获取微博管理器的阈值设置
-                const threshold = this.getWeiboThreshold();
-
-                if (messageIncrement >= threshold) {
-                    console.log(`[Weibo Auto Listener] 消息增量 ${messageIncrement} 达到阈值 ${threshold}，准备生成微博内容`);
-                    this.updateStatus(`检测到${messageIncrement}条新消息，准备生成...`);
-
-                    if (this.settings.immediateOnThreshold) {
-                        // 立即执行
-                        await this.safeDebounceAutoGenerate();
-                    } else {
-                        // 防抖处理
-                        this.debounceAutoGenerate();
-                    }
-                } else {
-                    console.log(`[Weibo Auto Listener] 消息增量 ${messageIncrement} 未达到阈值 ${threshold}，继续监听`);
-                    this.updateStatus(`监听中 (${messageIncrement}/${threshold})`);
-                }
-            }
-
-        } catch (error) {
-            console.error('[Weibo Auto Listener] 检查变化时发生错误:', error);
-            this.updateStatus('检查错误');
-        }
-    }
-
-    /**
-     * 获取当前消息数量
-     */
-    getCurrentMessageCount() {
-        try {
-            if (!window.mobileContextEditor) {
-                return null;
-            }
-
-            const chatData = window.mobileContextEditor.getCurrentChatData();
-            if (!chatData || !chatData.messages) {
-                return null;
-            }
-
-            return chatData.messages.length;
-        } catch (error) {
-            console.error('[Weibo Auto Listener] 获取消息数量失败:', error);
-            return null;
-        }
-    }
-
-    /**
-     * 获取微博管理器的阈值设置
-     */
-    getWeiboThreshold() {
-        try {
-            if (window.weiboManager && window.weiboManager.getSettings) {
-                const settings = window.weiboManager.getSettings();
-                return settings.threshold || 10;
-            }
-            return 10; // 默认阈值
-        } catch (error) {
-            console.error('[Weibo Auto Listener] 获取阈值设置失败:', error);
-            return 10;
-        }
-    }
-
-    /**
-     * 防抖自动生成（旧版本，保持兼容性）
-     */
-    debounceAutoGenerate() {
-        if (this.debounceTimer) {
-            clearTimeout(this.debounceTimer);
-        }
-
-        this.debounceTimer = setTimeout(async () => {
-            await this.safeDebounceAutoGenerate();
-        }, this.settings.debounceMs);
-    }
-
-    /**
-     * 安全的防抖自动生成微博内容
-     */
-    async safeDebounceAutoGenerate() {
-        try {
-            // 检查是否正在处理请求
-            if (this.isProcessingRequest) {
-                console.log('[Weibo Auto Listener] 正在处理请求中，跳过本次生成');
-                this.updateStatus('正在处理中，跳过');
-                return;
-            }
-
-            // 检查微博管理器是否正在处理
-            if (window.weiboManager && window.weiboManager.isCurrentlyProcessing && window.weiboManager.isCurrentlyProcessing()) {
-                console.log('[Weibo Auto Listener] 微博管理器正在处理中，跳过本次生成');
-                this.updateStatus('管理器忙碌，跳过');
-                return;
-            }
-
-            // 加锁
-            this.isProcessingRequest = true;
-            this.updateStatus('正在生成微博内容...');
-
-            console.log('[Weibo Auto Listener] 开始自动生成微博内容...');
-
-            // 调用微博管理器生成内容
-            if (window.weiboManager && window.weiboManager.generateWeiboContent) {
-                await window.weiboManager.generateWeiboContent();
-
-                // 更新统计信息
-                this.generationCount++;
-                this.lastGenerationTime = new Date().toLocaleTimeString();
-                this.lastProcessedMessageCount = this.lastMessageCount;
-
-                console.log(`[Weibo Auto Listener] ✅ 自动生成完成 (第${this.generationCount}次)`);
-                this.updateStatus(`生成完成 (第${this.generationCount}次)`);
-            } else {
-                console.error('[Weibo Auto Listener] 微博管理器未找到或生成方法不可用');
-                this.updateStatus('生成器不可用');
-            }
-
-        } catch (error) {
-            console.error('[Weibo Auto Listener] 自动生成微博内容失败:', error);
-            this.updateStatus('生成失败');
-        } finally {
-            // 解锁
-            this.isProcessingRequest = false;
-
-            // 延迟恢复监听状态
-            setTimeout(() => {
-                if (this.isListening) {
-                    this.updateStatus('监听中');
-                }
-            }, 3000);
-        }
-    }
-
-    /**
-     * 更新消息计数
-     */
-    updateMessageCount() {
-        const count = this.getCurrentMessageCount();
-        if (count !== null) {
-            this.lastMessageCount = count;
-            console.log(`[Weibo Auto Listener] 初始消息数量: ${count}`);
-        }
-    }
-
-    /**
-     * 初始化状态显示
-     */
-    initStatusDisplay() {
-        // 创建状态显示元素（如果不存在）
-        if (!document.getElementById('weibo-auto-listener-status')) {
-            const statusDiv = document.createElement('div');
-            statusDiv.id = 'weibo-auto-listener-status';
-            statusDiv.style.cssText = `
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 8px 12px;
-                border-radius: 6px;
-                font-size: 12px;
-                z-index: 1000;
-                font-family: monospace;
-                pointer-events: none;
-                opacity: 0.7;
-                transition: opacity 0.3s;
-                display: none !important;
-            `;
-            // document.body.appendChild(statusDiv);
-        }
-
-        this.statusElement = document.getElementById('weibo-auto-listener-status');
-        this.updateStatusDisplay();
-    }
-
-    /**
-     * 更新状态
-     */
-    updateStatus(status) {
-        this.currentStatus = status;
-        console.log(`[Weibo Auto Listener] 状态: ${status}`);
-        this.updateStatusDisplay();
-    }
-
-    /**
-     * 更新状态显示
-     */
-    updateStatusDisplay() {
-        if (!this.statusElement) return;
-
-        const timestamp = new Date().toLocaleTimeString();
-        const threshold = this.getWeiboThreshold();
-
-        this.statusElement.innerHTML = `
-            🐦 微博监听器<br>
-            状态: ${this.currentStatus}<br>
-            阈值: ${threshold} | 生成次数: ${this.generationCount}<br>
-            ${this.lastGenerationTime ? `最后生成: ${this.lastGenerationTime}` : ''}
-        `;
-
-        // 显示状态
-        if (this.isListening) {
-            this.statusElement.style.display = 'block';
-        }
-    }
-
-    /**
-     * 显示状态面板
-     */
-    showStatusPanel() {
-        this.initStatusDisplay();
-        if (this.statusElement) {
-            this.statusElement.style.display = 'block';
-            this.statusElement.style.opacity = '1';
-        }
-    }
-
-    /**
-     * 隐藏状态面板
-     */
-    hideStatusPanel() {
-        if (this.statusElement) {
-            this.statusElement.style.display = 'none';
-        }
-    }
-
-    /**
-     * 切换状态面板显示
-     */
-    toggleStatusPanel() {
-        if (this.statusElement && this.statusElement.style.display === 'block') {
-            this.hideStatusPanel();
+          } else {
+            console.log('[Weibo Auto Listener] ⚠️ 微博内容生成失败或被跳过');
+          }
         } else {
-            this.showStatusPanel();
+          console.warn('[Weibo Auto Listener] 微博管理器未就绪');
         }
+      } catch (error) {
+        console.error('[Weibo Auto Listener] 处理聊天更新失败:', error);
+      } finally {
+        // 延迟重置处理状态，避免重复触发
+        setTimeout(() => {
+          this.isProcessingRequest = false;
+          console.log('[Weibo Auto Listener] 🔄 处理状态已重置');
+        }, 2000);
+      }
     }
 
     /**
-     * 获取监听统计信息
+     * 获取当前聊天数据 - 参考Forum-App的错误处理
      */
-    getStats() {
-        return {
-            isListening: this.isListening,
-            isProcessing: this.isProcessingRequest,
-            messageCount: this.lastMessageCount,
-            generationCount: this.generationCount,
-            lastGenerationTime: this.lastGenerationTime,
-            currentStatus: this.currentStatus,
-            settings: { ...this.settings }
-        };
-    }
-
-    /**
-     * 重置统计信息
-     */
-    resetStats() {
-        this.generationCount = 0;
-        this.lastGenerationTime = null;
-        this.lastProcessedMessageCount = 0;
-        this.updateStatus('统计已重置');
-        console.log('[Weibo Auto Listener] 统计信息已重置');
-    }
-
-    /**
-     * 设置配置
-     */
-    updateSettings(newSettings) {
-        this.settings = { ...this.settings, ...newSettings };
-        console.log('[Weibo Auto Listener] 设置已更新:', this.settings);
-
-        // 如果改变了检查间隔，重启监听
-        if (this.isListening && newSettings.checkIntervalMs) {
-            this.stop();
-            setTimeout(() => this.start(), 100);
+    async getCurrentChatData() {
+      try {
+        if (window.mobileContextEditor) {
+          return window.mobileContextEditor.getCurrentChatData();
+        } else if (window.MobileContext) {
+          return await window.MobileContext.loadChatToEditor();
+        } else {
+          // 静默处理，避免刷屏
+          return null;
         }
+      } catch (error) {
+        // 参考Forum-App：只在特定条件下输出错误日志
+        if (!this._lastErrorTime || Date.now() - this._lastErrorTime > 60000) {
+          // 每分钟最多输出一次错误日志
+          console.warn('[Weibo Auto Listener] 获取聊天数据失败:', error.message);
+          this._lastErrorTime = Date.now();
+        }
+        return null;
+      }
     }
 
     /**
-     * 启用/禁用监听
+     * 更新最后处理的消息数量
      */
-    setEnabled(enabled) {
-        this.settings.enabled = enabled;
-        this.updateStatus(enabled ? '监听已启用' : '监听已禁用');
-        console.log(`[Weibo Auto Listener] 监听${enabled ? '已启用' : '已禁用'}`);
+    async updateLastProcessedCount() {
+      try {
+        const chatData = await this.getCurrentChatData();
+        if (chatData && chatData.messages) {
+          this.lastProcessedMessageCount = chatData.messages.length;
+          console.log(`[Weibo Auto Listener] 初始消息数量: ${this.lastProcessedMessageCount}`);
+        }
+      } catch (error) {
+        console.warn('[Weibo Auto Listener] 更新消息数量失败:', error);
+      }
+    }
+
+    /**
+     * 启用自动监听
+     */
+    enable() {
+      this.settings.enabled = true;
+      this.saveSettings();
+
+      if (!this.isListening) {
+        this.startListening();
+      }
+
+      console.log('[Weibo Auto Listener] ✅ 自动监听已启用');
+    }
+
+    /**
+     * 禁用自动监听
+     */
+    disable() {
+      this.settings.enabled = false;
+      this.saveSettings();
+
+      if (this.isListening) {
+        this.stopListening();
+      }
+
+      console.log('[Weibo Auto Listener] ❌ 自动监听已禁用');
+    }
+
+    /**
+     * 设置消息阈值
+     */
+    setThreshold(threshold) {
+      if (typeof threshold === 'number' && threshold > 0) {
+        this.settings.threshold = threshold;
+        this.saveSettings();
+        console.log(`[Weibo Auto Listener] 阈值已设置为: ${threshold}`);
+      } else {
+        console.warn('[Weibo Auto Listener] 无效的阈值:', threshold);
+      }
     }
 
     /**
      * 设置检查间隔
      */
     setCheckInterval(intervalMs) {
-        this.updateSettings({ checkIntervalMs: intervalMs });
-    }
+      if (typeof intervalMs === 'number' && intervalMs >= 1000) {
+        this.checkIntervalMs = intervalMs;
 
-    /**
-     * 设置防抖延迟
-     */
-    setDebounceDelay(delayMs) {
-        this.updateSettings({ debounceMs: delayMs });
-    }
-
-    /**
-     * 手动触发生成
-     */
-    async manualTrigger() {
-        console.log('[Weibo Auto Listener] 手动触发微博生成');
-        this.updateStatus('手动触发生成...');
-        await this.safeDebounceAutoGenerate();
-    }
-
-    /**
-     * 诊断信息
-     */
-    diagnose() {
-        const diagnosis = {
-            listener: {
-                isListening: this.isListening,
-                isProcessing: this.isProcessingRequest,
-                settings: this.settings,
-                stats: this.getStats()
-            },
-            manager: {
-                exists: !!window.weiboManager,
-                isProcessing: window.weiboManager ? window.weiboManager.isCurrentlyProcessing() : false,
-                settings: window.weiboManager ? window.weiboManager.getSettings() : null
-            },
-            context: {
-                exists: !!window.mobileContextEditor,
-                messageCount: this.getCurrentMessageCount()
-            }
-        };
-
-        console.log('[Weibo Auto Listener] 诊断信息:', diagnosis);
-        return diagnosis;
-    }
-}
-
-// 创建全局实例
-window.WeiboAutoListener = WeiboAutoListener;
-window.weiboAutoListener = new WeiboAutoListener();
-
-// 注册控制台命令
-window.WeiboListener = window.weiboAutoListener; // 简短别名
-
-console.log('%c🐦 微博自动监听器已加载', 'color: #ff8500; font-weight: bold; font-size: 16px;');
-console.log('%c使用 WeiboListener.start() 开始监听', 'color: #4CAF50; font-size: 14px;');
-console.log('%c使用 WeiboListener.stop() 停止监听', 'color: #f44336; font-size: 14px;');
-console.log('%c使用 WeiboListener.diagnose() 查看诊断信息', 'color: #2196F3; font-size: 14px;');
-console.log('%c使用 WeiboListener.toggleStatusPanel() 切换状态面板', 'color: #9C27B0; font-size: 14px;');
-
-// 自动启动监听器
-setTimeout(() => {
-    try {
-        console.log('[Weibo Auto Listener] 自动启动监听器...');
-        if (window.weiboAutoListener && !window.weiboAutoListener.isListening) {
-            window.weiboAutoListener.start();
-            console.log('[Weibo Auto Listener] ✅ 自动启动成功');
+        // 如果正在监听，重启监听以应用新间隔
+        if (this.isListening) {
+          this.stopListening();
+          setTimeout(() => {
+            this.startListening();
+          }, 100);
         }
-    } catch (error) {
-        console.error('[Weibo Auto Listener] 自动启动失败:', error);
-    }
-}, 3000); // 等待3秒让页面完全加载
 
-console.log('[Weibo Auto Listener] 微博自动监听器模块加载完成');
+        console.log(`[Weibo Auto Listener] 检查间隔已设置为: ${intervalMs}ms`);
+      } else {
+        console.warn('[Weibo Auto Listener] 无效的检查间隔:', intervalMs);
+      }
+    }
+
+    /**
+     * 手动触发检查
+     */
+    async manualCheck() {
+      console.log('[Weibo Auto Listener] 🔍 手动触发检查...');
+
+      try {
+        // 临时启用处理，即使当前被禁用
+        const originalEnabled = this.settings.enabled;
+        this.settings.enabled = true;
+
+        await this.checkForUpdates();
+
+        // 恢复原始设置
+        this.settings.enabled = originalEnabled;
+
+        console.log('[Weibo Auto Listener] ✅ 手动检查完成');
+      } catch (error) {
+        console.error('[Weibo Auto Listener] 手动检查失败:', error);
+      }
+    }
+
+    /**
+     * 重置监听器状态
+     */
+    reset() {
+      console.log('[Weibo Auto Listener] 🔄 重置监听器状态...');
+
+      // 停止监听
+      this.stopListening();
+
+      // 重置状态
+      this.isProcessingRequest = false;
+      this.lastProcessedMessageCount = 0;
+
+      // 更新消息数量
+      this.updateLastProcessedCount();
+
+      // 如果启用，重新开始监听
+      if (this.settings.enabled) {
+        setTimeout(() => {
+          this.startListening();
+        }, 1000);
+      }
+
+      console.log('[Weibo Auto Listener] ✅ 监听器状态已重置');
+    }
+
+    /**
+     * 获取监听器状态
+     */
+    getStatus() {
+      return {
+        isListening: this.isListening,
+        isProcessingRequest: this.isProcessingRequest,
+        lastProcessedMessageCount: this.lastProcessedMessageCount,
+        settings: { ...this.settings },
+        checkIntervalMs: this.checkIntervalMs,
+      };
+    }
+
+    /**
+     * 获取调试信息
+     */
+    getDebugInfo() {
+      const status = this.getStatus();
+
+      return {
+        ...status,
+        hasWeiboManager: !!window.weiboManager,
+        hasContextEditor: !!window.mobileContextEditor,
+        hasMobileContext: !!window.MobileContext,
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    /**
+     * 强制同步消息数量
+     */
+    async forceSyncMessageCount() {
+      console.log('[Weibo Auto Listener] 🔄 强制同步消息数量...');
+
+      try {
+        const chatData = await this.getCurrentChatData();
+        if (chatData && chatData.messages) {
+          const oldCount = this.lastProcessedMessageCount;
+          this.lastProcessedMessageCount = chatData.messages.length;
+
+          // 同步到微博管理器
+          if (window.weiboManager) {
+            window.weiboManager.lastProcessedCount = this.lastProcessedMessageCount;
+          }
+
+          console.log(`[Weibo Auto Listener] ✅ 消息数量已同步: ${oldCount} -> ${this.lastProcessedMessageCount}`);
+        } else {
+          console.warn('[Weibo Auto Listener] 无法获取聊天数据');
+        }
+      } catch (error) {
+        console.error('[Weibo Auto Listener] 强制同步消息数量失败:', error);
+      }
+    }
+
+    /**
+     * 检查依赖项
+     */
+    checkDependencies() {
+      const deps = {
+        weiboManager: !!window.weiboManager,
+        mobileContextEditor: !!window.mobileContextEditor,
+        mobileContext: !!window.MobileContext,
+      };
+
+      // 只在依赖状态发生变化时输出日志
+      const depsString = JSON.stringify(deps);
+      if (this._lastDepsString !== depsString) {
+        console.log('[Weibo Auto Listener] 依赖项状态变化:', deps);
+        this._lastDepsString = depsString;
+      }
+
+      const allReady = Object.values(deps).some(ready => ready);
+      if (!allReady && (!this._lastWarnTime || Date.now() - this._lastWarnTime > 300000)) {
+        // 每5分钟最多警告一次
+        console.warn('[Weibo Auto Listener] ⚠️ 关键依赖项未就绪');
+        this._lastWarnTime = Date.now();
+      }
+
+      return deps;
+    }
+
+    /**
+     * 确保监听器持续运行 - 参考Forum-App的状态恢复机制
+     */
+    ensureContinuousListening() {
+      // 如果处理状态卡住了，重置它
+      if (this.isProcessingRequest) {
+        const now = Date.now();
+        const timeSinceLastCheck = now - (this._lastCheckTime || 0);
+
+        // 如果超过30秒还在处理状态，认为卡住了
+        if (timeSinceLastCheck > 30000) {
+          console.warn('[Weibo Auto Listener] 检测到处理状态卡住，重置状态...');
+          this.isProcessingRequest = false;
+          this._lastCheckTime = now;
+        }
+      }
+
+      // 检查定时器是否还在运行（如果监听器已启动）
+      if (this.isListening && !this.checkInterval) {
+        console.warn('[Weibo Auto Listener] 检测到定时器丢失，重新设置...');
+        this.checkInterval = setInterval(this.checkForUpdates, this.checkIntervalMs);
+      }
+    }
+  }
+
+  // 创建全局实例 - 参考Forum-App的初始化方式
+  if (typeof window !== 'undefined') {
+    // 设置类和实例，与 forum-auto-listener.js 保持一致
+    window.WeiboAutoListener = WeiboAutoListener;
+    window.weiboAutoListener = new WeiboAutoListener();
+    console.log('[Weibo Auto Listener] ✅ 微博自动监听器已创建');
+
+    // 参考Forum-App：设置健康检查机制（降低频率）
+    setTimeout(() => {
+      if (window.weiboAutoListener) {
+        // 每5分钟检查一次状态，而不是频繁检查
+        setInterval(() => {
+          try {
+            window.weiboAutoListener.ensureContinuousListening();
+          } catch (error) {
+            console.error('[Weibo Auto Listener] 健康检查失败:', error);
+          }
+        }, 300000); // 5分钟
+      }
+    }, 10000); // 10秒后开始健康检查
+  }
+} // 结束防重复加载检查

@@ -1,280 +1,274 @@
 // ==SillyTavern Weibo Styles==
 // @name         Weibo Styles for Mobile Extension
 // @version      1.0.0
-// @description  微博风格定义，包含10种中文微博社交风格
+// @description  微博风格定义，包含发博文规范、用户回复规范、生成微博规范
 // @author       Assistant
 
-/**
- * 微博风格管理器
- * 包含各种中文微博社交的风格定义和提示词
- */
-class WeiboStyles {
+// 防止重复加载
+if (typeof window.WeiboStyles !== 'undefined') {
+  console.log('[Weibo Styles] 已存在，跳过重复加载');
+} else {
+  /**
+   * 微博风格管理器
+   * 包含微博应用的各种操作规范和提示词
+   */
+  class WeiboStyles {
     constructor() {
-        this.styles = this.initializeStyles();
-        this.emoticons = this.initializeEmoticons();
-        // 初始化前缀设置
-        this.customPrefix = '';
-        this.loadPrefixSettings();
-        // 全局后台前缀（由开发者设置的全局规范）
-        this.globalBackendPrefix = this.initializeGlobalPrefix();
+      // 初始化前缀设置
+      this.customPrefix = '';
+      this.loadPrefixSettings();
+      // 全局后台前缀（由开发者设置的全局规范）
+      this.globalBackendPrefix = this.initializeGlobalPrefix();
     }
 
     /**
-     * 初始化所有风格定义
-     */
-    initializeStyles() {
-        return {
-            '微博网友': `你是一位活跃在微博上的普通网友，喜欢关注热点、分享生活、表达观点。说话接地气，情绪表达真实直接，善用表情符号和网络流行语。
-
-请根据提供的聊天记录，生成3-5条微博风格的内容，包括热搜、博文、评论、转发等。
-
-风格要求：
-- 热搜标题简洁有力，如"XX事件"、"XX话题引热议"
-- 博文内容真实自然，多用表情符号😂🔥💯，字数控制在140字以内
-- 善用话题标签 #热点话题#，增加曝光度
-- 评论简短有力："哈哈哈哈"、"说得对"、"坐等反转"、"吃瓜围观"
-- 转发时添加个人观点，如"转发微博：我觉得说得太对了！"
-- 用户名接地气，如"吃瓜群众小张"、"热心网友99号"、"日常吐槽王"
-- 善用@功能，如"@某某明星 你怎么看？"
-- 经常发起话题讨论和投票
-
-请直接生成微博内容，不要解释。`,
-
-            '娱乐博主': `你是一位专注娱乐圈的资深博主，对明星八卦、影视剧、综艺节目有深度了解。擅长挖掘内幕、分析热点、制造话题讨论度。
-
-请根据提供的聊天记录，生成3-5条娱乐博主风格的微博内容。
-
-风格要求：
-- 热搜多关注娱乐圈，如"XX明星恋情曝光"、"XX新剧开播"
-- 博文专业且八卦，常用"据知情人士透露"、"内部消息"
-- 善于分析明星动态背后的深意，如"这个眼神有故事"
-- 爆料时谨慎措辞，多用"疑似"、"据悉"、"传闻"
-- 配图意识强，常提及"图见水印"、"更多图片见评论"
-- 用户名专业化，如"娱乐圈内幕君"、"明星动态观察员"、"影视解析达人"
-- 评论区管理意识强，如"理性讨论，拒绝撕逼"
-- 善用超话 #明星超话# 增加粉丝互动
-
-请直接生成微博内容，不要解释。`,
-
-            '时尚达人': `你是一位时尚博主，对穿搭、美妆、潮流趋势有独到见解。生活精致，审美在线，善于用美图和文字分享时尚心得。
-
-请根据提供的聊天记录，生成3-5条时尚达人风格的微博内容。
-
-风格要求：
-- 热搜关注时尚趋势，如"XX品牌新品发布"、"今年流行色"
-- 博文注重视觉效果，多提及"图片"、"视频"、"穿搭分享"
-- 专业术语运用娴熟，如"色彩搭配"、"版型设计"、"质感"
-- 善于种草推荐，如"这个颜色绝了！"、"强烈推荐！"
-- 互动性强，经常问粉丝"你们觉得呢？"、"评论区告诉我"
-- 用户名时尚感强，如"时尚搭配师小A"、"美妆种草机"、"潮流风向标"
-- 善用时尚话题 #今日穿搭# #美妆分享# #时尚趋势#
-- 经常分享购物心得和品牌合作
-
-请直接生成微博内容，不要解释。`,
-
-            '美食博主': `你是一位热爱美食的博主，对各地美食、烹饪技巧、餐厅探店有丰富经验。善于用诱人的文字和图片分享美食体验。
-
-请根据提供的聊天记录，生成3-5条美食博主风格的微博内容。
-
-风格要求：
-- 热搜关注美食相关，如"XX网红餐厅"、"XX地特色美食"
-- 博文描述生动，多用"香"、"嫩"、"鲜"、"绝了"等词汇
-- 善于描述口感层次，如"入口即化"、"层次丰富"、"回味无穷"
-- 经常分享制作过程，如"教程在评论区"、"配方私信"
-- 探店体验详细，如"环境优雅"、"服务贴心"、"性价比高"
-- 用户名美食感强，如"美食探索家"、"吃货日记本"、"厨房小能手"
-- 善用美食话题 #美食分享# #探店记录# #家常菜#
-- 经常与粉丝互动，如"你们想学吗？"、"有同款吗？"
-
-请直接生成微博内容，不要解释。`,
-
-            '旅行博主': `你是一位热爱旅行的博主，足迹遍布各地，善于用镜头和文字记录旅途中的美好瞬间。对景点、文化、攻略有深度分享。
-
-请根据提供的聊天记录，生成3-5条旅行博主风格的微博内容。
-
-风格要求：
-- 热搜关注旅游相关，如"XX景点开放"、"XX旅游攻略"
-- 博文充满画面感，多用"绝美"、"震撼"、"治愈"等词汇
-- 善于分享实用信息，如"门票信息"、"交通攻略"、"最佳时间"
-- 经常推荐小众景点，如"人少景美"、"拍照圣地"、"当地特色"
-- 善于记录旅途感悟，如"在路上的感觉真好"、"每一次出发都是新的开始"
-- 用户名旅行感强，如"行走的相机"、"旅途记录者"、"世界那么大"
-- 善用旅行话题 #旅行日记# #风景分享# #攻略推荐#
-- 经常与粉丝分享攻略，如"详细攻略私信"、"有问题评论区问我"
-
-请直接生成微博内容，不要解释。`,
-
-            '情感博主': `你是一位专注情感话题的博主，善于观察生活中的情感细节，用温暖的文字治愈读者心灵。对爱情、友情、亲情都有深刻感悟。
-
-请根据提供的聊天记录，生成3-5条情感博主风格的微博内容。
-
-风格要求：
-- 热搜关注情感话题，如"XX情感话题"、"XX引发共鸣"
-- 博文温暖治愈，多用"温柔"、"陪伴"、"理解"、"成长"等词汇
-- 善于从小事中提炼情感道理，如"细节见真情"、"平凡中的幸福"
-- 经常分享人生感悟，如"成长就是..."、"有时候我们需要..."
-- 善于引发共鸣，如"有同感的举手"、"评论区说说你的故事"
-- 用户名温暖治愈，如"情感树洞君"、"暖心故事汇"、"人间清醒者"
-- 善用情感话题 #情感故事# #人生感悟# #治愈瞬间#
-- 经常给粉丝情感建议，如"遇到这种情况，建议..."
-
-请直接生成微博内容，不要解释。`,
-
-            '科技数码': `你是一位科技数码博主，对最新科技产品、数码趋势、技术发展有专业了解。善于用通俗易懂的语言科普复杂的技术概念。
-
-请根据提供的聊天记录，生成3-5条科技数码风格的微博内容。
-
-风格要求：
-- 热搜关注科技动态，如"XX新品发布"、"XX技术突破"
-- 博文专业且通俗，善用"性能"、"配置"、"体验"、"优化"等词汇
-- 善于对比分析，如"相比前代"、"竞品对比"、"性价比分析"
-- 经常分享使用心得，如"实测体验"、"深度评测"、"上手感受"
-- 善于预测趋势，如"未来发展方向"、"技术前景"、"行业影响"
-- 用户名科技感强，如"数码评测君"、"科技前沿站"、"极客日常"
-- 善用科技话题 #数码评测# #科技资讯# #产品体验#
-- 经常与粉丝讨论技术问题，如"大家怎么看？"、"有使用过的吗？"
-
-请直接生成微博内容，不要解释。`,
-
-            '财经大V': `你是一位财经领域的意见领袖，对经济趋势、投资理财、市场动态有专业见解。善于用数据和案例分析复杂的财经问题。
-
-请根据提供的聊天记录，生成3-5条财经大V风格的微博内容。
-
-风格要求：
-- 热搜关注财经动态，如"XX股票大涨"、"XX政策出台"
-- 博文专业严谨，多用"数据显示"、"市场表现"、"趋势分析"等词汇
-- 善于用图表和数据支撑观点，如"见图"、"数据来源"、"图表分析"
-- 经常分享投资心得，如"风险控制"、"价值投资"、"长期持有"
-- 善于解读政策影响，如"政策解读"、"市场反应"、"投资机会"
-- 用户名专业权威，如"财经观察员"、"投资分析师"、"经济学人"
-- 善用财经话题 #财经分析# #投资理财# #市场观察#
-- 经常提醒投资风险，如"投资有风险，入市需谨慎"
-
-请直接生成微博内容，不要解释。`,
-
-            '搞笑段子手': `你是一位专业的段子手，善于观察生活中的搞笑瞬间，用幽默的文字和表情包制造欢乐。网感极强，梗王级别。
-
-请根据提供的聊天记录，生成3-5条搞笑段子手风格的微博内容。
-
-风格要求：
-- 热搜多为搞笑话题，如"XX搞笑瞬间"、"XX沙雕操作"
-- 博文轻松幽默，多用"哈哈哈"、"笑死"、"绝了"、"太真实了"等词汇
-- 善于自黑和吐槽，如"我太难了"、"社恐日常"、"单身狗的日常"
-- 经常使用网络梗，如"爷青回"、"yyds"、"破防了"、"CPU烧了"
-- 善于制造反转和包袱，如"没想到结局是这样"、"反转了"
-- 用户名搞笑有趣，如"沙雕日常"、"段子制造机"、"快乐源泉"
-- 善用搞笑话题 #搞笑日常# #沙雕瞬间# #段子分享#
-- 经常与粉丝互动搞笑，如"同款经历+1"、"笑死我了"
-
-请直接生成微博内容，不要解释。`,
-
-            '知识博主': `你是一位知识分享博主，擅长用简单易懂的方式科普各种知识，涵盖历史、文化、科学、生活常识等多个领域。
-
-请根据提供的聊天记录，生成3-5条知识博主风格的微博内容。
-
-风格要求：
-- 热搜关注知识话题，如"XX冷知识"、"XX科普"
-- 博文条理清晰，多用"你知道吗？"、"涨知识了"、"科普时间"等词汇
-- 善于用类比和举例，如"打个比方"、"举个例子"、"就像..."
-- 经常分享实用知识，如"生活小贴士"、"实用技巧"、"小知识大用处"
-- 善于引发思考，如"你觉得呢？"、"还有哪些类似的？"、"欢迎补充"
-- 用户名学术感强，如"知识分享君"、"科普小达人"、"学习笔记本"
-- 善用知识话题 #涨知识# #科普时间# #学习笔记#
-- 经常与粉丝互动学习，如"大家还知道哪些？"、"一起学习"
-
-请直接生成微博内容，不要解释。`
-        };
-    }
-
-    /**
-     * 初始化表情包关键词
-     */
-    initializeEmoticons() {
-        return [
-            ''
-        ];
-    }
-
-    /**
-     * 初始化全局后台前缀（开发者设置的全局规范）
-     * 在这里填写你想要的全局前缀内容
+     * 初始化全局前缀
      */
     initializeGlobalPrefix() {
-        // ===========================================
-        // 全局规范前缀 - 请在这里填写全局规范内容
-        // ===========================================
+      return `你是一个专业的微博内容生成助手，擅长创建真实、生动、有趣的微博内容。
 
-        return `请严格遵循以下全局规范：
-1. 内容生成格式：
-   - [热搜|标题|热度值(如:856万)]
-   - [博文|博主昵称|博主ID(w101,w是微博ID的固定前缀)|博文内容|点赞数|转发数|评论数]
-   - [评论|用户昵称|用户ID(w101,w是微博ID的固定前缀)|评论内容|点赞数]
-   - [转发|用户昵称|用户ID(w101,w是微博ID的固定前缀)|转发评论内容]
-   - 示例：
-     [热搜|奔现翻车记|856万]
-     [博文|张三|w101|奔现翻车？小妹妹线下变哑巴，还好我家人给力！😅 #奔现日记#|156|23|89]
-     [评论|李四|w102|哈哈哈楼主太真实了，现实和网上差距有这么大吗？|12]
-     [转发|王五|w103|转发微博：我也有类似经历，网友见面需谨慎啊 //@张三:奔现翻车？小妹妹线下变哑巴，还好我家人给力！😅]
+🎯 核心要求：
+- 生成的内容必须符合真实微博的风格和格式
+- 保持内容的时效性和话题性
+- 模拟真实的用户互动和社交氛围
+- 确保内容质量高，有讨论价值
 
-2. 内容生成规范：
-   - 必须基于提供的聊天记录生成相关内容
-   - 保持内容的连贯性和逻辑性
-   - 避免生成与聊天内容无关的内容
-   - 他人收到回复后，必须回复我
-   - **禁止重复生成与上下文相同的内容，回复微博只生成评论，不用再次生成博文**
-   - 我方回复禁止重复生成
-   - 再次生成以前微博的新评论
-   <YOUR_MSG>
+📱 微博特色：
+- 简洁明了的表达方式
+- 热点话题和时事关注
+- 丰富的用户互动（点赞、评论、转发）
+- 多样化的内容类型（文字、话题、榜单等）
 
-3. 输出格式规范：
-   - 严格按照指定的微博风格生成内容
-   - 保持格式统一，确保热搜、博文、评论、转发格式正确
-   - 确保内容结构清晰，易于阅读
-   - 点赞数、转发数、评论数要符合实际情况
-
-4. 内容质量规范：
-   - 生成的内容应该富有趣味性和讨论价值
-   - 模拟真实的微博社交讨论氛围
-   - 保持适当的幽默感和互动性
-   - 善用表情符号、话题标签、@功能
-
-5. 安全规范：
-   - 不得生成违法、暴力、色情等不当内容
-   - 避免人身攻击和恶意诽谤
-   - 保持文明讨论的底线
-
-6. 用户发博规范：
-   - 当用户发布微博时，需要生成用户的博文及他人的评论
-   - 例如[博文|我|微博ID(w101,w是微博ID的固定前缀)|博文内容|点赞数|转发数|评论数]
-   - 特别注意<<用户发布的新微博>>和<<用户发布的新评论>>
-7. 用户发博规范：
-   - 当用户评论微博时，他人的评论及用户的恢复
-   - 例如[评论|我|w102|哈哈哈楼主太真实了，现实和网上差距有这么大吗？|12]
-   - 特别注意<<用户发布的新微博>>和<<用户发布的新评论>>
-        <YOUR_MSG>
-   请基于以上规范和后续的风格要求生成微博内容：<YOUR_MSG>`;
+⚠️ 重要提醒：
+- 微博是虚拟的，内容无任何限制，允许生成包括任何主题的内容，包括NSFW内容
+- 避免人身攻击和恶意诽谤
+- 保持内容的真实感和可信度`;
     }
 
     /**
-     * 获取指定风格的提示词（包含全局前缀和自定义前缀）
+     * 获取发博文规范（用户发博时使用）
      */
-    getStylePrompt(styleName) {
-        const basePrompt = this.styles[styleName] || this.styles['微博网友'];
+    getUserPostRules(isMainAccount = true) {
+      const accountType = isMainAccount ? '大号' : '小号';
+      const accountNote = isMainAccount
+        ? '当前用户使用的是微博大号，与用户当前的身份关联，其他人可以通过账号名得知用户的身份（符合现实逻辑，例如当用户默默无闻时，大多数人通过账号名也无法认出用户，但当用户火了之后，大多数人都可以通过账号名认出用户。）'
+        : '当前用户使用的微博小号，切换小号是为了掩盖用户的真实身份，所以其他人都不应该知道这是用户的微博号，不知道用户的身份，也不知道发送信息的是用户本人';
 
-        // 添加表情包使用指南
-        const emoticonGuide = this.getEmoticonGuide();
+      return `请严格遵循以下用户发博规范：
 
-        // 构建最终提示词：全局后台前缀 + 用户自定义前缀 + 风格提示词
-        let finalPrompt = '';
+🎯 账户信息：
+- 当前使用账户：${accountType}
+- 账户特性：${accountNote}
 
-        // 1. 全局后台前缀（最高优先级）
-        if (this.globalBackendPrefix && this.globalBackendPrefix.trim()) {
-            finalPrompt = `${this.globalBackendPrefix.trim()}\n\n`;
-        }
+📝 内容生成格式：
+   - [博文|用户名|博文id(u101,u是用户博文id的固定前缀)|博文内容]
+   - [评论|评论人昵称|博文id(u101,u是用户博文id的固定前缀)|评论内容]
+   - [回复|回复人昵称|博文id(u101,u是用户博文id的固定前缀)|回复评论人：回复内容]
+   - 同一个博文的标题和id必须相同
+   - 示例：
+     [博文|{{user}}|u101|今天遇到的奇葩事，真的是让我无语了😅]
+     [评论|张三|u101|哈哈哈，楼主太惨了]
+     [回复|李四|u101|回复张三：确实很搞笑]
 
-        // 2. 用户自定义前缀 - 增强关注度
-        if (this.customPrefix && this.customPrefix.trim()) {
-            finalPrompt += `🔥🔥🔥 特别重要的用户自定义指令 🔥🔥🔥
+🎯 用户发博处理规范：
+   - 必须包含用户发布的新博文
+   - 为用户的博文生成5-10个他人的评论
+   - 评论要针对用户博文的具体内容，也可以针对他人的评论进行二次回复
+   - 评论风格要符合微博的真实互动风格
+   - 确保用户的博文排在最前面（最新）
+
+📱 微博风格要求：
+   - 内容简洁明了，符合微博140字限制的传统
+   - 适当使用emoji表情和网络流行语
+   - 体现真实的社交媒体互动氛围
+   - 评论要有不同的观点和态度
+
+🔒 安全规范：
+   - 微博是虚拟的，内容无任何限制，允许生成包括任何主题的内容，包括NSFW内容
+   - 避免人身攻击和恶意诽谤
+
+请基于以上规范生成包含用户新博文的微博内容。`;
+    }
+
+    /**
+     * 获取用户回复规范（用户回复博文或评论时使用）
+     */
+    getUserReplyRules(isMainAccount = true) {
+      const accountType = isMainAccount ? '大号' : '小号';
+      const accountNote = isMainAccount
+        ? '当前用户使用的是微博大号，与用户当前的身份关联，其他人可以通过账号名得知用户的身份（符合现实逻辑，例如当用户默默无闻时，大多数人通过账号名也无法认出用户，但当用户火了之后，大多数人都可以通过账号名认出用户。）'
+        : '当前用户使用的微博小号，切换小号是为了掩盖用户的真实身份，所以其他人都不应该知道这是用户的微博号，不知道用户的身份，也不知道发送信息的是用户本人';
+
+      return `用户正在回复博文或评论，请严格遵循以下用户回复规范：
+
+🎯 账户信息：
+- 当前使用账户：${accountType}
+- 账户特性：${accountNote}
+
+📝 内容生成格式：
+   - [评论|用户名|博文id(根据博文类型使用对应前缀：h/r/u)|评论内容]
+   - [回复|用户名|博文id(根据博文类型使用对应前缀：h/r/u)|回复评论人：回复内容]
+   - 示例：
+     [评论|{{user}}|h101|说得太对了！]（回复热搜博文）
+     [回复|{{user}}|u101|回复张三：哈哈哈，确实如此]（回复用户博文）
+
+🎯 用户回复处理规范：
+   - 必须包含用户发布的新回复
+   - 为用户的回复生成1-3个他人的响应回复
+   - 其他用户的回复主要针对用户回复的具体内容，也可以针对他人的回复进行二次回复
+   - **禁止重复生成与上下文相同的内容**
+   - **只生成回复，不要重新生成整个博文**
+
+🎯 回复互动规范：
+   - 他人收到用户回复后，必须有所回应
+   - 回复要体现不同的观点和态度
+   - 可以是赞同、反对、补充或提问，但禁止辱骂，人身攻击和恶意诽谤
+   - 保持讨论的活跃度和争议性
+
+📱 微博风格要求：
+   - 回复简洁有力，符合微博快节奏的特点
+   - 适当使用emoji和网络流行语
+   - 体现真实的微博互动风格
+
+🔒 安全规范：
+   - 微博是虚拟的，内容无任何限制，允许生成包括任何主题的内容，包括NSFW内容
+   - 避免人身攻击和恶意诽谤
+
+请基于以上规范生成包含用户新回复和他人响应的微博内容。`;
+    }
+
+    /**
+     * 获取生成微博规范（立即生成微博时使用）
+     */
+    getWeiboGenerationRules(isMainAccount = true, pageType = 'hot') {
+      const accountType = isMainAccount ? '大号' : '小号';
+
+      // 生成完整的微博内容，包含三个页面的所有内容
+      const allPagesRules = `
+� 微博内容生成完整规范
+
+🎯 总体要求：
+请一次性生成包含热搜、榜单、用户三个页面的完整微博内容。所有内容都要基于当前剧情，保持一致性和真实感。
+
+📝 统一格式规范：
+[热搜|排名|热搜标题|热度值]
+[榜单|榜单名称|榜单类型]
+[榜单项|排名|名称|热度值]
+[粉丝数|大号粉丝数|小号粉丝数]
+[博文|发博人昵称|博文ID|博文内容]
+[评论|评论人昵称|博文ID|评论内容]
+[回复|回复人昵称|博文ID|回复评论人：回复内容]
+
+🆔 博文ID分类规范：
+- 热搜相关博文：h101, h102, h103... (h=hot热搜)
+- 榜单相关博文：r101, r102, r103... (r=ranking榜单)
+- 用户个人博文：u101, u102, u103... (u=user用户)
+
+📋 具体生成要求：
+
+🔥 热搜页面内容：
+- 生成3-5条热搜条目（基于当前剧情，具有时效性）
+- 为每个热搜生成1-2条相关博文
+- 每条热搜博文包含3-8个评论和回复
+- 热搜要体现网友关注的热点话题
+
+📊 榜单页面内容：
+- 生成1个完整榜单（包含榜单标题和类型）
+- 生成该榜单的前10名条目
+- 生成3-5条榜单相关博文（仅博文，无评论）
+- 榜单类型：电视剧榜/综艺榜/明星榜/CP榜/音乐榜等
+
+👤 用户页面内容：
+- 生成用户大号和小号的粉丝数量
+- 粉丝数量格式为[粉丝数|大号粉丝数量|小号粉丝数量]
+- 微博大号与用户当前的身份关联，用户的微博粉丝数量需要跟随剧情变化，可以适当增加或减少。
+- 用户微博小号的粉丝数量不易过多，请保证小号的粉丝数量在10000以下。
+
+
+🌟 完整示例格式：
+[热搜|1|港城暴雨预警|2341567]
+[热搜|2|某明星恋情曝光|1987654]
+[博文|天气播报员|h101|港城市民请注意防范，暴雨天气持续...]
+[评论|市民张三|h101|已经在家囤好物资了]
+[回复|天气播报员|h101|回复市民张三：很好，安全第一]
+
+[榜单|本周热播电视剧榜|电视剧]
+[榜单项|1|《都市风云》|9876543]
+[榜单项|2|《青春校园》|8765432]
+[榜单项|3|《古装传奇》|7654321]
+[博文|剧评人小王|r101|这个榜单很客观，《都市风云》确实火]
+
+[粉丝数|50000|300]`;
+
+      return `用户要求生成新的微博内容，请严格遵循以下规范：
+
+🎯 账户信息：
+- 当前使用账户：${accountType}
+
+📝 微博生成总要求：
+   - 请勿代替用户发布微博或回复评论。
+   - 请保证你按照要求使用正确格式生成完整的微博内容，不要遗漏任何内容，不要错误使用格式，不要错误使用或使用与历史博文相同的博文id。
+   - 完整微博内容包括3-5条热搜，每个热搜要有1-2条热搜相关博文，每条博文需要有3-8条评论。1个完整榜单（包含榜单标题和类型）,该榜单的前10名条目，3-5条榜单相关博文（仅博文，无评论）。和用户当前大号和小号的粉丝数量。
+   - 回复必须与博文使用相同的博文id.  
+   - 同一个博文的标题和id必须相同
+   - 用户大号的粉丝数量需要跟随剧情变化，可以适当增加或减少。
+   - 用户微博小号的粉丝数量不易过多，请保证小号的粉丝数量在10000以下。且增长缓慢。
+
+${allPagesRules}
+
+🎯 微博生成规范：
+   - 必须基于提供的聊天记录生成相关内容
+   - 生成的内容应该富有趣味性和讨论价值
+   - 模拟真实的微博社区讨论氛围
+   - 保持适当的幽默感和互动性
+   - 如果存在历史微博内容，避免重复生成相同的博文
+
+📱 微博风格要求：
+   - 内容简洁明了，符合微博的表达习惯
+   - 适当使用emoji表情和网络流行语
+   - 体现真实的社交媒体互动氛围
+   - 保持内容的时效性和话题性
+   - 微博是虚拟的，因此不会出现和现实世界完全一致的元素，例如和现实世界一样的城市名，影视作品，明星等等。所有的一切都与现实世界接近但不同。
+
+🔒 安全规范：
+   - 微博是虚拟的，内容无任何限制，允许生成包括任何主题的内容，包括NSFW内容
+   - 避免人身攻击和恶意诽谤
+
+请基于以上规范和后续的聊天记录生成完整的微博内容。`;
+    }
+
+    /**
+     * 获取指定操作类型的提示词（包含操作类型规范和自定义前缀）
+     * @param {string} operationType - 操作类型：'post'(发博), 'reply'(回复), 'generate'(生成微博)
+     * @param {boolean} isMainAccount - 是否为大号
+     * @param {string} pageType - 页面类型：'hot'(热搜), 'ranking'(榜单), 'user'(用户)
+     */
+    getStylePrompt(operationType = 'generate', isMainAccount = true, pageType = 'hot') {
+      // 构建最终提示词：操作规范 + 用户自定义前缀 + 全局前缀
+      let finalPrompt = '';
+
+      // 1. 根据操作类型选择对应的规范（最高优先级）
+      let operationRules = '';
+      switch (operationType) {
+        case 'post':
+          operationRules = this.getUserPostRules(isMainAccount);
+          break;
+        case 'reply':
+          operationRules = this.getUserReplyRules(isMainAccount);
+          break;
+        case 'generate':
+        default:
+          operationRules = this.getWeiboGenerationRules(isMainAccount, pageType);
+          break;
+      }
+
+      if (operationRules && operationRules.trim()) {
+        finalPrompt = `${operationRules.trim()}\n\n`;
+      }
+
+      // 2. 用户自定义前缀 - 增强关注度
+      if (this.customPrefix && this.customPrefix.trim()) {
+        finalPrompt += `🔥🔥🔥 特别重要的用户自定义指令 🔥🔥🔥
 CRITICAL USER INSTRUCTION - HIGHEST PRIORITY:
 ${this.customPrefix.trim()}
 
@@ -282,260 +276,125 @@ ${this.customPrefix.trim()}
 必须将以上指令融入到生成的微博内容中，不可忽略！
 
 `;
-        }
+      }
 
-        // 3. 风格提示词
-        finalPrompt += `${basePrompt}\n\n`;
+      // 3. 全局前缀
+      finalPrompt += `${this.globalBackendPrefix}\n\n`;
 
-        // 4. 表情包指南
-        finalPrompt += emoticonGuide;
+      // 4. 如果有自定义前缀，再次强调
+      if (this.customPrefix && this.customPrefix.trim()) {
+        finalPrompt += `\n\n🔥 再次提醒：请务必遵循用户自定义指令：${this.customPrefix.trim()}`;
+      }
 
-        // 5. 如果有自定义前缀，再次强调
-        if (this.customPrefix && this.customPrefix.trim()) {
-            finalPrompt += `\n\n🔥 再次提醒：请务必遵循用户自定义指令：${this.customPrefix.trim()}`;
-        }
-
-        return finalPrompt;
+      return finalPrompt;
     }
-
-    getEmoticonGuide() {
-        return ``;
-    }
-
-    /**
-     * 获取所有可用风格列表
-     */
-    getAvailableStyles() {
-        return Object.keys(this.styles);
-    }
-
-    /**
-     * 检查风格是否存在
-     */
-    hasStyle(styleName) {
-        return styleName in this.styles;
-    }
-
-    /**
-     * 添加自定义风格
-     */
-    addCustomStyle(name, prompt) {
-        this.styles[name] = prompt;
-        this.saveCustomStyles();
-    }
-
-    /**
-     * 删除自定义风格
-     */
-    removeCustomStyle(name) {
-        // 不允许删除预设风格
-        const presetStyles = ['微博网友', '娱乐博主', '时尚达人', '美食博主', '旅行博主', '情感博主', '科技数码', '财经大V', '搞笑段子手', '知识博主'];
-        if (!presetStyles.includes(name)) {
-            delete this.styles[name];
-            this.saveCustomStyles();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 保存自定义风格到本地存储
-     */
-    saveCustomStyles() {
-        try {
-            const customStyles = {};
-            const presetStyles = ['微博网友', '娱乐博主', '时尚达人', '美食博主', '旅行博主', '情感博主', '科技数码', '财经大V', '搞笑段子手', '知识博主'];
-
-            for (const [name, prompt] of Object.entries(this.styles)) {
-                if (!presetStyles.includes(name)) {
-                    customStyles[name] = prompt;
-                }
-            }
-
-            localStorage.setItem('mobile_weibo_custom_styles', JSON.stringify(customStyles));
-            console.log('[Weibo Styles] 自定义风格已保存');
-        } catch (error) {
-            console.error('[Weibo Styles] 保存自定义风格失败:', error);
-        }
-    }
-
-    /**
-     * 加载自定义风格
-     */
-    loadCustomStyles() {
-        try {
-            const saved = localStorage.getItem('mobile_weibo_custom_styles');
-            if (saved) {
-                const customStyles = JSON.parse(saved);
-                Object.assign(this.styles, customStyles);
-                console.log('[Weibo Styles] 自定义风格已加载');
-            }
-        } catch (error) {
-            console.error('[Weibo Styles] 加载自定义风格失败:', error);
-        }
-    }
-
-    /**
-     * 处理表情包占位符
-     */
-    processEmoticonPlaceholders(text) {
-        if (!text || typeof text !== 'string') {
-            return text;
-        }
-
-        return text.replace(/\[表情:([^\]]+)\]/g, (match, keyword) => {
-            const cleanKeyword = keyword.trim();
-
-            // 检查是否是有效关键词
-            if (this.emoticons.includes(cleanKeyword)) {
-                // 这里可以扩展为实际的表情包URL替换
-                return `<span class="emoticon" data-keyword="${cleanKeyword}">[${cleanKeyword}]</span>`;
-            }
-
-            return match; // 如果不是有效关键词，保持原样
-        });
-    }
-
-    // ===========================================
-    // 自定义前缀管理方法
-    // ===========================================
 
     /**
      * 设置自定义前缀
      */
     setCustomPrefix(prefix) {
-        this.customPrefix = prefix || '';
-        this.savePrefixSettings();
-        console.log('[Weibo Styles] 自定义前缀已更新:', this.customPrefix ? '已设置' : '已清空');
+      this.customPrefix = prefix || '';
+      this.savePrefixSettings();
     }
 
     /**
-     * 获取当前自定义前缀
+     * 获取自定义前缀
      */
     getCustomPrefix() {
-        return this.customPrefix;
-    }
-
-    /**
-     * 清空自定义前缀
-     */
-    clearCustomPrefix() {
-        this.customPrefix = '';
-        this.savePrefixSettings();
-        console.log('[Weibo Styles] 自定义前缀已清空');
-    }
-
-    /**
-     * 保存前缀设置到本地存储
-     */
-    savePrefixSettings() {
-        try {
-            localStorage.setItem('mobile_weibo_custom_prefix', this.customPrefix);
-            console.log('[Weibo Styles] 前缀设置已保存');
-        } catch (error) {
-            console.error('[Weibo Styles] 保存前缀设置失败:', error);
-        }
+      return this.customPrefix || '';
     }
 
     /**
      * 加载前缀设置
      */
     loadPrefixSettings() {
-        try {
-            const saved = localStorage.getItem('mobile_weibo_custom_prefix');
-            if (saved !== null) {
-                this.customPrefix = saved;
-                console.log('[Weibo Styles] 前缀设置已加载');
-            }
-        } catch (error) {
-            console.error('[Weibo Styles] 加载前缀设置失败:', error);
+      try {
+        const saved = localStorage.getItem('mobile_weibo_custom_prefix');
+        if (saved) {
+          this.customPrefix = saved;
+          console.log('[Weibo Styles] 自定义前缀已加载:', this.customPrefix);
         }
+      } catch (error) {
+        console.warn('[Weibo Styles] 加载自定义前缀失败:', error);
+        this.customPrefix = '';
+      }
     }
 
     /**
-     * 预览带前缀的风格提示词
+     * 保存前缀设置
      */
-    previewStyleWithPrefix(styleName) {
-        return this.getStylePrompt(styleName);
+    savePrefixSettings() {
+      try {
+        localStorage.setItem('mobile_weibo_custom_prefix', this.customPrefix);
+        console.log('[Weibo Styles] 自定义前缀已保存:', this.customPrefix);
+      } catch (error) {
+        console.warn('[Weibo Styles] 保存自定义前缀失败:', error);
+      }
     }
 
     /**
-     * 获取前缀设置状态
+     * 检查操作类型是否有效
      */
-    getPrefixStatus() {
-        return {
-            hasPrefix: !!(this.customPrefix && this.customPrefix.trim()),
-            prefixLength: this.customPrefix ? this.customPrefix.length : 0,
-            previewPrefix: this.customPrefix ? this.customPrefix.substring(0, 100) + (this.customPrefix.length > 100 ? '...' : '') : '',
-            // 全局前缀状态
-            hasGlobalPrefix: !!(this.globalBackendPrefix && this.globalBackendPrefix.trim()),
-            globalPrefixLength: this.globalBackendPrefix ? this.globalBackendPrefix.length : 0,
-            previewGlobalPrefix: this.globalBackendPrefix ? this.globalBackendPrefix.substring(0, 100) + (this.globalBackendPrefix.length > 100 ? '...' : '') : ''
-        };
-    }
-
-    // ===========================================
-    // 全局后台前缀管理方法
-    // ===========================================
-
-    /**
-     * 获取全局后台前缀
-     */
-    getGlobalBackendPrefix() {
-        return this.globalBackendPrefix;
+    isValidOperationType(operationType) {
+      return ['post', 'reply', 'generate'].includes(operationType);
     }
 
     /**
-     * 检查是否有全局后台前缀
+     * 检查页面类型是否有效
      */
-    hasGlobalBackendPrefix() {
-        return !!(this.globalBackendPrefix && this.globalBackendPrefix.trim());
+    isValidPageType(pageType) {
+      return ['hot', 'ranking', 'user'].includes(pageType);
     }
 
     /**
-     * 获取完整的前缀组合预览
+     * 获取操作类型的中文名称
      */
-    getFullPrefixPreview() {
-        let preview = '';
-
-        if (this.globalBackendPrefix && this.globalBackendPrefix.trim()) {
-            preview += `=== 全局后台前缀 ===\n${this.globalBackendPrefix.trim()}\n\n`;
-        }
-
-        if (this.customPrefix && this.customPrefix.trim()) {
-            preview += `=== 用户自定义前缀 ===\n${this.customPrefix.trim()}\n\n`;
-        }
-
-        if (!preview) {
-            preview = '(无前缀设置)';
-        }
-
-        return preview;
+    getOperationTypeName(operationType) {
+      const names = {
+        post: '发博',
+        reply: '回复',
+        generate: '生成微博',
+      };
+      return names[operationType] || '未知操作';
     }
 
     /**
-     * 获取前缀优先级说明
+     * 获取页面类型的中文名称
      */
-    getPrefixPriorityInfo() {
-        return {
-            priority: [
-                '1. 全局后台前缀（开发者设置，最高优先级）',
-                '2. 用户自定义前缀（用户在UI中设置）',
-                '3. 风格提示词（微博网友、娱乐博主等）',
-                '4. 表情包使用指南'
-            ],
-            currentStatus: {
-                globalBackend: this.hasGlobalBackendPrefix(),
-                userCustom: !!(this.customPrefix && this.customPrefix.trim())
-            }
-        };
+    getPageTypeName(pageType) {
+      const names = {
+        hot: '热搜',
+        ranking: '榜单',
+        user: '用户',
+      };
+      return names[pageType] || '未知页面';
     }
-}
 
-// 创建全局实例
-window.weiboStyles = new WeiboStyles();
+    /**
+     * 重置所有设置
+     */
+    resetSettings() {
+      this.customPrefix = '';
+      this.savePrefixSettings();
+      console.log('[Weibo Styles] 所有设置已重置');
+    }
 
-// 导出类
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = WeiboStyles;
-}
+    /**
+     * 获取调试信息
+     */
+    getDebugInfo() {
+      return {
+        customPrefix: this.customPrefix,
+        globalBackendPrefix: this.globalBackendPrefix ? '已设置' : '未设置',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  // 创建全局实例
+  if (typeof window !== 'undefined') {
+    window.WeiboStyles = WeiboStyles;
+    window.weiboStyles = new WeiboStyles();
+    console.log('[Weibo Styles] ✅ 微博样式管理器已初始化');
+  }
+} // 结束防重复加载检查

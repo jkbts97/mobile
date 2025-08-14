@@ -40,6 +40,11 @@ window.MessageRenderer = class MessageRenderer {
         this.messageCache = new Map(); // 消息缓存
         this.renderCache = new Map(); // 渲染缓存
 
+        // 🔥 新增：好友姓名到ID的映射
+        this.friendNameToIdMap = new Map();
+        this.groupNameToIdMap = new Map();
+        this.generatedUserIds = new Map(); // 缓存生成的用户ID
+
         this.init();
     }
 
@@ -183,6 +188,169 @@ window.MessageRenderer = class MessageRenderer {
         return Math.abs(hash);
     }
 
+    /**
+     * 🔥 新增：建立好友姓名到ID的映射关系
+     * 从动态提取的数据格式中解析好友和群聊信息
+     */
+    buildFriendNameToIdMapping() {
+        const friendMap = new Map();
+        const groupMap = new Map();
+
+        // 检查是否有FriendRenderer实例
+        // @ts-ignore
+        if (window.friendRenderer && window.friendRenderer.extractedFriends) {
+            // @ts-ignore
+            window.friendRenderer.extractedFriends.forEach(contact => {
+                if (contact.isGroup) {
+                    // 群聊：记录群名到群ID的映射
+                    groupMap.set(contact.name, contact.number);
+                    console.log(`[Message Renderer] 群聊映射: ${contact.name} -> ${contact.number}`);
+                } else {
+                    // 好友：记录好友名到好友ID的映射
+                    friendMap.set(contact.name, contact.number);
+                    console.log(`[Message Renderer] 好友映射: ${contact.name} -> ${contact.number}`);
+                }
+            });
+        }
+
+        // 如果没有提取到信息，尝试从上下文中直接解析
+        if (friendMap.size === 0 && groupMap.size === 0) {
+            console.log('[Message Renderer] 尝试从上下文中直接解析好友和群聊信息');
+            this.parseFriendDataFromContext(friendMap, groupMap);
+        }
+
+        // 存储映射关系
+        this.friendNameToIdMap = friendMap;
+        this.groupNameToIdMap = groupMap;
+
+        console.log(`[Message Renderer] 建立了 ${friendMap.size} 个好友映射和 ${groupMap.size} 个群聊映射`);
+        return { friendMap, groupMap };
+    }
+
+    /**
+     * 🔥 新增：从上下文中直接解析好友和群聊数据
+     */
+    parseFriendDataFromContext(friendMap, groupMap) {
+        try {
+            // 检查SillyTavern是否可用
+            // @ts-ignore
+            if (!window.SillyTavern || !window.SillyTavern.getContext) {
+                console.warn('[Message Renderer] SillyTavern上下文不可用');
+                return;
+            }
+
+            // @ts-ignore
+            const context = window.SillyTavern.getContext();
+            if (!context || !context.chat || !Array.isArray(context.chat)) {
+                console.warn('[Message Renderer] 聊天数据不可用');
+                return;
+            }
+
+            // 定义正则表达式匹配动态提取的格式
+            const friendPattern = /\[好友id\|([^|]+)\|(\d+)\]/g;
+            const groupPattern = /\[群聊\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
+
+            context.chat.forEach(message => {
+                if (message.mes && typeof message.mes === 'string') {
+                    // 移除thinking标签
+                    const messageForMatching = this.removeThinkingTags ?
+                        this.removeThinkingTags(message.mes) : message.mes;
+
+                    // 提取好友信息：[好友id|络络|555555]
+                    const friendMatches = [...messageForMatching.matchAll(friendPattern)];
+                    friendMatches.forEach(match => {
+                        const friendName = match[1];
+                        const friendId = match[2];
+                        friendMap.set(friendName, friendId);
+                    });
+
+                    // 提取群聊信息：[群聊|一家人|123456|我、络络、江叙之]
+                    const groupMatches = [...messageForMatching.matchAll(groupPattern)];
+                    groupMatches.forEach(match => {
+                        const groupName = match[1];
+                        const groupId = match[2];
+                        const membersList = match[3];
+
+                        groupMap.set(groupName, groupId);
+
+                        // 🔥 新增：解析群聊成员列表，为每个成员建立映射
+                        if (membersList) {
+                            const members = membersList.split(/[、,，]/).map(name => name.trim()).filter(name => name);
+                            members.forEach(memberName => {
+                                // 如果成员不在好友映射中，生成一个唯一ID
+                                if (!friendMap.has(memberName) && memberName !== '我') {
+                                    const generatedId = this.generateUserIdFromName(memberName);
+                                    friendMap.set(memberName, generatedId);
+                                    console.log(`[Message Renderer] 为群聊成员 "${memberName}" 建立映射: ${generatedId}`);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+        } catch (error) {
+            console.error('[Message Renderer] 解析好友数据时出错:', error);
+        }
+    }
+
+    /**
+     * 🔥 新增：根据发送者姓名获取对应的ID
+     */
+    getIdBySenderName(senderName, isGroupMessage) {
+        // 首先检查是否已建立映射
+        if (!this.friendNameToIdMap || !this.groupNameToIdMap) {
+            this.buildFriendNameToIdMapping();
+        }
+
+        if (isGroupMessage) {
+            // 对于群聊消息，尝试从群聊映射中查找
+            // 注意：群聊消息的发送者是群内成员，我们需要的是群ID
+            // 这里可能需要根据当前聊天上下文来确定群ID
+            return this.currentFriendId || '';
+        } else {
+            // 对于私聊消息，从好友映射中查找
+            return this.friendNameToIdMap.get(senderName) || '';
+        }
+    }
+
+    /**
+     * 🔥 新增：移除thinking标签的辅助方法（如果不存在的话）
+     */
+    removeThinkingTags(text) {
+        if (!text) return '';
+        // 移除 <thinking>...</thinking> 标签及其内容
+        return text.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
+    }
+
+    /**
+     * 🔥 新增：为用户姓名生成唯一ID
+     * 用于群聊中没有明确好友关系的成员
+     */
+    generateUserIdFromName(userName) {
+        if (!userName) return '';
+
+        // 方法1：使用简单哈希算法生成数字ID
+        let hash = this.simpleHash(userName);
+
+        // 确保ID是6位数字，添加固定前缀避免与真实ID冲突
+        let generatedId = '8' + (hash % 100000).toString().padStart(5, '0');
+
+        console.log(`[Message Renderer] 为用户 "${userName}" 生成ID: ${generatedId}`);
+
+        // 缓存生成的ID，确保同一用户总是得到相同的ID
+        if (!this.generatedUserIds) {
+            this.generatedUserIds = new Map();
+        }
+
+        if (this.generatedUserIds.has(userName)) {
+            return this.generatedUserIds.get(userName);
+        } else {
+            this.generatedUserIds.set(userName, generatedId);
+            return generatedId;
+        }
+    }
+
     // 加载上下文监控器
     loadContextMonitor() {
         // @ts-ignore
@@ -233,6 +401,9 @@ window.MessageRenderer = class MessageRenderer {
 
         try {
             console.log('[Message Renderer] 🔥 开始使用统一提取法，保持原始穿插顺序');
+
+            // 🔥 新增：在提取消息前建立好友映射
+            this.buildFriendNameToIdMapping();
 
             // 🔥 核心修复：使用统一提取法，一次性提取所有消息
             // 这样可以保持消息在原始文本中的穿插顺序
@@ -822,9 +993,49 @@ window.MessageRenderer = class MessageRenderer {
         }
 
         // 提取字段值
-        const friendId = isGroupMessage ? (message.groupId || '') : (message.number || '');
+        // 🔥 修复：统一使用 message.number 字段，它在字段映射过程中已经正确设置
+        // 对于群聊消息，number 字段包含群ID
+        // 对于普通消息，number 字段包含好友ID
+        let friendId = message.number || '';
         const messageType = message.messageType || '';
         const content = message.content || '';
+
+        // 🔥 新增：尝试通过发送者姓名获取更精确的ID
+        if (!friendId && senderName) {
+            // 确保映射已建立
+            if (this.friendNameToIdMap.size === 0 && this.groupNameToIdMap.size === 0) {
+                this.buildFriendNameToIdMapping();
+            }
+
+            // 对于所有消息（包括群聊），都尝试获取发送者的个人ID
+            const mappedId = this.friendNameToIdMap.get(senderName);
+            if (mappedId) {
+                friendId = mappedId;
+                console.log(`[Message Renderer] 通过姓名 "${senderName}" 映射到个人ID: ${friendId}`);
+            } else if (isGroupMessage) {
+                // 如果是群聊消息但找不到发送者的个人ID，则使用群ID作为备用
+                friendId = this.currentFriendId || '';
+                console.log(`[Message Renderer] 群聊消息找不到 "${senderName}" 的个人ID，使用群ID: ${friendId}`);
+            }
+        }
+
+        // 🔥 新增：对于群聊消息，优先使用发送者的个人ID而不是群ID
+        if (isGroupMessage && senderName && senderName !== '我') {
+            // 确保映射已建立
+            if (this.friendNameToIdMap.size === 0 && this.groupNameToIdMap.size === 0) {
+                this.buildFriendNameToIdMapping();
+            }
+
+            const senderPersonalId = this.friendNameToIdMap.get(senderName);
+            if (senderPersonalId) {
+                friendId = senderPersonalId;
+                console.log(`[Message Renderer] 群聊消息使用发送者 "${senderName}" 的个人ID: ${friendId}`);
+            } else {
+                // 如果找不到发送者的个人ID，生成一个基于姓名的唯一ID
+                friendId = this.generateUserIdFromName(senderName);
+                console.log(`[Message Renderer] 为群聊成员 "${senderName}" 生成唯一ID: ${friendId}`);
+            }
+        }
 
         // 🌟 特殊处理：表情包消息
         if (messageType === '表情包' && content) {
@@ -2293,9 +2504,17 @@ window.MessageRenderer = class MessageRenderer {
         console.log('群聊消息数量:', this.groupMessages.length);
         console.log('总消息数量:', this.allMessages.length);
         console.log('上下文监控器状态:', !!this.contextMonitor);
+        console.log('好友姓名映射数量:', this.friendNameToIdMap ? this.friendNameToIdMap.size : 0);
+        console.log('群聊姓名映射数量:', this.groupNameToIdMap ? this.groupNameToIdMap.size : 0);
         console.log('性能统计:', this.getPerformanceStats());
         if (this.allMessages.length > 0) {
             console.log('消息样例:', this.allMessages[0]);
+        }
+        if (this.friendNameToIdMap && this.friendNameToIdMap.size > 0) {
+            console.log('好友姓名映射:', Array.from(this.friendNameToIdMap.entries()));
+        }
+        if (this.groupNameToIdMap && this.groupNameToIdMap.size > 0) {
+            console.log('群聊姓名映射:', Array.from(this.groupNameToIdMap.entries()));
         }
         console.groupEnd();
     }

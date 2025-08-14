@@ -1,750 +1,475 @@
-/* ===== weibo-control-app.css ===== */
-/* 微博应用控制面板样式 */
-/* 基于forum-control-app.css改写，适配微博应用控制面板 */
+/* ==SillyTavern Weibo Control App Styles== */
+/* @name         Weibo Control App Styles for Mobile Extension */
+/* @version      1.0.0 */
+/* @description  微博控制应用的样式，包含弹窗、表单、按钮等样式 */
+/* @author       Assistant */
+
+/* ===== 弹窗容器样式 ===== */
+.weibo-dialog-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.weibo-dialog-container[style*='block'] {
+  pointer-events: all;
+}
+
+/* ===== 弹窗遮罩样式 ===== */
+.weibo-dialog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+
+/* ===== 弹窗主体样式 ===== */
+.weibo-dialog {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.weibo-dialog.show {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* ===== 弹窗头部样式 ===== */
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.close-btn i {
+  font-size: 14px;
+}
+
+/* ===== 弹窗内容样式 ===== */
+.dialog-content {
+  padding: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
 
-/* ========== 基础样式 ========== */
-.weibo-control-container {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f5f5f5;
-    height: 100%;
-    overflow: hidden;
-    color: #333;
+/* 确认对话框内容 */
+.confirm-dialog .dialog-content p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+  text-align: center;
 }
 
-.weibo-control-interface {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: #f5f5f5;
+/* 输入对话框内容 */
+.input-dialog .dialog-content input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-dialog .dialog-content input:focus {
+  border-color: #ff8500;
 }
 
-/* ========== 手机状态栏 ========== */
-.weibo-control-interface .phone-status-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 44px;
-    padding: 0 15px;
-    background: linear-gradient(135deg, #ff6b6b, #ffa726);
-    color: white;
-    font-size: 16px;
-    font-weight: 500;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 10;
+/* ===== 用户信息样式 ===== */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f8f8;
+  border-radius: 8px;
 }
 
-.weibo-control-interface .status-bar-back {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    padding: 8px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
+.user-info .user-avatar {
+  flex-shrink: 0;
 }
 
-.weibo-control-interface .status-bar-back:hover {
-    background: rgba(255,255,255,0.1);
+.user-details {
+  flex: 1;
+  min-width: 0;
 }
 
-.weibo-control-interface .status-bar-title {
-    font-weight: 600;
-    font-size: 17px;
+.user-details .username {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
 }
 
-.weibo-control-interface .status-bar-icons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.user-details .account-badge {
+  font-size: 12px;
+  color: #666;
+  background: #e8e8e8;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
 }
 
-.weibo-control-interface .status-bar-time {
-    font-size: 14px;
-    font-weight: 500;
+/* ===== 发博输入区域样式 ===== */
+.post-input-section {
+  margin-bottom: 16px;
 }
 
-/* ========== 控制面板内容 ========== */
-.weibo-control-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0;
-    background: #f5f5f5;
+.post-input-section textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+  background: white !important; /* 强制白色背景 */
+  color: black !important; /* 强制黑色文字 */
 }
 
-.weibo-control-content::-webkit-scrollbar {
-    width: 4px;
+.post-input-section textarea:focus {
+  border-color: #ff8500;
 }
 
-.weibo-control-content::-webkit-scrollbar-track {
-    background: transparent;
+.post-input-section textarea::placeholder {
+  color: #999 !important; /* 强制placeholder颜色 */
 }
 
-.weibo-control-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 107, 107, 0.3);
-    border-radius: 2px;
+.char-count {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #666;
 }
 
-/* ========== 控制区块 ========== */
-.control-section {
-    background: white;
-    margin: 12px;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #f0f3f4;
+/* ===== 发博选项样式 ===== */
+.post-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #f8f9fa;
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 16px;
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
 }
 
-.section-icon {
-    font-size: 18px;
-    color: #ff6b6b;
-    margin-right: 12px;
-    width: 20px;
-    text-align: center;
+.option-item:hover {
+  background: #e8e8e8;
+  color: #333;
 }
 
-.section-header h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
+.option-item i {
+  font-size: 12px;
 }
 
-/* ========== 状态网格 ========== */
-.status-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
+/* ===== 弹窗底部样式 ===== */
+.dialog-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
 }
 
-.status-item {
-    text-align: center;
-    padding: 16px 12px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    border: 1px solid #e9ecef;
-    transition: all 0.2s ease;
+.dialog-footer button {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.status-item:hover {
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transform: translateY(-1px);
+.cancel-btn {
+  background: #f5f5f5;
+  color: #666;
 }
 
-.status-label {
-    font-size: 12px;
-    color: #6c757d;
-    margin-bottom: 8px;
-    font-weight: 500;
+.cancel-btn:hover {
+  background: #e8e8e8;
+  color: #333;
 }
 
-.status-value {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+.post-btn,
+.confirm-btn {
+  background: #ff8500;
+  color: white;
 }
 
-.status-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
+.post-btn:hover,
+.confirm-btn:hover {
+  background: #ff7300;
 }
 
-.status-indicator.online {
-    background: #28a745;
-    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+.post-btn:disabled {
+  background: #ccc;
+  color: #999;
+  cursor: not-allowed;
 }
 
-.status-indicator.offline {
-    background: #dc3545;
-    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+.post-btn.enabled {
+  background: #ff8500;
+  color: white;
 }
 
-/* ========== 控制网格 ========== */
-.control-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
+/* ===== Toast 提示样式 ===== */
+.weibo-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-.control-item {
-    display: flex;
-    flex-direction: column;
+.weibo-toast-success {
+  background: #52c41a;
 }
 
-.control-item.full-width {
-    grid-column: 1 / -1;
+.weibo-toast-error {
+  background: #ff4d4f;
 }
 
-.control-item label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #495057;
-    margin-bottom: 6px;
+.weibo-toast-info {
+  background: #1890ff;
 }
 
-.control-select {
-    padding: 8px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    background: white;
-    color: #495057;
-    font-size: 13px;
-    transition: all 0.2s ease;
-}
-
-.control-select:focus {
-    outline: none;
-    border-color: #ff6b6b;
-    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
-}
-
-/* ========== 滑块样式 ========== */
-.slider-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.control-slider {
-    flex: 1;
-    height: 6px;
-    border-radius: 3px;
-    background: #e9ecef;
-    outline: none;
-    -webkit-appearance: none;
-}
-
-.control-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ff6b6b;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
-    transition: all 0.2s ease;
-}
-
-.control-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
-}
-
-.control-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ff6b6b;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
-}
-
-.slider-value {
-    min-width: 30px;
-    text-align: center;
-    font-weight: 600;
-    color: #ff6b6b;
-    font-size: 14px;
-}
-
-/* ========== 开关样式 ========== */
-.switch-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.control-checkbox {
-    display: none;
-}
-
-.switch-slider {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    background: #ccc;
-    border-radius: 12px;
-    margin-right: 12px;
-    transition: all 0.3s ease;
-}
-
-.switch-slider::before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.control-checkbox:checked + .switch-slider {
-    background: #ff6b6b;
-}
-
-.control-checkbox:checked + .switch-slider::before {
-    transform: translateX(20px);
-}
-
-/* ========== 按钮样式 ========== */
-.control-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.control-btn {
-    flex: 1;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: none;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.control-btn.primary {
-    background: #ff6b6b;
-    color: white;
-}
-
-.control-btn.primary:hover {
-    background: #ff5252;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-}
-
-.control-btn.secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.control-btn.secondary:hover {
-    background: #5a6268;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-}
-
-.control-btn.warning {
-    background: #ffc107;
-    color: #212529;
-}
-
-.control-btn.warning:hover {
-    background: #e0a800;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
-}
-
-.control-btn.danger {
-    background: #dc3545;
-    color: white;
-}
-
-.control-btn.danger:hover {
-    background: #c82333;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.control-btn.info {
-    background: #17a2b8;
-    color: white;
-}
-
-.control-btn.info:hover {
-    background: #138496;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
-}
-
-.control-btn:active {
-    transform: translateY(0);
-}
-
-/* ========== 统计网格 ========== */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 16px;
-}
-
-.stats-item {
-    text-align: center;
-    padding: 20px 16px;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-radius: 12px;
-    border: 1px solid #dee2e6;
-    transition: all 0.2s ease;
-}
-
-.stats-item:hover {
-    background: linear-gradient(135deg, #fff, #f8f9fa);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-}
-
-.stats-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #ff6b6b;
-    margin-bottom: 6px;
-    display: block;
-}
-
-.stats-label {
-    font-size: 12px;
-    color: #6c757d;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* ========== 日志容器 ========== */
-.log-container {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    height: 200px;
-    overflow-y: auto;
-    padding: 12px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-}
-
-.log-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-.log-container::-webkit-scrollbar-track {
-    background: #e9ecef;
-    border-radius: 3px;
-}
-
-.log-container::-webkit-scrollbar-thumb {
-    background: #ced4da;
-    border-radius: 3px;
-}
-
-.log-entry {
-    display: flex;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid #e9ecef;
-    font-size: 12px;
-}
-
-.log-entry:last-child {
-    border-bottom: none;
-}
-
-.log-time {
-    color: #6c757d;
-    font-weight: 500;
-    margin-right: 12px;
-    min-width: 80px;
-}
-
-.log-message {
-    flex: 1;
-    color: #495057;
-}
-
-.log-entry.info .log-message {
-    color: #17a2b8;
-}
-
-.log-entry.success .log-message {
-    color: #28a745;
-}
-
-.log-entry.warning .log-message {
-    color: #ffc107;
-}
-
-.log-entry.error .log-message {
-    color: #dc3545;
-}
-
-.btn-clear-log {
-    background: none;
-    border: none;
-    color: #6c757d;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.btn-clear-log:hover {
-    background: #e9ecef;
-    color: #495057;
-}
-
-/* ========== 高级操作按钮 ========== */
-.advanced-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px;
-}
-
-.advanced-buttons .control-btn {
-    font-size: 13px;
-    padding: 10px 12px;
-}
-
-/* ========== 响应式设计 ========== */
+/* ===== 响应式设计 ===== */
 @media (max-width: 480px) {
-    .control-section {
-        margin: 8px;
-        padding: 16px;
-        border-radius: 8px;
-    }
+  .weibo-dialog-overlay {
+    padding: 16px;
+  }
 
-    .control-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
+  .weibo-dialog {
+    max-width: none;
+    width: 100%;
+    max-height: 90vh;
+  }
 
-    .status-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
+  .dialog-header {
+    padding: 12px 16px;
+  }
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
+  .dialog-header h3 {
+    font-size: 16px;
+  }
 
-    .control-buttons {
-        flex-direction: column;
-    }
+  .dialog-content {
+    padding: 16px;
+  }
 
-    .advanced-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
+  .user-info {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
 
-    .section-header h3 {
-        font-size: 15px;
-    }
+  .user-details .username {
+    font-size: 15px;
+  }
 
-    .log-container {
-        height: 150px;
-    }
+  .post-input-section textarea {
+    min-height: 80px;
+    font-size: 15px;
+  }
+
+  .post-options {
+    gap: 6px;
+  }
+
+  .option-item {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .dialog-footer {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .dialog-footer button {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
 }
 
 @media (max-width: 320px) {
-    .status-grid,
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
+  .weibo-dialog-overlay {
+    padding: 12px;
+  }
 
-    .control-section {
-        margin: 6px;
-        padding: 12px;
-    }
+  .dialog-header {
+    padding: 10px 12px;
+  }
+
+  .dialog-content {
+    padding: 12px;
+  }
+
+  .user-info {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .post-input-section textarea {
+    min-height: 70px;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .post-options {
+    gap: 4px;
+  }
+
+  .option-item {
+    padding: 5px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .dialog-footer {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .dialog-footer button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
 }
 
-/* ========== 动画效果 ========== */
-.control-fade-in {
-    animation: controlFadeIn 0.3s ease-out;
-}
-
-@keyframes controlFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.control-slide-up {
-    animation: controlSlideUp 0.3s ease-out;
-}
-
-@keyframes controlSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ========== 暗色主题支持 ========== */
-@media (prefers-color-scheme: dark) {
-    .weibo-control-container,
-    .weibo-control-interface {
-        background: #15202b;
-        color: #ffffff;
-    }
-
-    .weibo-control-content {
-        background: #15202b;
-    }
-
-    .control-section {
-        background: #1e2732;
-        border-color: #38444d;
-        color: #ffffff;
-    }
-
-    .section-header {
-        border-color: #38444d;
-    }
-
-    .section-header h3 {
-        color: #ffffff;
-    }
-
-    .status-item {
-        background: #192734;
-        border-color: #38444d;
-        color: #ffffff;
-    }
-
-    .status-item:hover {
-        background: #1e2732;
-    }
-
-    .control-select {
-        background: #1e2732;
-        border-color: #38444d;
-        color: #ffffff;
-    }
-
-    .control-slider {
-        background: #38444d;
-    }
-
-    .switch-slider {
-        background: #38444d;
-    }
-
-    .log-container {
-        background: #192734;
-        border-color: #38444d;
-        color: #ffffff;
-    }
-
-    .log-entry {
-        border-color: #38444d;
-    }
-
-    .stats-item {
-        background: linear-gradient(135deg, #192734, #1e2732);
-        border-color: #38444d;
-        color: #ffffff;
-    }
-
-    .stats-item:hover {
-        background: linear-gradient(135deg, #1e2732, #253341);
-    }
-}
-
-/* ========== 工具提示 ========== */
-.control-tooltip {
-    position: relative;
-}
-
-.control-tooltip::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    white-space: nowrap;
+/* ===== 动画效果 ===== */
+@keyframes fadeIn {
+  from {
     opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-    z-index: 1000;
-    margin-bottom: 8px;
-}
-
-.control-tooltip:hover::after {
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
     opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-/* ========== 加载状态 ========== */
-.control-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-    color: #6c757d;
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
 }
 
-.control-loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #e9ecef;
-    border-top: 2px solid #ff6b6b;
-    border-radius: 50%;
-    animation: controlSpin 1s linear infinite;
-    margin-right: 12px;
+/* ===== 滚动条样式 ===== */
+.dialog-content::-webkit-scrollbar {
+  width: 6px;
 }
 
-@keyframes controlSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.dialog-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
 }
 
-/* ========== 成功/错误状态 ========== */
-.control-success {
-    color: #28a745;
-    font-weight: 500;
+.dialog-content::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
 }
 
-.control-error {
-    color: #dc3545;
-    font-weight: 500;
+.dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
-.control-warning {
-    color: #ffc107;
-    font-weight: 500;
+/* ===== 焦点样式 ===== */
+.weibo-dialog button:focus,
+.weibo-dialog input:focus,
+.weibo-dialog textarea:focus {
+  outline: 2px solid #ff8500;
+  outline-offset: 2px;
 }
 
-.control-info {
-    color: #17a2b8;
-    font-weight: 500;
+/* ===== 禁用状态样式 ===== */
+.weibo-dialog button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.weibo-dialog button:disabled:hover {
+  transform: none;
 }
