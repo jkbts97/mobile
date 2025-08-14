@@ -104,9 +104,11 @@
   border-top: 1px solid #e8e8e8; /* 改为顶部边框 */
   border-bottom: none; /* 移除底部边框 */
   flex-shrink: 0;
-  height: 32px; /* 增加高度 */
+  height: 50px; /* 增加高度从32px到50px */
   z-index: 1000; /* 确保在最上层 */
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+  padding-bottom: env(safe-area-inset-bottom, 0); /* 适配iPhone底部安全区域 */
+  align-items: center; /* 垂直居中对齐 */
 }
 
 .weibo-tabs .tab-item {
@@ -115,13 +117,14 @@
   flex-direction: row; /* 改为水平排列 */
   align-items: center;
   justify-content: center;
-  padding: 2px 4px; /* 大幅缩小padding */
+  padding: 4px 6px; /* 大幅缩小padding */
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   color: #666;
-  font-size: 12px; /* 增加字体大小 */
-  gap: 3px; /* 增加图标和文字间距 */
+  font-size: 14px; /* 增加字体大小从12px到14px */
+  gap: 4px; /* 增加图标和文字间距 */
+  min-height: 40px; /* 确保最小高度 */
 }
 
 .weibo-tabs .tab-item:hover {
@@ -147,28 +150,55 @@
 }
 
 .weibo-tabs .tab-item i {
-  font-size: 12px; /* 增加图标大小 */
+  font-size: 16px; /* 增加图标大小从12px到16px */
   margin-bottom: 0; /* 移除下边距 */
 }
 
 .weibo-tabs .tab-item span {
-  font-size: 11px; /* 增加文字大小 */
+  font-size: 13px; /* 增加文字大小从11px到13px */
   font-weight: 500;
 }
 
 /* 响应式标签栏 */
 @media (max-width: 320px) {
+  .weibo-tabs {
+    height: 45px; /* 小屏幕下稍微减小高度 */
+  }
+
   .weibo-tabs .tab-item {
-    padding: 1px 3px; /* 进一步缩小 */
+    padding: 2px 4px; /* 适当缩小但保持可用性 */
+    min-height: 35px; /* 确保最小高度 */
   }
 
   .weibo-tabs .tab-item i {
-    font-size: 8px; /* 进一步缩小图标 */
+    font-size: 14px; /* 适当缩小图标但保持可见性 */
     margin-bottom: 0;
   }
 
   .weibo-tabs .tab-item span {
-    font-size: 7px; /* 进一步缩小文字 */
+    font-size: 11px; /* 适当缩小文字但保持可读性 */
+  }
+
+  .weibo-content {
+    padding-bottom: 55px; /* 小屏幕下调整底部间距 */
+  }
+}
+
+/* 中等屏幕响应式 */
+@media (max-width: 480px) and (min-width: 321px) {
+  .weibo-content {
+    padding-bottom: 60px; /* 确保有足够空间 */
+  }
+}
+
+/* 处理iPhone等设备的安全区域 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .weibo-tabs {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 5px);
+  }
+
+  .weibo-content {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
   }
 }
 
@@ -178,7 +208,7 @@
   overflow-y: auto;
   background: #f7f7f7;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 32px; /* 为底部tabs留出空间 */
+  padding-bottom: 60px; /* 为底部tabs留出足够空间 (50px + 10px margin) */
 }
 
 /* ===== 微博页面通用样式 ===== */
@@ -388,6 +418,8 @@
   width: 28px;
   height: 28px;
   font-size: 12px;
+  flex-shrink: 0; /* 防止头像被压缩 */
+  min-width: 28px; /* 确保最小宽度 */
 }
 
 .author-avatar.large {
@@ -505,26 +537,34 @@
 }
 
 .comment-author {
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+  flex-wrap: nowrap; /* 防止换行 */
+  width: 100%;
 }
 
 .comment-info {
   flex: 1;
   min-width: 0;
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 .comment-author-name {
   font-size: 13px;
   font-weight: 600;
   color: #333;
+  white-space: nowrap; /* 防止用户名换行 */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .comment-time {
   font-size: 11px;
   color: #999;
+  white-space: nowrap; /* 防止时间换行 */
+  flex-shrink: 0; /* 防止时间被压缩 */
 }
 
 .comment-content {
@@ -533,8 +573,11 @@
   font-size: 14px;
   color: #333;
   word-wrap: break-word;
+  word-break: break-word; /* 确保长单词换行 */
   margin-left: 0;
   padding-left: 0;
+  width: 100%; /* 确保占满可用宽度 */
+  box-sizing: border-box;
 }
 
 .comment-content .reply-to {
@@ -569,6 +612,64 @@
 
 .comment-actions .action-btn i {
   font-size: 12px;
+}
+
+/* 评论布局强化规则 - 防止格式错乱 */
+.comment-item * {
+  box-sizing: border-box;
+}
+
+/* 确保评论作者区域始终为水平布局 - 最高优先级 */
+.comment-author {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* 确保评论信息区域为垂直布局 */
+.comment-info {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center;
+  flex: 1 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* 确保用户名和时间为块级元素 */
+.comment-author-name,
+.comment-time {
+  display: block !important;
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+/* 防止任何子元素破坏布局 */
+.comment-author > * {
+  flex-shrink: 0;
+}
+
+.comment-author .comment-info {
+  flex-shrink: 1 !important;
+}
+
+/* 强制所有屏幕尺寸下的布局稳定性 */
+@media screen and (max-width: 9999px) {
+  .comment-author {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .comment-info {
+    display: flex !important;
+    flex-direction: column !important;
+  }
 }
 
 /* 回复输入框 */
@@ -914,6 +1015,8 @@
     width: 24px;
     height: 24px;
     font-size: 10px;
+    flex-shrink: 0; /* 防止头像被压缩 */
+    min-width: 24px; /* 确保最小宽度 */
   }
 
   .author-name {
@@ -937,11 +1040,21 @@
   .comment-content {
     font-size: 13px;
     margin-left: 0;
+    width: 100%; /* 确保占满可用宽度 */
+    box-sizing: border-box;
   }
 
   .comment-actions {
     justify-content: center; /* 保持居中对齐 */
     gap: 16px; /* 响应式下缩小间距 */
+  }
+
+  /* 强化评论作者布局 */
+  .comment-author {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 6px; /* 响应式下缩小间距 */
   }
 
   .user-header {
@@ -986,6 +1099,8 @@
     width: 20px;
     height: 20px;
     font-size: 9px;
+    flex-shrink: 0; /* 防止头像被压缩 */
+    min-width: 20px; /* 确保最小宽度 */
   }
 
   .post-content {
@@ -1001,11 +1116,21 @@
   .comment-content {
     font-size: 12px;
     margin-left: 0;
+    width: 100%; /* 确保占满可用宽度 */
+    box-sizing: border-box;
   }
 
   .comment-actions {
     justify-content: center; /* 保持居中对齐 */
     gap: 12px; /* 最小屏幕下进一步缩小间距 */
+  }
+
+  /* 强化评论作者布局 - 最小屏幕 */
+  .comment-author {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 4px; /* 最小屏幕下进一步缩小间距 */
   }
 
   /* 用户头部在小屏幕下的进一步优化 */
