@@ -300,9 +300,9 @@ class MessageSender {
         const validatedMessages = this.validateMessages(formattedMessages);
 
         // 构建最终消息
-        const targetPrefix = this.isGroup ?
-            `向${this.currentFriendName}（${this.currentFriendId}）发送群聊` :
-            `向${this.currentFriendName}（${this.currentFriendId}）发送消息`;
+        const targetPrefix = this.isGroup
+          ? `向${this.currentFriendName}（${this.currentFriendId}）发送群聊，请按照线上聊天群聊消息中的要求和格式生成群聊内角色回复，回复需要符合所有角色的人设和当前剧情`
+          : `向${this.currentFriendName}（${this.currentFriendId}）发送消息，请按照线上聊天私聊消息中的要求和格式生成角色回复，回复需要符合角色人设和当前剧情`;
 
         const finalMessage = `请用规定格式，${targetPrefix}\n${validatedMessages.join('\n')}`;
 

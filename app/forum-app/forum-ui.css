@@ -4,7 +4,7 @@
  */
 
 /* 导入Font Awesome图标库 */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+@import url('');
 
 /* CSS变量定义 */
 :root {
@@ -428,6 +428,7 @@
   display: flex;
   gap: 6px;
   margin-bottom: 6px;
+      flex-wrap: wrap;
 }
 
 .comment-avatar {
@@ -623,7 +624,7 @@
 
 .reply-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content:space-around;
   align-items: center;
   margin-top: 0;
   margin-left: 10px;

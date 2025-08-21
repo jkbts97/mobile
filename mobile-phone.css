@@ -50,7 +50,6 @@
   left: 0;
   width: 100%;
   height: 100%;
-
 }
 
 /* 手机框架 */
@@ -387,11 +386,13 @@
 }
 
 .app-header {
-  height: 40px; /* 减少高度 48px → 40px */
+  height: 40px;
+  /* 减少高度 48px → 40px */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 15px; /* 减少左右padding */
+  padding: 0 15px;
+  /* 减少左右padding */
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -416,7 +417,8 @@
 }
 
 .app-title {
-  font-size: 16px; /* 减小字体 18px → 16px */
+  font-size: 16px;
+  /* 减小字体 18px → 16px */
   font-weight: 600;
   color: #2d3748;
   margin: 0;
@@ -425,10 +427,12 @@
 .app-header-right {
   display: flex;
   align-items: center;
-  gap: 6px; /* 减小间距 10px → 6px */
+  gap: 6px;
+  /* 减小间距 10px → 6px */
   min-width: 40px;
   justify-content: flex-end;
-  margin-left: auto; /* 确保右侧组件靠右 */
+  margin-left: auto;
+  /* 确保右侧组件靠右 */
 }
 
 .app-header-btn {
@@ -436,14 +440,25 @@
   border: none;
   color: var(--text-color);
   cursor: pointer;
-  font-size: 13px; /* 进一步减小字体 14px → 13px */
-  padding: 3px 5px; /* 进一步减小padding */
+  font-size: 13px;
+  /* 进一步减小字体 14px → 13px */
+  padding: 3px 5px;
+  /* 进一步减小padding */
   border-radius: 6px;
   transition: all 0.2s ease;
-  margin-left: 3px; /* 进一步减小左边距 4px → 3px */
-  min-width: 38px; /* 减小最小宽度 44px → 38px */
+  margin-left: 3px;
+  /* 进一步减小左边距 4px → 3px */
+  min-width: 38px;
+  /* 减小最小宽度 44px → 38px */
   text-align: center;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-header-btn i {
+  font-size: 14px;
 }
 
 .app-header-btn:hover {
@@ -546,7 +561,8 @@
   }
 
   .app-header[data-app='weibo'] .app-header-btn span {
-    display: none; /* 在最小屏幕上隐藏文字，只显示图标 */
+    display: none;
+    /* 在最小屏幕上隐藏文字，只显示图标 */
   }
 
   .app-header[data-app='weibo'] .app-header-btn i {
@@ -566,6 +582,10 @@
     min-width: 32px;
     margin-left: 2px;
   }
+
+  .app-header-btn i {
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 420px) {
@@ -575,6 +595,10 @@
     min-width: 28px;
     margin-left: 2px;
   }
+
+  .app-header-btn i {
+    font-size: 11px;
+  }
 }
 
 @media (max-width: 360px) {
@@ -583,6 +607,10 @@
     padding: 1px 3px;
     min-width: 26px;
     margin-left: 1px;
+  }
+
+  .app-header-btn i {
+    font-size: 10px;
   }
 
   .app-title {
@@ -858,6 +886,7 @@
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -1252,18 +1281,24 @@
 .viewer-count {
   display: flex;
   align-items: center;
-  gap: 3px; /* 减小间距 5px → 3px */
-  font-size: 12px; /* 减小字体 14px → 12px */
+  gap: 3px;
+  /* 减小间距 5px → 3px */
+  font-size: 12px;
+  /* 减小字体 14px → 12px */
   color: var(--text-color);
   background: rgba(255, 255, 255, 0.1);
-  padding: 3px 6px; /* 减小padding 4px 8px → 3px 6px */
-  border-radius: 10px; /* 减小圆角 12px → 10px */
-  margin-right: 3px; /* 减小右边距 5px → 3px */
+  padding: 3px 6px;
+  /* 减小padding 4px 8px → 3px 6px */
+  border-radius: 10px;
+  /* 减小圆角 12px → 10px */
+  margin-right: 3px;
+  /* 减小右边距 5px → 3px */
 }
 
 .viewer-count i {
   color: #fb7299;
-  font-size: 10px; /* 减小图标 12px → 10px */
+  font-size: 10px;
+  /* 减小图标 12px → 10px */
 }
 
 .gift-log-btn {
@@ -1277,7 +1312,8 @@
 .app-content {
   flex: 1;
   overflow-y: auto;
-  height: calc(100% - 40px); /* 更新高度计算 48px → 40px */
+  height: calc(100% - 40px);
+  /* 更新高度计算 48px → 40px */
   padding-bottom: 0;
 }
 
@@ -1297,10 +1333,10 @@
   display: flex;
   gap: 12px;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: transparent; /* 完全透明背景 */
+  border-radius: 0; /* 移除圆角 */
+  backdrop-filter: none; /* 移除磨砂效果 */
+  box-shadow: none; /* 移除阴影 */
 }
 
 .message-avatar {
@@ -1514,37 +1550,54 @@
 @media (max-width: 768px) {
   /* Header响应式 */
   .app-header {
-    height: 36px; /* 减少高度 40px → 36px */
-    padding: 0 12px; /* 减少左右padding */
+    height: 36px;
+    /* 减少高度 40px → 36px */
+    padding: 0 12px;
+    /* 减少左右padding */
   }
 
   .app-title {
-    font-size: 15px; /* 减小字体 16px → 15px */
+    font-size: 15px;
+    /* 减小字体 16px → 15px */
   }
 
   .app-header-btn {
-    font-size: 12px; /* 进一步减小字体 13px → 12px */
-    padding: 2px 4px; /* 进一步减小padding */
-    margin-left: 2px; /* 进一步减小左边距 */
-    min-width: 34px; /* 减小最小宽度 */
+    font-size: 12px;
+    /* 进一步减小字体 13px → 12px */
+    padding: 2px 4px;
+    /* 进一步减小padding */
+    margin-left: 2px;
+    /* 进一步减小左边距 */
+    min-width: 34px;
+    /* 减小最小宽度 */
+  }
+
+  .app-header-btn i {
+    font-size: 13px;
   }
 
   .app-header-right {
-    gap: 5px; /* 减小间距 6px → 5px */
+    gap: 5px;
+    /* 减小间距 6px → 5px */
   }
 
   .viewer-count {
-    font-size: 11px; /* 减小字体 12px → 11px */
-    padding: 2px 5px; /* 减小padding */
-    margin-right: 2px; /* 减小右边距 */
+    font-size: 11px;
+    /* 减小字体 12px → 11px */
+    padding: 2px 5px;
+    /* 减小padding */
+    margin-right: 2px;
+    /* 减小右边距 */
   }
 
   .viewer-count i {
-    font-size: 9px; /* 减小图标 10px → 9px */
+    font-size: 9px;
+    /* 减小图标 10px → 9px */
   }
 
   .app-content {
-    height: calc(100% - 36px); /* 更新高度计算 */
+    height: calc(100% - 36px);
+    /* 更新高度计算 */
   }
 
   .mobile-phone-frame {
@@ -2085,21 +2138,26 @@
   background-size: 12px 12px, 100% 4px;
   background-position: 100% center, center center;
 }
+
 .config-section {
   padding: 10px !important;
 }
+
 .avatars-section {
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
 }
+
 .config-field small,
 .config-field label {
   color: #666 !important;
 }
+
 .home-screen input[type='text'],
 .home-screen textarea,
 .home-screen select {
   background: #eee !important;
 }
+
 .weibo-auto-listener-status {
   display: none !important;
 }
@@ -2108,37 +2166,54 @@
 @media (max-width: 480px) {
   /* Header响应式 */
   .app-header {
-    height: 32px; /* 进一步减少高度 36px → 32px */
-    padding: 0 10px; /* 进一步减少左右padding */
+    height: 32px;
+    /* 进一步减少高度 36px → 32px */
+    padding: 0 10px;
+    /* 进一步减少左右padding */
   }
 
   .app-title {
-    font-size: 14px; /* 进一步减小字体 15px → 14px */
+    font-size: 14px;
+    /* 进一步减小字体 15px → 14px */
   }
 
   .app-header-btn {
-    font-size: 10px; /* 进一步减小字体 12px → 10px */
-    padding: 1px 3px; /* 进一步减小padding */
-    margin-left: 1px; /* 进一步减小左边距 */
-    min-width: 30px; /* 减小最小宽度 */
+    font-size: 10px;
+    /* 进一步减小字体 12px → 10px */
+    padding: 1px 3px;
+    /* 进一步减小padding */
+    margin-left: 1px;
+    /* 进一步减小左边距 */
+    min-width: 30px;
+    /* 减小最小宽度 */
+  }
+
+  .app-header-btn i {
+    font-size: 11px;
   }
 
   .app-header-right {
-    gap: 4px; /* 进一步减小间距 5px → 4px */
+    gap: 4px;
+    /* 进一步减小间距 5px → 4px */
   }
 
   .viewer-count {
-    font-size: 10px; /* 进一步减小字体 11px → 10px */
-    padding: 1px 4px; /* 进一步减小padding */
-    margin-right: 1px; /* 进一步减小右边距 */
+    font-size: 10px;
+    /* 进一步减小字体 11px → 10px */
+    padding: 1px 4px;
+    /* 进一步减小padding */
+    margin-right: 1px;
+    /* 进一步减小右边距 */
   }
 
   .viewer-count i {
-    font-size: 8px; /* 进一步减小图标 9px → 8px */
+    font-size: 8px;
+    /* 进一步减小图标 9px → 8px */
   }
 
   .app-content {
-    height: calc(100% - 32px); /* 更新高度计算 */
+    height: calc(100% - 32px);
+    /* 更新高度计算 */
   }
 }
 
@@ -2152,3 +2227,4 @@
 .shop-accent-btn:hover {
   filter: brightness(1.05);
 }
+

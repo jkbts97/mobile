@@ -22,6 +22,11 @@ class MobilePhone {
     this.createPhoneContainer();
     this.registerApps();
     this.startClock();
+
+    // 初始化文字颜色设置
+    setTimeout(() => {
+      this.initTextColor();
+    }, 1000); // 延迟初始化，确保页面加载完成
   }
 
   // 加载拖拽辅助插件
@@ -97,7 +102,7 @@ class MobilePhone {
           clickThreshold: 8, // 稍微增加点击阈值确保点击功能正常
           dragClass: 'mobile-phone-trigger-dragging',
           savePosition: false, // 不保存位置
-          storageKey: 'mobile-phone-trigger-position'
+          storageKey: 'mobile-phone-trigger-position',
         });
 
         console.log('[Mobile Phone] 拖拽功能初始化成功');
@@ -143,7 +148,7 @@ class MobilePhone {
             savePosition: false, // 不保存位置
             storageKey: 'mobile-phone-frame-position',
             touchTimeout: 300, // 增加触摸超时时间
-            dragHandle: '.mobile-status-bar' // 指定拖拽手柄为状态栏
+            dragHandle: '.mobile-status-bar', // 指定拖拽手柄为状态栏
           });
 
           console.log('[Mobile Phone] 框架拖拽功能初始化成功');
@@ -310,9 +315,18 @@ class MobilePhone {
 
   // 绑定事件
   bindEvents() {
-    // 点击遮罩层关闭
+    // 点击遮罩层关闭（仅在非兼容模式下生效）
     document.querySelector('.mobile-phone-overlay').addEventListener('click', () => {
-      this.hidePhone();
+      // 检查是否启用了兼容模式
+      const isCompatibilityMode =
+        window.MobileContextPlugin &&
+        window.MobileContextPlugin.getSettings &&
+        window.MobileContextPlugin.getSettings().tavernCompatibilityMode;
+
+      // 只有在非兼容模式下才允许点击外部关闭
+      if (!isCompatibilityMode) {
+        this.hidePhone();
+      }
     });
 
     // 返回按钮
@@ -607,6 +621,23 @@ class MobilePhone {
     // 根据应用状态添加功能按钮
     if (state.app === 'messages') {
       if (state.view === 'messageList' || state.view === 'list') {
+        // 消息列表页面：添加文字颜色切换按钮
+        const textColorBtn = document.createElement('button');
+        textColorBtn.className = 'app-header-btn text-color-toggle';
+        // 显示将要切换到的颜色（与当前颜色相反）
+        textColorBtn.innerHTML = this.getCurrentTextColor() === 'white' ? '黑' : '白';
+        textColorBtn.title = '切换文字颜色';
+        textColorBtn.addEventListener('click', () => this.toggleTextColor());
+        headerRight.appendChild(textColorBtn);
+
+        // 消息列表页面：添加图片设置按钮
+        const imageConfigBtn = document.createElement('button');
+        imageConfigBtn.className = 'app-header-btn';
+        imageConfigBtn.innerHTML = '<i class="fas fa-image"></i>';
+        imageConfigBtn.title = '图片设置';
+        imageConfigBtn.addEventListener('click', () => this.showImageConfigModal());
+        headerRight.appendChild(imageConfigBtn);
+
         // 消息列表页面：添加好友按钮
         const addFriendBtn = document.createElement('button');
         addFriendBtn.className = 'app-header-btn';
@@ -615,10 +646,17 @@ class MobilePhone {
         addFriendBtn.addEventListener('click', () => this.showAddFriend());
         headerRight.appendChild(addFriendBtn);
       } else if (state.view === 'messageDetail') {
-        // 消息详情页面：添加刷新按钮
+        // 消息详情页面：添加相片按钮和刷新按钮
+        const photoBtn = document.createElement('button');
+        photoBtn.className = 'app-header-btn';
+        photoBtn.innerHTML = '<i class="fas fa-image"></i>';
+        photoBtn.title = '图片设置';
+        photoBtn.addEventListener('click', () => this.openFriendImageConfig());
+        headerRight.appendChild(photoBtn);
+
         const refreshBtn = document.createElement('button');
         refreshBtn.className = 'app-header-btn';
-        refreshBtn.innerHTML = '🔄';
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
         refreshBtn.title = '刷新消息';
         refreshBtn.addEventListener('click', () => this.refreshMessageDetail());
         headerRight.appendChild(refreshBtn);
@@ -912,7 +950,7 @@ class MobilePhone {
       // 刷新按钮
       const refreshBtn = document.createElement('button');
       refreshBtn.className = 'app-header-btn';
-      refreshBtn.innerHTML = '🔄';
+      refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
       refreshBtn.title = '刷新背包';
       refreshBtn.addEventListener('click', () => {
         if (window.backpackAppRefresh) {
@@ -977,6 +1015,165 @@ class MobilePhone {
   refreshMessageDetail() {
     if (window.messageApp && window.messageApp.refreshMessageDetail) {
       window.messageApp.refreshMessageDetail();
+    }
+  }
+
+  // 打开好友图片配置弹窗
+  async openFriendImageConfig() {
+    try {
+      // 获取当前好友信息
+      const friendInfo = this.getCurrentFriendInfo();
+      if (!friendInfo) {
+        console.warn('[Mobile Phone] 无法获取当前好友信息');
+        return;
+      }
+
+      // 检查是否为群聊
+      if (friendInfo.isGroup) {
+        console.log('[Mobile Phone] 群聊不支持图片配置');
+        return;
+      }
+
+      // 确保好友图片配置模块已加载
+      if (!window.friendImageConfigModal) {
+        console.log('[Mobile Phone] 正在加载好友图片配置模块...');
+        await this.loadFriendImageConfigModule();
+      }
+
+      // 打开弹窗
+      await window.friendImageConfigModal.open(friendInfo.friendId, friendInfo.friendName, friendInfo.backgroundId);
+
+      console.log(`[Mobile Phone] 打开好友图片配置: ${friendInfo.friendName}`);
+    } catch (error) {
+      console.error('[Mobile Phone] 打开好友图片配置失败:', error);
+    }
+  }
+
+  // 获取当前好友信息
+  getCurrentFriendInfo() {
+    try {
+      // 方法1: 从全局MessageApp获取
+      if (window.messageApp && window.messageApp.currentFriendId) {
+        const friendName =
+          window.messageApp.currentFriendName || this.getFriendNameById(window.messageApp.currentFriendId);
+        return {
+          friendId: window.messageApp.currentFriendId,
+          friendName: friendName,
+          isGroup: window.messageApp.currentIsGroup || false,
+          backgroundId: window.messageApp.currentFriendId,
+        };
+      }
+
+      // 方法2: 从MessageApp获取
+      if (this.messageApp && this.messageApp.currentFriendId) {
+        return {
+          friendId: this.messageApp.currentFriendId,
+          friendName: this.messageApp.currentFriendName || '未知好友',
+          isGroup: this.messageApp.isGroup || false,
+          backgroundId: this.messageApp.currentFriendId,
+        };
+      }
+
+      // 方法3: 从DOM获取data-background-id
+      const messageDetailContent = document.querySelector('.message-detail-content[data-background-id]');
+      if (messageDetailContent) {
+        const backgroundId = messageDetailContent.getAttribute('data-background-id');
+        return {
+          friendId: backgroundId,
+          friendName: '未知好友',
+          isGroup: false,
+          backgroundId: backgroundId,
+        };
+      }
+
+      console.warn('[Mobile Phone] 无法获取当前好友信息');
+      return null;
+    } catch (error) {
+      console.error('[Mobile Phone] 获取好友信息失败:', error);
+      return null;
+    }
+  }
+
+  // 加载好友图片配置模块
+  async loadFriendImageConfigModule() {
+    try {
+      // 检查是否已经加载
+      if (window.FriendImageConfigModal || window.friendImageConfigModal) {
+        console.log('[Mobile Phone] 好友图片配置模块已存在');
+        return;
+      }
+
+      console.log('[Mobile Phone] 开始加载好友图片配置模块...');
+
+      // 动态加载JavaScript模块
+      const scriptPath = '/scripts/extensions/third-party/mobile/app/friend-image-config-modal.js';
+
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = scriptPath;
+        script.onload = () => {
+          console.log('[Mobile Phone] 好友图片配置JS加载完成');
+          // 等待一小段时间确保模块初始化
+          setTimeout(resolve, 100);
+        };
+        script.onerror = error => {
+          console.error('[Mobile Phone] 好友图片配置JS加载失败:', error);
+          reject(error);
+        };
+        document.head.appendChild(script);
+
+        // 10秒超时
+        setTimeout(() => reject(new Error('加载超时')), 10000);
+      });
+
+      // 验证模块是否正确加载
+      if (!window.friendImageConfigModal) {
+        throw new Error('模块加载后未找到friendImageConfigModal实例');
+      }
+
+      console.log('[Mobile Phone] 好友图片配置模块加载完成');
+    } catch (error) {
+      console.error('[Mobile Phone] 加载好友图片配置模块失败:', error);
+      throw error;
+    }
+  }
+
+  // 根据好友ID获取好友名称
+  getFriendNameById(friendId) {
+    try {
+      // 方法1: 从FriendRenderer获取
+      if (window.friendRenderer && window.friendRenderer.getFriendById) {
+        const friend = window.friendRenderer.getFriendById(friendId);
+        if (friend && friend.name) {
+          return friend.name;
+        }
+      }
+
+      // 方法2: 从MessageRenderer获取
+      if (window.messageRenderer && window.messageRenderer.getCurrentFriendName) {
+        const name = window.messageRenderer.getCurrentFriendName();
+        if (name) {
+          return name;
+        }
+      }
+
+      // 方法3: 从DOM中的标题获取
+      const headerTitle = document.querySelector('.app-header-title');
+      if (headerTitle && headerTitle.textContent && headerTitle.textContent !== '消息') {
+        return headerTitle.textContent.trim();
+      }
+
+      // 方法4: 从好友列表DOM获取
+      const friendElement = document.querySelector(`[data-friend-id="${friendId}"] .friend-name`);
+      if (friendElement && friendElement.textContent) {
+        return friendElement.textContent.trim();
+      }
+
+      console.warn(`[Mobile Phone] 无法获取好友ID ${friendId} 的名称`);
+      return '未知好友';
+    } catch (error) {
+      console.error('[Mobile Phone] 获取好友名称失败:', error);
+      return '未知好友';
     }
   }
 
@@ -1187,6 +1384,11 @@ class MobilePhone {
 
     // 启动应用状态同步轮询
     this.startStateSyncLoop();
+
+    // 应用pointer-events设置
+    if (window.MobileContextPlugin && window.MobileContextPlugin.updatePointerEventsSettings) {
+      window.MobileContextPlugin.updatePointerEventsSettings();
+    }
   }
 
   hidePhone() {
@@ -4274,7 +4476,7 @@ class MobilePhone {
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        fontAwesomeLink.href = '';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成（论坛应用）');
           checkComplete();
@@ -4440,7 +4642,7 @@ class MobilePhone {
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        fontAwesomeLink.href = '';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成');
           checkComplete();
@@ -5370,6 +5572,98 @@ class MobilePhone {
       this._stateSyncTimer = null;
       console.log('[Mobile Phone] 已停止状态同步轮询');
     }
+  }
+
+  // 获取当前文字颜色设置
+  getCurrentTextColor() {
+    // 从全局CSS配置的Data Bank中获取
+    if (window.styleConfigManager && window.styleConfigManager.getConfig) {
+      const config = window.styleConfigManager.getConfig();
+      return config.messageTextColor || 'black';
+    }
+
+    // 从localStorage获取（备用方案）
+    return localStorage.getItem('messageTextColor') || 'black';
+  }
+
+  // 切换文字颜色
+  toggleTextColor() {
+    // 直接从DOM获取当前状态，更可靠
+    const body = document.body;
+    const isCurrentlyWhite = body.classList.contains('text-color-white');
+    const newColor = isCurrentlyWhite ? 'black' : 'white';
+
+    console.log(`[Mobile Phone] 切换文字颜色: ${isCurrentlyWhite ? 'white' : 'black'} -> ${newColor}`);
+
+    // 保存到全局CSS配置的Data Bank
+    if (window.styleConfigManager && window.styleConfigManager.updateConfig) {
+      window.styleConfigManager.updateConfig({
+        messageTextColor: newColor,
+      });
+    } else {
+      // 备用方案：保存到localStorage
+      localStorage.setItem('messageTextColor', newColor);
+    }
+
+    // 应用颜色到页面
+    this.applyTextColor(newColor);
+
+    // 更新按钮文字
+    this.updateTextColorButton(newColor);
+
+    // 显示提示
+    MobilePhone.showToast(`文字颜色已切换为${newColor === 'white' ? '白色' : '黑色'}`);
+  }
+
+  // 应用文字颜色到页面
+  applyTextColor(color) {
+    const root = document.documentElement;
+    const body = document.body;
+
+    // 移除之前的颜色类
+    body.classList.remove('text-color-white', 'text-color-black');
+
+    // 添加新的颜色类
+    body.classList.add(`text-color-${color}`);
+
+    // 设置CSS变量
+    root.style.setProperty('--message-text-color', color === 'white' ? '#fff' : '#000');
+
+    console.log(`[Mobile Phone] 已应用文字颜色: ${color}`);
+  }
+
+  // 更新文字颜色按钮显示
+  updateTextColorButton(color) {
+    const button = document.querySelector('.text-color-toggle');
+    if (button) {
+      // 显示将要切换到的颜色（与当前颜色相反）
+      button.innerHTML = color === 'white' ? '黑' : '白';
+      button.title = `当前: ${color === 'white' ? '白色' : '黑色'}文字，点击切换为${
+        color === 'white' ? '黑色' : '白色'
+      }`;
+    }
+  }
+
+  // 初始化文字颜色设置
+  initTextColor() {
+    const savedColor = this.getCurrentTextColor();
+    this.applyTextColor(savedColor);
+    console.log(`[Mobile Phone] 初始化文字颜色: ${savedColor}`);
+  }
+
+  // 显示图片配置弹窗
+  showImageConfigModal() {
+    console.log('[Mobile Phone] 显示图片配置弹窗');
+
+    // 确保ImageConfigModal已加载
+    if (!window.ImageConfigModal) {
+      console.error('[Mobile Phone] ImageConfigModal未加载');
+      MobilePhone.showToast('图片配置功能未就绪', 'error');
+      return;
+    }
+
+    // 显示弹窗
+    window.ImageConfigModal.show();
   }
 }
 

@@ -1,0 +1,121 @@
+<!-- 好友专用图片配置弹窗 -->
+<div id="friend-image-config-modal" class="friend-image-config-modal" style="display: none">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" id="friend-modal-title">好友设置</h3>
+      <button class="modal-close-btn" id="friend-modal-close" type="button">✕</button>
+    </div>
+
+    <div class="modal-tabs">
+      <button class="tab-btn active" data-tab="avatar">角色头像</button>
+      <button class="tab-btn" data-tab="background">聊天背景</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="tab-content" data-tab="avatar" style="display: block">
+        <div class="config-section">
+          <div class="upload-section">
+            <div class="upload-controls">
+              <input type="file" id="friend-avatar-file-input" accept="image/*" style="display: none" />
+              <button class="upload-btn" data-target="friend-avatar-file-input">选择图片</button>
+              <input type="url" class="url-input" placeholder="或输入图片链接..." data-type="avatar" />
+            </div>
+          </div>
+
+          <div class="preview-section">
+            <div class="preview-container avatar-preview">
+              <div class="preview-image" id="friend-avatar-preview"></div>
+              <div class="drag-hint">拖拽调整位置</div>
+            </div>
+          </div>
+
+          <div class="controls-section">
+            <div class="control-row">
+              <label>旋转:</label>
+              <input
+                type="range"
+                class="control-slider"
+                min="0"
+                max="360"
+                step="1"
+                value="0"
+                data-type="avatar"
+                data-property="rotation"
+              />
+              <span class="control-value">0°</span>
+            </div>
+            <div class="control-row">
+              <label>缩放:</label>
+              <input
+                type="range"
+                class="control-slider"
+                min="0.5"
+                max="2"
+                step="0.1"
+                value="1"
+                data-type="avatar"
+                data-property="scale"
+              />
+              <span class="control-value">1.0x</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" data-tab="background" style="display: none">
+        <div class="config-section">
+          <div class="upload-section">
+            <div class="upload-controls">
+              <input type="file" id="friend-background-file-input" accept="image/*" style="display: none" />
+              <button class="upload-btn" data-target="friend-background-file-input">选择图片</button>
+              <input type="url" class="url-input" placeholder="或输入图片链接..." data-type="background" />
+            </div>
+          </div>
+
+          <div class="preview-section">
+            <div class="preview-container background-preview">
+              <div class="preview-image" id="friend-background-preview"></div>
+              <div class="drag-hint">拖拽调整位置</div>
+            </div>
+          </div>
+
+          <div class="controls-section">
+            <div class="control-row">
+              <label>旋转:</label>
+              <input
+                type="range"
+                class="control-slider"
+                min="0"
+                max="360"
+                step="1"
+                value="0"
+                data-type="background"
+                data-property="rotation"
+              />
+              <span class="control-value">0°</span>
+            </div>
+            <div class="control-row">
+              <label>缩放:</label>
+              <input
+                type="range"
+                class="control-slider"
+                min="0.5"
+                max="2"
+                step="0.1"
+                value="1"
+                data-type="background"
+                data-property="scale"
+              />
+              <span class="control-value">1.0x</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="save-btn" id="friend-config-save" type="button">保存设置</button>
+    </div>
+  </div>
+</div>

@@ -205,16 +205,22 @@ if (typeof window.WeiboAutoListener !== 'undefined') {
 
         // 参考Forum-App：只在有实际消息增量时输出日志
         if (increment > 0) {
-          console.log(
-            `[Weibo Auto Listener] 检测到新消息: +${increment} (${this.lastProcessedMessageCount} -> ${currentCount})`,
-          );
+          if (window.DEBUG_WEIBO_AUTO_LISTENER) {
+            console.log(
+              `[Weibo Auto Listener] 检测到新消息: +${increment} (${this.lastProcessedMessageCount} -> ${currentCount})`,
+            );
+          }
 
           // 检查是否达到阈值
           if (increment >= this.settings.threshold) {
             console.log(`[Weibo Auto Listener] 🚀 达到阈值 (${increment}/${this.settings.threshold})，触发微博生成`);
             await this.handleChatUpdate(currentCount);
           } else {
-            console.log(`[Weibo Auto Listener] 消息增量未达到阈值 (${increment}/${this.settings.threshold})，继续监听`);
+            if (window.DEBUG_WEIBO_AUTO_LISTENER) {
+              console.log(
+                `[Weibo Auto Listener] 消息增量未达到阈值 (${increment}/${this.settings.threshold})，继续监听`,
+              );
+            }
           }
         }
         // 如果没有新消息，不输出任何日志（避免刷屏）

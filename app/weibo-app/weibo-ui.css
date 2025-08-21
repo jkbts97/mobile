@@ -104,7 +104,7 @@
   border-top: 1px solid #e8e8e8; /* 改为顶部边框 */
   border-bottom: none; /* 移除底部边框 */
   flex-shrink: 0;
-  height: 50px; /* 增加高度从32px到50px */
+  height: 32px; /* 恢复原来的高度 */
   z-index: 1000; /* 确保在最上层 */
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影 */
   padding-bottom: env(safe-area-inset-bottom, 0); /* 适配iPhone底部安全区域 */
@@ -117,14 +117,13 @@
   flex-direction: row; /* 改为水平排列 */
   align-items: center;
   justify-content: center;
-  padding: 4px 6px; /* 大幅缩小padding */
+  padding: 2px 4px; /* 恢复原来的内边距 */
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   color: #666;
-  font-size: 14px; /* 增加字体大小从12px到14px */
-  gap: 4px; /* 增加图标和文字间距 */
-  min-height: 40px; /* 确保最小高度 */
+  font-size: 12px; /* 恢复原来的字体大小 */
+  gap: 3px; /* 恢复原来的图标和文字间距 */
 }
 
 .weibo-tabs .tab-item:hover {
@@ -150,44 +149,35 @@
 }
 
 .weibo-tabs .tab-item i {
-  font-size: 16px; /* 增加图标大小从12px到16px */
+  font-size: 12px; /* 恢复原来的图标大小 */
   margin-bottom: 0; /* 移除下边距 */
 }
 
 .weibo-tabs .tab-item span {
-  font-size: 13px; /* 增加文字大小从11px到13px */
+  font-size: 11px; /* 恢复原来的文字大小 */
   font-weight: 500;
 }
 
 /* 响应式标签栏 */
 @media (max-width: 320px) {
-  .weibo-tabs {
-    height: 45px; /* 小屏幕下稍微减小高度 */
-  }
-
   .weibo-tabs .tab-item {
-    padding: 2px 4px; /* 适当缩小但保持可用性 */
-    min-height: 35px; /* 确保最小高度 */
+    padding: 1px 3px; /* 进一步缩小 */
   }
 
   .weibo-tabs .tab-item i {
-    font-size: 14px; /* 适当缩小图标但保持可见性 */
+    font-size: 8px; /* 进一步缩小图标 */
     margin-bottom: 0;
   }
 
   .weibo-tabs .tab-item span {
-    font-size: 11px; /* 适当缩小文字但保持可读性 */
-  }
-
-  .weibo-content {
-    padding-bottom: 55px; /* 小屏幕下调整底部间距 */
+    font-size: 7px; /* 进一步缩小文字 */
   }
 }
 
 /* 中等屏幕响应式 */
 @media (max-width: 480px) and (min-width: 321px) {
   .weibo-content {
-    padding-bottom: 60px; /* 确保有足够空间 */
+    padding-bottom: 42px; /* 适应原始tabs高度 */
   }
 }
 
@@ -198,7 +188,7 @@
   }
 
   .weibo-content {
-    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    padding-bottom: calc(42px + env(safe-area-inset-bottom));
   }
 }
 
@@ -208,7 +198,7 @@
   overflow-y: auto;
   background: #f7f7f7;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 60px; /* 为底部tabs留出足够空间 (50px + 10px margin) */
+  padding-bottom: 42px; /* 为底部tabs留出空间 (32px + 10px margin) */
 }
 
 /* ===== 微博页面通用样式 ===== */
@@ -485,6 +475,8 @@
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
+  justify-content: center;
+  
 }
 
 .action-btn:hover {
@@ -607,20 +599,26 @@
 .comment-actions .action-btn {
   padding: 4px 6px;
   font-size: 12px;
-  gap: 3px;
+  gap: 3px;flex:1;
 }
 
 .comment-actions .action-btn i {
   font-size: 12px;
 }
 
-/* 评论布局强化规则 - 防止格式错乱 */
-.comment-item * {
-  box-sizing: border-box;
+/* ===== 微博评论布局强化规则 - 防止格式错乱 ===== */
+/* 使用更高的特异性来确保样式不被覆盖 */
+
+/* 重置所有评论项的盒模型 */
+.weibo-app .comment-item,
+.weibo-app .comment-item * {
+  box-sizing: border-box !important;
 }
 
-/* 确保评论作者区域始终为水平布局 - 最高优先级 */
-.comment-author {
+/* 🔥 超高优先级：确保微博评论作者区域始终为水平布局 */
+.weibo-app .comment-item .comment-author,
+.weibo-app .post-comments .comment-author,
+.weibo-app .comments-list .comment-author {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -628,45 +626,92 @@
   width: 100% !important;
   max-width: 100% !important;
   overflow: hidden !important;
+  gap: 8px !important;
+  margin-bottom: 8px !important;
 }
 
-/* 确保评论信息区域为垂直布局 */
-.comment-info {
+/* 🔥 超高优先级：确保微博评论信息区域为垂直布局 */
+.weibo-app .comment-item .comment-info,
+.weibo-app .post-comments .comment-info,
+.weibo-app .comments-list .comment-info {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center;
+  justify-content: center !important;
   flex: 1 !important;
   min-width: 0 !important;
   overflow: hidden !important;
 }
 
-/* 确保用户名和时间为块级元素 */
-.comment-author-name,
-.comment-time {
+/* 🔥 超高优先级：确保用户名和时间为块级元素 */
+.weibo-app .comment-author-name,
+.weibo-app .comment-time {
   display: block !important;
   width: auto !important;
   max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* 防止任何子元素破坏布局 */
-.comment-author > * {
-  flex-shrink: 0;
+/* 🔥 防止任何子元素破坏布局 */
+.weibo-app .comment-author > * {
+  flex-shrink: 0 !important;
 }
 
-.comment-author .comment-info {
+.weibo-app .comment-author .comment-info {
   flex-shrink: 1 !important;
+  flex-grow: 1 !important;
 }
 
-/* 强制所有屏幕尺寸下的布局稳定性 */
+/* 🔥 确保评论内容和操作按钮正确布局 */
+.weibo-app .comment-content {
+  display: block !important;
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
+
+.weibo-app .comment-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 20px !important;
+  margin-top: 8px !important;
+  width: 100% !important;
+}
+
+/* 🔥 强制所有屏幕尺寸下的布局稳定性 - 使用更高特异性 */
 @media screen and (max-width: 9999px) {
-  .comment-author {
+  .weibo-app .comment-item .comment-author,
+  .weibo-app .post-comments .comment-author,
+  .weibo-app .comments-list .comment-author {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
   }
 
-  .comment-info {
+  .weibo-app .comment-item .comment-info,
+  .weibo-app .post-comments .comment-info,
+  .weibo-app .comments-list .comment-info {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+
+/* 🔥 额外保护：防止其他CSS框架干扰 */
+.weibo-app .comment-item {
+  contain: layout style !important;
+}
+
+/* 🔥 最终保护：使用CSS层级来确保优先级 */
+@layer weibo-comments {
+  .weibo-app .comment-author {
+    display: flex !important;
+    flex-direction: row !important;
+  }
+
+  .weibo-app .comment-info {
     display: flex !important;
     flex-direction: column !important;
   }

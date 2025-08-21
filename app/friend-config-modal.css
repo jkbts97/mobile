@@ -1,0 +1,321 @@
+/* 好友专用图片配置弹窗样式 - 完全复刻原弹窗 */
+
+/* 弹窗容器 */
+.friend-image-config-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.friend-image-config-modal .modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+}
+
+/* 弹窗主容器 */
+.friend-image-config-modal .modal-content {
+  background: #efe4d4;
+  border: 1px solid #d8c9ba;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* 弹窗头部 */
+.friend-image-config-modal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #d8c9ba;
+  background: #c7d5e8;
+  flex-shrink: 0;
+}
+
+.friend-image-config-modal .modal-title {
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+  color: #000000 !important;
+}
+
+.friend-image-config-modal .modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #6a6a6a;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+
+.friend-image-config-modal .modal-close-btn:hover {
+  background: #a8bedf;
+  color: #333;
+}
+
+/* 标签页 */
+.friend-image-config-modal .modal-tabs {
+  display: flex;
+  background: #efe4d4;
+  border-bottom: 1px solid #c7d5e8;
+  flex-shrink: 0;
+}
+
+.friend-image-config-modal .tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  font-size: 12px;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+
+.friend-image-config-modal .tab-btn.active {
+  color: #2c3e50 !important;
+  border-bottom-color: #a8bedf !important;
+  background: #a8bedf !important;
+  font-weight: 500;
+}
+
+.friend-image-config-modal .tab-btn:hover:not(.active) {
+  background: #c7d5e8;
+  color: #333;
+}
+
+/* 弹窗主体 */
+.friend-image-config-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  background: #ffffff;
+  min-height: 0;
+}
+
+/* 标签页内容 */
+.friend-image-config-modal .tab-content {
+  display: none;
+  padding: 12px;
+}
+
+.friend-image-config-modal .tab-content[style*="block"] {
+  display: block !important;
+}
+
+/* 配置区域 */
+.friend-image-config-modal .config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 上传区域 */
+.friend-image-config-modal .upload-section {
+  margin-bottom: 12px;
+}
+
+.friend-image-config-modal .upload-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.friend-image-config-modal .upload-btn {
+  background: #a8bedf;
+  color: #2c3e50;
+  border: 1px solid #d8c9ba;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.friend-image-config-modal .upload-btn:hover {
+  background: #9aafdb;
+  transform: translateY(-1px);
+}
+
+.friend-image-config-modal .url-input {
+  padding: 6px 8px;
+  border: 1px solid #d8c9ba;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #ffffff;
+  color: #2c3e50;
+}
+
+.friend-image-config-modal .url-input:focus {
+  outline: none;
+  border-color: #a8bedf;
+  box-shadow: 0 0 0 2px rgba(168, 190, 223, 0.2);
+}
+
+/* 预览区域 */
+.friend-image-config-modal .preview-section {
+  margin-bottom: 12px;
+}
+
+.friend-image-config-modal .preview-container {
+  background: #c7d5e8;
+  border: 2px solid #d8c9ba;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* 头像预览 - 圆形 */
+.friend-image-config-modal .avatar-preview .preview-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  cursor: move;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 背景预览 - 竖直长方形 */
+.friend-image-config-modal .background-preview .preview-image {
+  width: 120px;
+  height: 160px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  cursor: move;
+  position: relative;
+  overflow: hidden;
+}
+
+.friend-image-config-modal .drag-hint {
+  font-size: 10px;
+  color: #666;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* 控制区域 */
+.friend-image-config-modal .controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.friend-image-config-modal .control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.friend-image-config-modal .control-row label {
+  font-size: 11px;
+  color: #2c3e50;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+
+.friend-image-config-modal .control-slider {
+  flex: 1;
+  height: 16px;
+  background: #d8c9ba;
+  border-radius: 8px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.friend-image-config-modal .control-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #a8bedf;
+  border: 1px solid #2c3e50;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.friend-image-config-modal .control-value {
+  font-size: 11px;
+  color: #2c3e50;
+  min-width: 35px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* 弹窗底部 */
+.friend-image-config-modal .modal-footer {
+  padding: 8px 12px;
+  border-top: 1px solid #d8c9ba;
+  background: #efe4d4;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.friend-image-config-modal .save-btn {
+  background: #a8bedf;
+  color: #2c3e50;
+  border: 1px solid #d8c9ba;
+  border-radius: 4px;
+  padding: 8px 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.friend-image-config-modal .save-btn:hover {
+  background: #9aafdb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(168, 190, 223, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 360px) {
+  .friend-image-config-modal .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .friend-image-config-modal .avatar-preview .preview-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .friend-image-config-modal .background-preview .preview-image {
+    width: 100px;
+    height: 130px;
+  }
+}

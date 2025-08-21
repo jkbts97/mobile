@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片配置弹窗测试</title>
+    <link rel="stylesheet" href="mobile-phone.css">
+    <link rel="stylesheet" href="app/image-config-modal.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .phone-container {
+            position: relative;
+            width: 375px;
+            height: 667px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>图片配置弹窗测试</h1>
+        <p>这是一个独立的测试页面，用于验证图片配置弹窗的功能。</p>
+        
+        <div class="test-controls">
+            <button class="test-button" onclick="testShowModal()">显示图片配置弹窗</button>
+            <button class="test-button" onclick="testStyleConfigManager()">测试StyleConfigManager</button>
+            <button class="test-button" onclick="testToast()">测试Toast通知</button>
+        </div>
+        
+        <div id="status" class="status info">
+            准备就绪，点击按钮开始测试...
+        </div>
+        
+        <!-- 模拟手机容器 -->
+        <div class="phone-container">
+            <div class="phone-screen">
+                <div>模拟手机屏幕</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模拟必要的全局对象 -->
+    <script>
+        // 模拟MobilePhone.showToast
+        window.MobilePhone = {
+            showToast: function(message, type = 'info') {
+                console.log(`[Toast] ${type.toUpperCase()}: ${message}`);
+                updateStatus(message, type);
+            }
+        };
+        
+        // 模拟StyleConfigManager
+        window.styleConfigManager = {
+            isReady: true,
+            currentConfig: {
+                messageSentAvatar: {
+                    backgroundImage: '',
+                    backgroundImageUrl: '',
+                    backgroundPosition: 'center center',
+                    rotation: '0',
+                    scale: '1'
+                },
+                messagesApp: {
+                    backgroundImage: '',
+                    backgroundImageUrl: '',
+                    backgroundPosition: 'center center',
+                    rotation: '0',
+                    scale: '1'
+                }
+            },
+            
+            getConfig: function() {
+                return this.currentConfig;
+            },
+            
+            saveConfig: async function() {
+                console.log('[StyleConfigManager] 模拟保存配置:', this.currentConfig);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 模拟异步操作
+                return true;
+            }
+        };
+        
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+        
+        function testShowModal() {
+            updateStatus('正在显示图片配置弹窗...', 'info');
+            
+            if (window.ImageConfigModal) {
+                window.ImageConfigModal.show();
+                updateStatus('图片配置弹窗已显示', 'success');
+            } else {
+                updateStatus('ImageConfigModal未加载', 'error');
+            }
+        }
+        
+        function testStyleConfigManager() {
+            if (window.styleConfigManager) {
+                updateStatus('StyleConfigManager已就绪', 'success');
+                console.log('StyleConfigManager配置:', window.styleConfigManager.currentConfig);
+            } else {
+                updateStatus('StyleConfigManager未就绪', 'error');
+            }
+        }
+        
+        function testToast() {
+            window.MobilePhone.showToast('这是一个测试通知', 'success');
+        }
+        
+        // 页面加载完成后的初始化
+        window.addEventListener('load', function() {
+            console.log('[Test] 页面加载完成');
+            
+            // 检查必要的模块是否加载
+            setTimeout(() => {
+                const checks = [
+                    { name: 'ImageConfigModal', obj: window.ImageConfigModal },
+                    { name: 'StyleConfigManager', obj: window.styleConfigManager },
+                    { name: 'MobilePhone', obj: window.MobilePhone }
+                ];
+                
+                let allReady = true;
+                checks.forEach(check => {
+                    if (check.obj) {
+                        console.log(`✅ ${check.name} 已加载`);
+                    } else {
+                        console.log(`❌ ${check.name} 未加载`);
+                        allReady = false;
+                    }
+                });
+                
+                if (allReady) {
+                    updateStatus('所有模块加载完成，可以开始测试', 'success');
+                } else {
+                    updateStatus('部分模块未加载，请检查控制台', 'error');
+                }
+            }, 1000);
+        });
+    </script>
+    
+    <!-- 加载必要的脚本 -->
+    <script src="app/image-config-modal.js"></script>
+</body>
+</html>

@@ -58,6 +58,217 @@ class WeiboUI {
 
   init() {
     console.log('[Weibo UI] 微博UI管理器初始化');
+
+    // 🔥 新增：启动评论布局监控
+    this.startCommentLayoutMonitor();
+  }
+
+  /**
+   * 🔥 评论布局监控器 - 防止CSS被覆盖导致的布局错乱
+   */
+  startCommentLayoutMonitor() {
+    // 创建一个MutationObserver来监控DOM变化
+    const observer = new MutationObserver(mutations => {
+      let needsLayoutFix = false;
+
+      mutations.forEach(mutation => {
+        // 检查是否有新的评论元素被添加
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              if (node.classList?.contains('comment-item') || node.querySelector?.('.comment-item')) {
+                needsLayoutFix = true;
+              }
+            }
+          });
+        }
+
+        // 检查是否有样式属性被修改
+        if (
+          mutation.type === 'attributes' &&
+          (mutation.attributeName === 'style' || mutation.attributeName === 'class')
+        ) {
+          const target = mutation.target;
+          if (target.classList?.contains('comment-author') || target.classList?.contains('comment-info')) {
+            needsLayoutFix = true;
+          }
+        }
+      });
+
+      if (needsLayoutFix) {
+        // 延迟执行修复，避免频繁操作
+        clearTimeout(this.layoutFixTimeout);
+        this.layoutFixTimeout = setTimeout(() => {
+          this.fixCommentLayout();
+        }, 100);
+      }
+    });
+
+    // 开始观察整个微博应用容器
+    const weiboApp = document.querySelector('.weibo-app');
+    if (weiboApp) {
+      observer.observe(weiboApp, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+      });
+
+      console.log('[Weibo UI] 🔥 评论布局监控器已启动');
+    }
+
+    // 立即执行一次布局修复
+    this.fixCommentLayout();
+  }
+
+  /**
+   * 🔥 修复评论布局 - 强制应用正确的CSS样式
+   */
+  fixCommentLayout() {
+    const commentItems = document.querySelectorAll('.weibo-app .comment-item');
+    let fixedCount = 0;
+
+    commentItems.forEach(commentItem => {
+      const commentAuthor = commentItem.querySelector('.comment-author');
+      const commentInfo = commentItem.querySelector('.comment-info');
+      const commentContent = commentItem.querySelector('.comment-content');
+      const commentActions = commentItem.querySelector('.comment-actions');
+
+      if (commentAuthor) {
+        // 强制设置评论作者区域为水平布局
+        const authorStyle = commentAuthor.style;
+        const authorComputed = window.getComputedStyle(commentAuthor);
+
+        if (authorComputed.flexDirection !== 'row' || authorComputed.display !== 'flex') {
+          authorStyle.setProperty('display', 'flex', 'important');
+          authorStyle.setProperty('flex-direction', 'row', 'important');
+          authorStyle.setProperty('align-items', 'center', 'important');
+          authorStyle.setProperty('flex-wrap', 'nowrap', 'important');
+          authorStyle.setProperty('gap', '8px', 'important');
+          fixedCount++;
+        }
+      }
+
+      if (commentInfo) {
+        // 强制设置评论信息区域为垂直布局
+        const infoStyle = commentInfo.style;
+        const infoComputed = window.getComputedStyle(commentInfo);
+
+        if (infoComputed.flexDirection !== 'column' || infoComputed.display !== 'flex') {
+          infoStyle.setProperty('display', 'flex', 'important');
+          infoStyle.setProperty('flex-direction', 'column', 'important');
+          infoStyle.setProperty('flex', '1', 'important');
+          infoStyle.setProperty('min-width', '0', 'important');
+          fixedCount++;
+        }
+      }
+
+      if (commentContent) {
+        // 确保评论内容正确显示
+        const contentStyle = commentContent.style;
+        contentStyle.setProperty('display', 'block', 'important');
+        contentStyle.setProperty('width', '100%', 'important');
+        contentStyle.setProperty('margin-bottom', '8px', 'important');
+      }
+
+      if (commentActions) {
+        // 确保评论操作按钮正确布局
+        const actionsStyle = commentActions.style;
+        const actionsComputed = window.getComputedStyle(commentActions);
+
+        if (actionsComputed.flexDirection !== 'row' || actionsComputed.display !== 'flex') {
+          actionsStyle.setProperty('display', 'flex', 'important');
+          actionsStyle.setProperty('flex-direction', 'row', 'important');
+          actionsStyle.setProperty('align-items', 'center', 'important');
+          actionsStyle.setProperty('justify-content', 'center', 'important');
+          actionsStyle.setProperty('gap', '20px', 'important');
+        }
+      }
+    });
+
+    if (fixedCount > 0) {
+      console.log(`[Weibo UI] 🔧 修复了 ${fixedCount} 个评论布局问题`);
+    }
+  }
+
+  /**
+   * 🔥 手动修复评论布局 - 提供给用户的控制台命令
+   */
+  static manualFixCommentLayout() {
+    console.log('[Weibo UI] 🔧 手动修复评论布局...');
+
+    const commentItems = document.querySelectorAll('.weibo-app .comment-item');
+    let fixedCount = 0;
+
+    commentItems.forEach((commentItem, index) => {
+      console.log(`[Weibo UI] 检查评论 ${index + 1}/${commentItems.length}`);
+
+      const commentAuthor = commentItem.querySelector('.comment-author');
+      const commentInfo = commentItem.querySelector('.comment-info');
+      const commentContent = commentItem.querySelector('.comment-content');
+      const commentActions = commentItem.querySelector('.comment-actions');
+
+      // 强制重置评论项的布局
+      commentItem.style.setProperty('display', 'block', 'important');
+      commentItem.style.setProperty('width', '100%', 'important');
+
+      if (commentAuthor) {
+        console.log(`[Weibo UI] 修复评论作者布局 ${index + 1}`);
+        const authorStyle = commentAuthor.style;
+
+        // 清除可能的冲突样式
+        authorStyle.removeProperty('flex-direction');
+        authorStyle.removeProperty('display');
+
+        // 重新应用正确样式
+        authorStyle.setProperty('display', 'flex', 'important');
+        authorStyle.setProperty('flex-direction', 'row', 'important');
+        authorStyle.setProperty('align-items', 'center', 'important');
+        authorStyle.setProperty('flex-wrap', 'nowrap', 'important');
+        authorStyle.setProperty('gap', '8px', 'important');
+        authorStyle.setProperty('margin-bottom', '8px', 'important');
+        authorStyle.setProperty('width', '100%', 'important');
+        fixedCount++;
+      }
+
+      if (commentInfo) {
+        console.log(`[Weibo UI] 修复评论信息布局 ${index + 1}`);
+        const infoStyle = commentInfo.style;
+
+        // 清除可能的冲突样式
+        infoStyle.removeProperty('flex-direction');
+        infoStyle.removeProperty('display');
+
+        // 重新应用正确样式
+        infoStyle.setProperty('display', 'flex', 'important');
+        infoStyle.setProperty('flex-direction', 'column', 'important');
+        infoStyle.setProperty('flex', '1', 'important');
+        infoStyle.setProperty('min-width', '0', 'important');
+        infoStyle.setProperty('overflow', 'hidden', 'important');
+        fixedCount++;
+      }
+
+      if (commentContent) {
+        const contentStyle = commentContent.style;
+        contentStyle.setProperty('display', 'block', 'important');
+        contentStyle.setProperty('width', '100%', 'important');
+        contentStyle.setProperty('margin-bottom', '8px', 'important');
+      }
+
+      if (commentActions) {
+        const actionsStyle = commentActions.style;
+        actionsStyle.setProperty('display', 'flex', 'important');
+        actionsStyle.setProperty('flex-direction', 'row', 'important');
+        actionsStyle.setProperty('align-items', 'center', 'important');
+        actionsStyle.setProperty('justify-content', 'center', 'important');
+        actionsStyle.setProperty('gap', '20px', 'important');
+        actionsStyle.setProperty('margin-top', '8px', 'important');
+        actionsStyle.setProperty('width', '100%', 'important');
+      }
+    });
+
+    console.log(`[Weibo UI] ✅ 手动修复完成，处理了 ${commentItems.length} 个评论项，修复了 ${fixedCount} 个布局问题`);
+    return { total: commentItems.length, fixed: fixedCount };
   }
 
   /**
@@ -1657,4 +1868,65 @@ function bindWeiboEvents() {
 if (typeof window !== 'undefined') {
   window.getWeiboAppContent = getWeiboAppContent;
   window.bindWeiboEvents = bindWeiboEvents;
+
+  // 🔥 添加评论布局修复的全局函数
+  window.fixWeiboCommentLayout = function () {
+    console.log('🔧 [全局函数] 修复微博评论布局...');
+    if (window.WeiboUI && window.WeiboUI.manualFixCommentLayout) {
+      return window.WeiboUI.manualFixCommentLayout();
+    } else {
+      console.error('❌ WeiboUI 类未找到，无法执行修复');
+      return { total: 0, fixed: 0 };
+    }
+  };
+
+  // 🔥 添加评论布局检查的全局函数
+  window.checkWeiboCommentLayout = function () {
+    console.log('🔍 [全局函数] 检查微博评论布局状态...');
+    const commentItems = document.querySelectorAll('.weibo-app .comment-item');
+    let issues = [];
+
+    commentItems.forEach((item, index) => {
+      const author = item.querySelector('.comment-author');
+      const info = item.querySelector('.comment-info');
+
+      if (author) {
+        const authorComputed = window.getComputedStyle(author);
+        if (authorComputed.flexDirection !== 'row' || authorComputed.display !== 'flex') {
+          issues.push(
+            `评论 ${index + 1}: 作者区域布局异常 (display: ${authorComputed.display}, flex-direction: ${
+              authorComputed.flexDirection
+            })`,
+          );
+        }
+      }
+
+      if (info) {
+        const infoComputed = window.getComputedStyle(info);
+        if (infoComputed.flexDirection !== 'column' || infoComputed.display !== 'flex') {
+          issues.push(
+            `评论 ${index + 1}: 信息区域布局异常 (display: ${infoComputed.display}, flex-direction: ${
+              infoComputed.flexDirection
+            })`,
+          );
+        }
+      }
+    });
+
+    console.log(`📊 检查结果: 共 ${commentItems.length} 个评论，发现 ${issues.length} 个布局问题`);
+    if (issues.length > 0) {
+      console.warn('⚠️ 发现的问题:');
+      issues.forEach(issue => console.warn(`  - ${issue}`));
+      console.log('💡 建议执行: fixWeiboCommentLayout() 来修复这些问题');
+    } else {
+      console.log('✅ 所有评论布局正常');
+    }
+
+    return { total: commentItems.length, issues: issues.length, details: issues };
+  };
+
+  console.log('🔧 [Weibo UI] 评论布局修复工具已加载');
+  console.log('💡 可用命令:');
+  console.log('  - fixWeiboCommentLayout() : 修复评论布局问题');
+  console.log('  - checkWeiboCommentLayout() : 检查评论布局状态');
 }
