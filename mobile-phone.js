@@ -646,14 +646,17 @@ class MobilePhone {
         addFriendBtn.addEventListener('click', () => this.showAddFriend());
         headerRight.appendChild(addFriendBtn);
       } else if (state.view === 'messageDetail') {
-        // 消息详情页面：添加相片按钮和刷新按钮
-        const photoBtn = document.createElement('button');
-        photoBtn.className = 'app-header-btn';
-        photoBtn.innerHTML = '<i class="fas fa-image"></i>';
-        photoBtn.title = '图片设置';
-        photoBtn.addEventListener('click', () => this.openFriendImageConfig());
-        headerRight.appendChild(photoBtn);
+        // 消息详情页面：添加相片按钮（仅好友，不包括群聊）
+        if (state.friendId && !this.isGroupChat(state.friendId)) {
+          const photoBtn = document.createElement('button');
+          photoBtn.className = 'app-header-btn';
+          photoBtn.innerHTML = '<i class="fas fa-image"></i>';
+          photoBtn.title = '相片设置';
+          photoBtn.addEventListener('click', () => this.showFriendImageConfigModal(state.friendId, state.friendName));
+          headerRight.appendChild(photoBtn);
+        }
 
+        // 消息详情页面：添加刷新按钮
         const refreshBtn = document.createElement('button');
         refreshBtn.className = 'app-header-btn';
         refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
@@ -1015,165 +1018,6 @@ class MobilePhone {
   refreshMessageDetail() {
     if (window.messageApp && window.messageApp.refreshMessageDetail) {
       window.messageApp.refreshMessageDetail();
-    }
-  }
-
-  // 打开好友图片配置弹窗
-  async openFriendImageConfig() {
-    try {
-      // 获取当前好友信息
-      const friendInfo = this.getCurrentFriendInfo();
-      if (!friendInfo) {
-        console.warn('[Mobile Phone] 无法获取当前好友信息');
-        return;
-      }
-
-      // 检查是否为群聊
-      if (friendInfo.isGroup) {
-        console.log('[Mobile Phone] 群聊不支持图片配置');
-        return;
-      }
-
-      // 确保好友图片配置模块已加载
-      if (!window.friendImageConfigModal) {
-        console.log('[Mobile Phone] 正在加载好友图片配置模块...');
-        await this.loadFriendImageConfigModule();
-      }
-
-      // 打开弹窗
-      await window.friendImageConfigModal.open(friendInfo.friendId, friendInfo.friendName, friendInfo.backgroundId);
-
-      console.log(`[Mobile Phone] 打开好友图片配置: ${friendInfo.friendName}`);
-    } catch (error) {
-      console.error('[Mobile Phone] 打开好友图片配置失败:', error);
-    }
-  }
-
-  // 获取当前好友信息
-  getCurrentFriendInfo() {
-    try {
-      // 方法1: 从全局MessageApp获取
-      if (window.messageApp && window.messageApp.currentFriendId) {
-        const friendName =
-          window.messageApp.currentFriendName || this.getFriendNameById(window.messageApp.currentFriendId);
-        return {
-          friendId: window.messageApp.currentFriendId,
-          friendName: friendName,
-          isGroup: window.messageApp.currentIsGroup || false,
-          backgroundId: window.messageApp.currentFriendId,
-        };
-      }
-
-      // 方法2: 从MessageApp获取
-      if (this.messageApp && this.messageApp.currentFriendId) {
-        return {
-          friendId: this.messageApp.currentFriendId,
-          friendName: this.messageApp.currentFriendName || '未知好友',
-          isGroup: this.messageApp.isGroup || false,
-          backgroundId: this.messageApp.currentFriendId,
-        };
-      }
-
-      // 方法3: 从DOM获取data-background-id
-      const messageDetailContent = document.querySelector('.message-detail-content[data-background-id]');
-      if (messageDetailContent) {
-        const backgroundId = messageDetailContent.getAttribute('data-background-id');
-        return {
-          friendId: backgroundId,
-          friendName: '未知好友',
-          isGroup: false,
-          backgroundId: backgroundId,
-        };
-      }
-
-      console.warn('[Mobile Phone] 无法获取当前好友信息');
-      return null;
-    } catch (error) {
-      console.error('[Mobile Phone] 获取好友信息失败:', error);
-      return null;
-    }
-  }
-
-  // 加载好友图片配置模块
-  async loadFriendImageConfigModule() {
-    try {
-      // 检查是否已经加载
-      if (window.FriendImageConfigModal || window.friendImageConfigModal) {
-        console.log('[Mobile Phone] 好友图片配置模块已存在');
-        return;
-      }
-
-      console.log('[Mobile Phone] 开始加载好友图片配置模块...');
-
-      // 动态加载JavaScript模块
-      const scriptPath = '/scripts/extensions/third-party/mobile/app/friend-image-config-modal.js';
-
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = scriptPath;
-        script.onload = () => {
-          console.log('[Mobile Phone] 好友图片配置JS加载完成');
-          // 等待一小段时间确保模块初始化
-          setTimeout(resolve, 100);
-        };
-        script.onerror = error => {
-          console.error('[Mobile Phone] 好友图片配置JS加载失败:', error);
-          reject(error);
-        };
-        document.head.appendChild(script);
-
-        // 10秒超时
-        setTimeout(() => reject(new Error('加载超时')), 10000);
-      });
-
-      // 验证模块是否正确加载
-      if (!window.friendImageConfigModal) {
-        throw new Error('模块加载后未找到friendImageConfigModal实例');
-      }
-
-      console.log('[Mobile Phone] 好友图片配置模块加载完成');
-    } catch (error) {
-      console.error('[Mobile Phone] 加载好友图片配置模块失败:', error);
-      throw error;
-    }
-  }
-
-  // 根据好友ID获取好友名称
-  getFriendNameById(friendId) {
-    try {
-      // 方法1: 从FriendRenderer获取
-      if (window.friendRenderer && window.friendRenderer.getFriendById) {
-        const friend = window.friendRenderer.getFriendById(friendId);
-        if (friend && friend.name) {
-          return friend.name;
-        }
-      }
-
-      // 方法2: 从MessageRenderer获取
-      if (window.messageRenderer && window.messageRenderer.getCurrentFriendName) {
-        const name = window.messageRenderer.getCurrentFriendName();
-        if (name) {
-          return name;
-        }
-      }
-
-      // 方法3: 从DOM中的标题获取
-      const headerTitle = document.querySelector('.app-header-title');
-      if (headerTitle && headerTitle.textContent && headerTitle.textContent !== '消息') {
-        return headerTitle.textContent.trim();
-      }
-
-      // 方法4: 从好友列表DOM获取
-      const friendElement = document.querySelector(`[data-friend-id="${friendId}"] .friend-name`);
-      if (friendElement && friendElement.textContent) {
-        return friendElement.textContent.trim();
-      }
-
-      console.warn(`[Mobile Phone] 无法获取好友ID ${friendId} 的名称`);
-      return '未知好友';
-    } catch (error) {
-      console.error('[Mobile Phone] 获取好友名称失败:', error);
-      return '未知好友';
     }
   }
 
@@ -5664,6 +5508,46 @@ class MobilePhone {
 
     // 显示弹窗
     window.ImageConfigModal.show();
+  }
+
+  // 显示好友图片配置弹窗
+  showFriendImageConfigModal(friendId, friendName) {
+    console.log('[Mobile Phone] 显示好友图片配置弹窗:', friendId, friendName);
+
+    // 确保FriendImageConfigModal已加载
+    if (!window.FriendImageConfigModal) {
+      console.error('[Mobile Phone] FriendImageConfigModal未加载');
+      console.log('[Mobile Phone] 当前全局对象状态:', {
+        ImageConfigModal: typeof window.ImageConfigModal,
+        FriendImageConfigModal: typeof window.FriendImageConfigModal,
+        styleConfigManager: typeof window.styleConfigManager,
+      });
+
+      // 尝试延迟重试
+      setTimeout(() => {
+        if (window.FriendImageConfigModal) {
+          console.log('[Mobile Phone] 延迟重试成功，显示好友弹窗');
+          window.FriendImageConfigModal.show(friendId, friendName);
+        } else {
+          MobilePhone.showToast('好友图片配置功能未就绪，请刷新页面重试', 'error');
+        }
+      }, 500);
+      return;
+    }
+
+    // 显示弹窗
+    window.FriendImageConfigModal.show(friendId, friendName);
+  }
+
+  // 判断是否为群聊
+  isGroupChat(friendId) {
+    // 群聊ID通常以特定前缀开头或有特定格式
+    // 这里可以根据实际的群聊ID格式进行判断
+    if (!friendId) return false;
+
+    // 示例判断逻辑：群聊ID可能包含特定字符或格式
+    // 可以根据实际情况调整
+    return friendId.includes('group') || friendId.includes('群') || friendId.length > 10;
   }
 }
 

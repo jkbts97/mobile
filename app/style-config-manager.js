@@ -49,6 +49,20 @@ const DEFAULT_STYLE_CONFIG = {
       description: '接收消息头像背景',
     },
   ],
+  // 新增：好友专属背景配置
+  friendBackgrounds: [
+    {
+      id: 'default',
+      friendId: '',
+      name: '默认好友背景',
+      backgroundImage: '',
+      backgroundImageUrl: '',
+      backgroundPosition: 'center center',
+      rotation: '0',
+      scale: '1',
+      description: '好友专属聊天背景',
+    },
+  ],
   customStyles: {
     cssText: '',
     description: '自定义CSS样式',
@@ -533,6 +547,8 @@ ${selector} {
     background-size: ${scale * 100}% !important;
     background-position: ${backgroundPosition} !important;
     background-repeat: no-repeat !important;
+    transform: rotate(${rotation}deg) !important;
+    transform-origin: center center !important;
     width: 40px !important;
     height: 40px !important;
     min-width: 40px !important;
@@ -556,6 +572,8 @@ ${selector} {
     background-size: ${scale * 100}% !important;
     background-position: ${backgroundPosition} !important;
     background-repeat: no-repeat !important;
+    transform: rotate(${rotation}deg) !important;
+    transform-origin: center center !important;
     width: 40px !important;
     height: 40px !important;
     min-width: 40px !important;
@@ -662,6 +680,33 @@ ${
 }
         `.trim();
 
+      // 添加好友专属背景CSS
+      if (config.friendBackgrounds && config.friendBackgrounds.length > 0) {
+        css += '\n\n/* 好友专属聊天背景 */\n';
+        config.friendBackgrounds.forEach(friendBg => {
+          if (friendBg.friendId && friendBg.friendId.trim()) {
+            const backgroundImage = friendBg.backgroundImage || friendBg.backgroundImageUrl;
+            if (backgroundImage) {
+              const backgroundPosition = friendBg.backgroundPosition || 'center center';
+              const rotation = parseFloat(friendBg.rotation) || 0;
+              const scale = parseFloat(friendBg.scale) || 1;
+
+              css += `
+.message-detail-content[data-background-id="${friendBg.friendId}"] {
+    background-image: url(${formatImageUrl(backgroundImage)}) !important;
+    background-size: cover !important;
+    background-position: ${backgroundPosition} !important;
+    background-repeat: no-repeat !important;
+    transform: rotate(${rotation}deg) scale(${scale}) !important;
+    transform-origin: center center !important;
+}
+`;
+              console.log(`[Style Config Manager] ✅ 生成好友专属背景CSS: ${friendBg.name || friendBg.friendId}`);
+            }
+          }
+        });
+      }
+
       // 添加自定义CSS样式
       if (config.customStyles && config.customStyles.cssText) {
         css += '\n\n/* 用户自定义CSS样式 */\n' + config.customStyles.cssText;
@@ -678,8 +723,8 @@ ${
 
     // 更新配置项
     updateConfig(key, property, value) {
-      // 处理数组类型的配置（如messageReceivedAvatars）
-      if (key === 'messageReceivedAvatars' && property === null) {
+      // 处理数组类型的配置（如messageReceivedAvatars、friendBackgrounds）
+      if ((key === 'messageReceivedAvatars' || key === 'friendBackgrounds') && property === null) {
         this.currentConfig[key] = value;
         console.log(`[Style Config Manager] 数组配置已更新: ${key} = `, value);
         return true;
@@ -1095,7 +1140,7 @@ ${
 
                 <div class="style-config-content">
                     ${this.generateConfigSection('homeScreen', '主屏幕背景', config.homeScreen)}
-                    ${this.generateConfigSection('messageDetailApp', '消息详情应用背景', config.messageDetailApp)}
+                    ${this.generateFriendBackgroundsSection(config.friendBackgrounds || [])}
                     ${this.generateConfigSection('messagesApp', '消息应用背景', config.messagesApp)}
                                 ${this.generateAvatarConfigSection(
                                   'messageSentAvatar',
@@ -2040,6 +2085,236 @@ ${
                     gap: 16px;
                 }
 
+                /* 好友背景配置样式 */
+                .friend-backgrounds-section {
+                    border-left: 4px solid #10b981;
+                    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                }
+
+                .backgrounds-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+
+                .background-card {
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 12px;
+                    border: 1px solid #e2e8f0;
+                    overflow: hidden;
+                    transition: all 0.3s ease;
+                }
+
+                .background-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+                }
+
+                .background-card-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 16px 20px;
+                    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                    border-bottom: 1px solid #e2e8f0;
+                }
+
+                .background-card-title {
+                    flex: 1;
+                    margin-right: 12px;
+                }
+
+                .background-name-input {
+                    width: 100%;
+                    padding: 8px 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    transition: border-color 0.2s;
+                }
+
+                .background-name-input:focus {
+                    outline: none;
+                    border-color: #10b981;
+                    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+                }
+
+                .background-card-actions {
+                    display: flex;
+                    gap: 8px;
+                }
+
+                .background-action-btn {
+                    padding: 6px 8px;
+                    border: none;
+                    border-radius: 6px;
+                    background: #f3f4f6;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .background-action-btn:hover {
+                    background: #e5e7eb;
+                }
+
+                .background-action-btn.delete-btn:hover {
+                    background: #fee2e2;
+                    color: #dc2626;
+                }
+
+                .background-card-content {
+                    padding: 20px;
+                    display: flex;
+                    gap: 20px;
+                }
+
+                .background-preview-section {
+                    flex-shrink: 0;
+                    text-align: center;
+                }
+
+                .background-preview {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 8px;
+                }
+
+                .background-preview-rect {
+                    width: 80px;
+                    height: 60px;
+                    border-radius: 8px;
+                    background: #f0f0f0;
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    border: 2px solid #e2e8f0;
+                    transition: all 0.3s ease;
+                }
+
+                .background-preview-label {
+                    font-size: 12px;
+                    color: #6b7280;
+                    margin-top: 4px;
+                }
+
+                .background-fields {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+
+                .background-input, .background-range, .background-number {
+                    padding: 8px 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    transition: border-color 0.2s;
+                }
+
+                .background-input:focus, .background-number:focus {
+                    outline: none;
+                    border-color: #10b981;
+                    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+                }
+
+                .background-range {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    height: 6px;
+                    background: #e2e8f0;
+                    border-radius: 3px;
+                    outline: none;
+                }
+
+                .background-range::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 18px;
+                    height: 18px;
+                    background: #10b981;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                }
+
+                .background-range::-moz-range-thumb {
+                    width: 18px;
+                    height: 18px;
+                    background: #10b981;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    border: none;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                }
+
+                .background-file-input {
+                    display: none;
+                }
+
+                .background-remove-btn {
+                    padding: 6px 8px;
+                    background: #fee2e2;
+                    color: #dc2626;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    transition: all 0.2s;
+                }
+
+                .background-remove-btn:hover {
+                    background: #fecaca;
+                }
+
+                .background-actions {
+                    text-align: center;
+                    margin-top: 20px;
+                }
+
+                .add-background-btn {
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .add-background-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+                }
+
+                .empty-backgrounds {
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: #6b7280;
+                }
+
+                .empty-icon {
+                    font-size: 48px;
+                    margin-bottom: 16px;
+                }
+
+                .empty-text {
+                    font-size: 16px;
+                    font-weight: 500;
+                    margin-bottom: 8px;
+                }
+
+                .empty-hint {
+                    font-size: 14px;
+                    opacity: 0.8;
+                }
+
                 .avatar-input, .avatar-range, .avatar-number {
                     padding: 8px 12px;
                     border: 1px solid #d1d5db;
@@ -2274,6 +2549,25 @@ ${
                     }
 
                     .avatar-card-actions {
+                        justify-content: center;
+                    }
+
+                    .background-card-content {
+                        flex-direction: column;
+                        gap: 16px;
+                    }
+
+                    .background-preview-section {
+                        align-self: center;
+                    }
+
+                    .background-card-header {
+                        flex-direction: column;
+                        gap: 12px;
+                        align-items: stretch;
+                    }
+
+                    .background-card-actions {
                         justify-content: center;
                     }
                 }
@@ -2696,6 +2990,50 @@ ${
         `;
     }
 
+    // 生成好友专属背景配置区段HTML
+    generateFriendBackgroundsSection(backgroundsArray) {
+      if (!backgroundsArray || !Array.isArray(backgroundsArray)) {
+        backgroundsArray = [];
+      }
+
+      const backgroundCards = backgroundsArray
+        .map((background, index) => {
+          return this.generateSingleBackgroundCard(background, index, backgroundsArray.length);
+        })
+        .join('');
+
+      return `
+            <div class="config-section friend-backgrounds-section">
+                <div class="section-header">
+                    <h3>🎨 好友专属聊天背景</h3>
+                    <p>为每个好友设置独特的聊天背景，基于data-background-id机制实现</p>
+                </div>
+
+                <div class="backgrounds-container">
+                    ${backgroundCards}
+                    ${
+                      backgroundsArray.length === 0
+                        ? `
+                        <div class="empty-backgrounds">
+                            <div class="empty-icon">🖼️</div>
+                            <div class="empty-text">暂无好友专属背景</div>
+                            <div class="empty-hint">使用好友弹窗设置专属背景</div>
+                        </div>
+                    `
+                        : ''
+                    }
+                </div>
+
+                <div class="background-actions">
+                    <button class="config-btn add-background-btn" onclick="window.styleConfigManager.addNewFriendBackground()">
+                        <span class="btn-icon">➕</span>
+                        <span>手动添加背景</span>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
     // 生成接收消息头像配置区段HTML（支持多个头像）
     generateReceivedAvatarsSection(avatarsArray) {
       if (!avatarsArray || !Array.isArray(avatarsArray)) {
@@ -2724,6 +3062,156 @@ ${
                         <span class="btn-icon">➕</span>
                         <span>添加新头像</span>
                     </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // 生成单个好友背景配置卡片
+    generateSingleBackgroundCard(background, index, backgroundsLength) {
+      const friendId = background.friendId || '';
+      const name = background.name || `好友背景 ${index + 1}`;
+      const backgroundImage = background.backgroundImage || background.backgroundImageUrl || '';
+      const rotation = background.rotation || '0';
+      const scale = background.scale || '1';
+      const backgroundPosition = background.backgroundPosition || 'center center';
+
+      const previewImageUrl = backgroundImage ? `url(${backgroundImage})` : 'none';
+      const previewTransform = `rotate(${rotation}deg) scale(${scale})`;
+
+      return `
+            <div class="background-card" data-background-index="${index}">
+                <div class="background-card-header">
+                    <div class="background-card-title">
+                        <input type="text" class="background-name-input"
+                               data-background-index="${index}"
+                               data-property="name"
+                               value="${name}"
+                               placeholder="背景名称">
+                    </div>
+                    <div class="background-card-actions">
+                        <button class="background-action-btn collapse-btn" onclick="window.styleConfigManager.toggleBackgroundCard(${index})" title="折叠/展开">
+                            <span>📁</span>
+                        </button>
+                        ${
+                          backgroundsLength > 1
+                            ? `
+                        <button class="background-action-btn delete-btn" onclick="window.styleConfigManager.deleteFriendBackground(${index})" title="删除">
+                            <span>🗑️</span>
+                        </button>
+                        `
+                            : ''
+                        }
+                    </div>
+                </div>
+
+                <div class="background-card-content">
+                    <div class="background-preview-section">
+                        <div class="background-preview" data-background-index="${index}">
+                            <div class="background-preview-rect"
+                                 style="background-image: ${previewImageUrl}; background-position: ${backgroundPosition}; transform: ${previewTransform};">
+                            </div>
+                        </div>
+                        <div class="background-preview-label">聊天背景预览</div>
+                    </div>
+
+                    <div class="background-fields">
+                        <div class="config-field">
+                            <label>好友ID (必填):</label>
+                            <input type="text"
+                                   class="config-input background-input"
+                                   data-background-index="${index}"
+                                   data-property="friendId"
+                                   value="${friendId}"
+                                   placeholder="558778"
+                                   required>
+                            <small>⚠️ <strong>必须填写好友ID才能生效</strong> - 用于匹配data-background-id属性</small>
+                            ${
+                              friendId
+                                ? `<small class="field-status valid">✅ 配置有效 - CSS选择器: .message-detail-content[data-background-id="${friendId}"]</small>`
+                                : `<small class="field-status invalid">❌ 配置无效 - 请填写好友ID</small>`
+                            }
+                        </div>
+
+                        <div class="config-field">
+                            <label>背景图片:</label>
+                            <div class="image-input-container">
+                                <input type="file"
+                                       class="image-file-input background-file-input"
+                                       data-background-index="${index}"
+                                       data-property="backgroundImage"
+                                       accept="image/*">
+                                <button class="upload-btn" onclick="this.previousElementSibling.click()">
+                                    <span>📁</span>
+                                    <span>选择图片</span>
+                                </button>
+                                ${
+                                  backgroundImage
+                                    ? `
+                                <button class="remove-btn background-remove-btn"
+                                        data-background-index="${index}"
+                                        data-property="backgroundImage">
+                                    <span>🗑️</span>
+                                </button>
+                                `
+                                    : ''
+                                }
+                            </div>
+                        </div>
+
+                        <div class="config-field">
+                            <label>图片链接:</label>
+                            <input type="text"
+                                   class="config-input background-input"
+                                   data-background-index="${index}"
+                                   data-property="backgroundImageUrl"
+                                   value="${background.backgroundImageUrl || ''}"
+                                   placeholder="https://example.com/image.jpg">
+                        </div>
+
+                        <div class="config-field">
+                            <label>背景位置:</label>
+                            <input type="text"
+                                   class="config-input background-input"
+                                   data-background-index="${index}"
+                                   data-property="backgroundPosition"
+                                   value="${backgroundPosition}"
+                                   placeholder="center center">
+                            <small>例如: center center, top left, 50% 25%</small>
+                        </div>
+
+                        <div class="config-field range-field">
+                            <label>旋转角度: <span class="range-value">${rotation}°</span></label>
+                            <div class="range-container">
+                                <input type="range"
+                                       class="config-range background-range"
+                                       data-background-index="${index}"
+                                       data-property="rotation"
+                                       min="0" max="360" step="1" value="${rotation}">
+                                <input type="number"
+                                       class="range-number background-number"
+                                       data-background-index="${index}"
+                                       data-property="rotation"
+                                       min="0" max="360" step="1" value="${rotation}">
+                            </div>
+                        </div>
+
+                        <div class="config-field range-field">
+                            <label>缩放比例: <span class="range-value">${scale}x</span></label>
+                            <div class="range-container">
+                                <input type="range"
+                                       class="config-range background-range"
+                                       data-background-index="${index}"
+                                       data-property="scale"
+                                       min="0.1" max="3" step="0.1" value="${scale}">
+                                <input type="number"
+                                       class="range-number background-number"
+                                       data-background-index="${index}"
+                                       data-property="scale"
+                                       min="0.1" max="3" step="0.1" value="${scale}">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -2941,6 +3429,68 @@ ${
         // 重新渲染界面
         this.refreshEditorInterface();
         this.updateStatus('删除头像成功，点击另存为按钮保存更改', 'info');
+      }
+    }
+
+    // 添加新好友背景配置
+    addNewFriendBackground() {
+      const config = this.getConfig();
+      if (!config.friendBackgrounds) {
+        config.friendBackgrounds = [];
+      }
+
+      const newBackground = {
+        id: 'friend_bg_' + Date.now(),
+        friendId: '',
+        name: `好友背景 ${config.friendBackgrounds.length + 1}`,
+        backgroundImage: '',
+        backgroundImageUrl: '',
+        backgroundPosition: 'center center',
+        rotation: '0',
+        scale: '1',
+        description: '好友专属聊天背景',
+      };
+
+      config.friendBackgrounds.push(newBackground);
+      this.updateConfig('friendBackgrounds', null, config.friendBackgrounds);
+
+      // 重新渲染界面
+      this.refreshEditorInterface();
+      this.updateStatus('添加新好友背景成功，点击另存为按钮保存更改', 'info');
+    }
+
+    // 删除好友背景配置
+    deleteFriendBackground(index) {
+      const config = this.getConfig();
+      if (!config.friendBackgrounds || config.friendBackgrounds.length === 0) {
+        this.updateStatus('没有可删除的背景配置', 'warning');
+        return;
+      }
+
+      if (confirm('确定要删除这个好友背景配置吗？')) {
+        config.friendBackgrounds.splice(index, 1);
+        this.updateConfig('friendBackgrounds', null, config.friendBackgrounds);
+
+        // 重新渲染界面
+        this.refreshEditorInterface();
+        this.updateStatus('删除好友背景成功，点击另存为按钮保存更改', 'info');
+      }
+    }
+
+    // 切换好友背景卡片展开/折叠状态
+    toggleBackgroundCard(index) {
+      const card = document.querySelector(`[data-background-index="${index}"]`);
+      if (card) {
+        const content = card.querySelector('.background-card-content');
+        const button = card.querySelector('.collapse-btn span');
+
+        if (content.style.display === 'none') {
+          content.style.display = 'block';
+          button.textContent = '📁';
+        } else {
+          content.style.display = 'none';
+          button.textContent = '📂';
+        }
       }
     }
 
@@ -4048,6 +4598,76 @@ ${
           this.handleAvatarImageRemove(e.target);
         });
       });
+
+      // 好友背景控件（多个）
+      document.querySelectorAll('.background-input, .background-range, .background-number').forEach(input => {
+        input.addEventListener('input', e => {
+          // @ts-ignore - Event target
+          const backgroundIndex = e.target.getAttribute('data-background-index');
+          // @ts-ignore - Event target
+          const property = e.target.getAttribute('data-property');
+          // @ts-ignore - Event target
+          const value = e.target.value;
+
+          if (backgroundIndex !== null && property) {
+            this.updateBackgroundProperty(parseInt(backgroundIndex), property, value);
+
+            // 同步滑块和数字输入的值
+            if (property === 'rotation' || property === 'scale') {
+              const relatedInputs = document.querySelectorAll(
+                `[data-background-index="${backgroundIndex}"][data-property="${property}"]`,
+              );
+              relatedInputs.forEach(relatedInput => {
+                // @ts-ignore - HTMLInputElement value property
+                if (relatedInput !== e.target) relatedInput.value = value;
+              });
+
+              // 更新范围值显示
+              const rangeValueSpan = document.querySelector(
+                `[data-background-index="${backgroundIndex}"] .range-value`,
+              );
+              if (rangeValueSpan && property === 'rotation') {
+                rangeValueSpan.textContent = `${value}°`;
+              } else if (rangeValueSpan && property === 'scale') {
+                rangeValueSpan.textContent = `${value}x`;
+              }
+            }
+
+            // 更新预览
+            this.updateBackgroundPreview(parseInt(backgroundIndex));
+          }
+        });
+      });
+
+      // 好友背景名称输入
+      document.querySelectorAll('.background-name-input').forEach(input => {
+        input.addEventListener('input', e => {
+          // @ts-ignore - Event target
+          const backgroundIndex = e.target.getAttribute('data-background-index');
+          // @ts-ignore - Event target
+          const property = e.target.getAttribute('data-property');
+          // @ts-ignore - Event target
+          const value = e.target.value;
+
+          if (backgroundIndex !== null && property) {
+            this.updateBackgroundProperty(parseInt(backgroundIndex), property, value);
+          }
+        });
+      });
+
+      // 好友背景文件上传
+      document.querySelectorAll('.background-file-input').forEach(input => {
+        input.addEventListener('change', e => {
+          this.handleBackgroundFileUpload(e.target);
+        });
+      });
+
+      // 好友背景移除按钮
+      document.querySelectorAll('.background-remove-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          this.handleBackgroundImageRemove(e.target);
+        });
+      });
     }
 
     // 更新所有头像预览
@@ -4208,6 +4828,101 @@ ${
       }
     }
 
+    // 更新好友背景属性
+    updateBackgroundProperty(backgroundIndex, property, value) {
+      const config = this.getConfig();
+      if (!config.friendBackgrounds || !config.friendBackgrounds[backgroundIndex]) return;
+
+      config.friendBackgrounds[backgroundIndex][property] = value;
+      this.updateConfig('friendBackgrounds', null, config.friendBackgrounds);
+
+      // 更新预览
+      if (
+        property === 'backgroundImage' ||
+        property === 'backgroundImageUrl' ||
+        property === 'rotation' ||
+        property === 'scale' ||
+        property === 'backgroundPosition'
+      ) {
+        this.updateBackgroundPreview(backgroundIndex);
+      }
+
+      // 如果是好友ID更改，更新状态指示器
+      if (property === 'friendId') {
+        this.updateBackgroundStatusIndicator(backgroundIndex, value);
+      }
+
+      // 提示用户保存配置
+      this.updateStatus('配置已修改，点击另存为按钮保存更改', 'info');
+    }
+
+    // 更新好友背景状态指示器
+    updateBackgroundStatusIndicator(backgroundIndex, friendId) {
+      const statusElement = document.querySelector(`[data-background-index="${backgroundIndex}"] .field-status`);
+      if (statusElement) {
+        if (friendId && friendId.trim()) {
+          statusElement.className = 'field-status valid';
+          statusElement.innerHTML = `✅ 配置有效 - CSS选择器: .message-detail-content[data-background-id="${friendId}"]`;
+        } else {
+          statusElement.className = 'field-status invalid';
+          statusElement.innerHTML = `❌ 配置无效 - 请填写好友ID`;
+        }
+      }
+    }
+
+    // 更新好友背景预览
+    updateBackgroundPreview(backgroundIndex) {
+      const config = this.getConfig();
+      if (!config.friendBackgrounds || !config.friendBackgrounds[backgroundIndex]) return;
+
+      const background = config.friendBackgrounds[backgroundIndex];
+      const previewElement = document.querySelector(
+        `[data-background-index="${backgroundIndex}"] .background-preview-rect`,
+      );
+
+      if (!previewElement) return;
+
+      const backgroundImage = background.backgroundImage || background.backgroundImageUrl || '';
+      const formattedUrl = formatImageUrl(backgroundImage);
+
+      console.log(`[Background Preview] 更新好友背景预览 ${backgroundIndex}:`, {
+        name: background.name,
+        originalUrl: backgroundImage,
+        formattedUrl: formattedUrl,
+        rotation: background.rotation,
+        scale: background.scale,
+        position: background.backgroundPosition,
+      });
+
+      // 获取变换参数
+      const rotation = parseFloat(background.rotation) || 0;
+      const scale = parseFloat(background.scale) || 1;
+      const backgroundPosition = background.backgroundPosition || 'center center';
+
+      // 应用样式
+      if (formattedUrl) {
+        // @ts-ignore - HTMLElement style property
+        previewElement.style.backgroundImage = `url(${formattedUrl})`;
+        // @ts-ignore - HTMLElement style property
+        previewElement.style.backgroundSize = 'cover';
+        // @ts-ignore - HTMLElement style property
+        previewElement.style.backgroundPosition = backgroundPosition;
+        // @ts-ignore - HTMLElement style property
+        previewElement.style.backgroundRepeat = 'no-repeat';
+      } else {
+        // @ts-ignore - HTMLElement style property
+        previewElement.style.backgroundImage = '';
+        // @ts-ignore - HTMLElement style property
+        previewElement.style.background = '#f0f0f0';
+      }
+
+      // 应用变换
+      // @ts-ignore - HTMLElement style property
+      previewElement.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+      // @ts-ignore - HTMLElement style property
+      previewElement.style.transformOrigin = 'center center';
+    }
+
     // 处理头像文件上传
     async handleAvatarFileUpload(fileInput) {
       const file = fileInput.files[0];
@@ -4338,6 +5053,56 @@ ${
       if (avatarIndex !== null && property) {
         this.updateAvatarProperty(avatarIndex, property, '');
         this.updateStatus('头像图片已移除，点击另存为按钮保存更改', 'info');
+
+        // 重新渲染界面以更新按钮状态
+        this.refreshEditorInterface();
+      }
+    }
+
+    // 处理好友背景文件上传
+    async handleBackgroundFileUpload(fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // @ts-ignore - Event target
+      const backgroundIndex = parseInt(fileInput.getAttribute('data-background-index'));
+      const property = fileInput.getAttribute('data-property');
+
+      if (backgroundIndex === null || !property) return;
+
+      // 验证文件类型
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        this.updateStatus('不支持的背景图片格式，请选择 JPG、PNG、GIF、WebP 等格式', 'error');
+        return;
+      }
+
+      try {
+        this.updateStatus('正在上传好友背景图片...', 'loading');
+
+        let imageUrl;
+        // 使用Base64方案处理背景图片
+        console.log('[Style Config Manager] 使用base64方案处理好友背景图片');
+        imageUrl = await this.fileToBase64(file);
+
+        // 更新背景配置
+        this.updateBackgroundProperty(backgroundIndex, property, imageUrl);
+        this.updateStatus('好友背景图片上传成功，点击另存为按钮保存更改', 'info');
+      } catch (error) {
+        console.error('[Style Config Manager] 好友背景图片上传失败:', error);
+        this.updateStatus('好友背景图片上传失败', 'error');
+      }
+    }
+
+    // 处理好友背景图片移除
+    handleBackgroundImageRemove(removeBtn) {
+      // @ts-ignore - Event target
+      const backgroundIndex = parseInt(removeBtn.getAttribute('data-background-index'));
+      const property = removeBtn.getAttribute('data-property');
+
+      if (backgroundIndex !== null && property) {
+        this.updateBackgroundProperty(backgroundIndex, property, '');
+        this.updateStatus('好友背景图片已移除，点击另存为按钮保存更改', 'info');
 
         // 重新渲染界面以更新按钮状态
         this.refreshEditorInterface();

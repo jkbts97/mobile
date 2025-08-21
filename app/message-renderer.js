@@ -1257,7 +1257,7 @@ if (typeof window.MessageRenderer === 'undefined') {
     renderEmptyMessageDetail(friendId, friendName) {
       return `
             <div class="message-detail-app">
-                <div class="message-detail-content" id="message-detail-content">
+                <div class="message-detail-content" id="message-detail-content" data-background-id="${friendId}">
                     <div class="empty-messages">
                         <div class="empty-icon">💬</div>
                         <div class="empty-text">暂无消息记录</div>
@@ -1291,7 +1291,7 @@ if (typeof window.MessageRenderer === 'undefined') {
     renderErrorMessageDetail(friendId, friendName, errorMessage) {
       return `
             <div class="message-detail-app">
-                <div class="message-detail-content" id="message-detail-content">
+                <div class="message-detail-content" id="message-detail-content" data-background-id="${friendId}">
                     <div class="error-messages">
                         <div class="error-icon">⚠️</div>
                         <div class="error-text">加载消息失败</div>

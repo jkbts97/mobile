@@ -3299,6 +3299,11 @@ if (typeof window.MessageApp === 'undefined') {
 
         appContent.innerHTML = newContent;
 
+        // 如果是消息详情页面，立即应用好友专属背景
+        if (this.currentView === 'messageDetail' && this.currentFriendId) {
+          this.applyFriendSpecificBackground(this.currentFriendId);
+        }
+
         // 确保内容更新完成后再绑定事件
         setTimeout(() => {
           try {
@@ -3865,6 +3870,60 @@ if (typeof window.MessageApp === 'undefined') {
 
       // 更新应用内容
       this.updateAppContent();
+    }
+
+    // 立即应用好友专属背景
+    applyFriendSpecificBackground(friendId) {
+      try {
+        console.log(`[Message App] 立即应用好友专属背景: ${friendId}`);
+
+        // 确保styleConfigManager存在
+        if (!window.styleConfigManager) {
+          console.warn('[Message App] styleConfigManager未加载，无法应用好友背景');
+          return;
+        }
+
+        // 获取好友背景配置
+        const config = window.styleConfigManager.getConfig();
+        if (!config.friendBackgrounds || config.friendBackgrounds.length === 0) {
+          console.log('[Message App] 没有好友背景配置');
+          return;
+        }
+
+        // 查找当前好友的背景配置
+        const friendBackground = config.friendBackgrounds.find(bg => bg.friendId === friendId);
+        if (!friendBackground) {
+          console.log(`[Message App] 好友 ${friendId} 没有专属背景配置`);
+          return;
+        }
+
+        // 查找消息详情容器
+        const messageDetailContent = document.querySelector('.message-detail-content');
+        if (!messageDetailContent) {
+          console.warn('[Message App] 消息详情容器未找到');
+          return;
+        }
+
+        // 立即应用背景样式
+        const backgroundImage = friendBackground.backgroundImage || friendBackground.backgroundImageUrl;
+        if (backgroundImage) {
+          const rotation = parseFloat(friendBackground.rotation) || 0;
+          const scale = parseFloat(friendBackground.scale) || 1;
+          const backgroundPosition = friendBackground.backgroundPosition || 'center center';
+
+          // 直接设置内联样式，确保立即生效
+          messageDetailContent.style.backgroundImage = `url(${backgroundImage})`;
+          messageDetailContent.style.backgroundSize = 'cover';
+          messageDetailContent.style.backgroundPosition = backgroundPosition;
+          messageDetailContent.style.backgroundRepeat = 'no-repeat';
+          messageDetailContent.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+          messageDetailContent.style.transformOrigin = 'center center';
+
+          console.log(`[Message App] ✅ 已立即应用好友 ${friendId} 的专属背景`);
+        }
+      } catch (error) {
+        console.error('[Message App] 应用好友专属背景失败:', error);
+      }
     }
 
     // 调试删除好友功能（不实际删除）

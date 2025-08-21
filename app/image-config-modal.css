@@ -181,7 +181,7 @@
   border: 2px solid #d8c9ba;
   border-radius: 8px;
   overflow: hidden;
-  background: #c7d5e8;
+  background: transparent; /* 修复：使用透明背景，避免缩放时显示蓝色背景 */
   cursor: grab;
 }
 
@@ -448,10 +448,75 @@
 
   .preview-container {
     border-color: var(--border-color-dark, #3a3a3c);
-    background: var(--preview-bg-dark, #2c2c2e);
+    background: transparent; /* 修复：深色模式下也使用透明背景 */
   }
 
   .control-slider {
     background: var(--slider-bg-dark, #3a3a3c);
+  }
+}
+
+/* 好友图片配置弹窗专用样式 */
+.friend-image-config-modal {
+  /* 继承所有基础样式，只需要特殊定制的部分 */
+  position: absolute !important; /* 确保在手机容器内正确定位 */
+}
+
+.friend-image-config-modal .modal-title {
+  color: #000000 !important;
+  font-weight: 500;
+}
+
+/* 好友弹窗的头像预览 - 简化方案，使用overflow裁剪 */
+.friend-image-config-modal .avatar-preview {
+  position: relative;
+  border-radius: 50% !important;
+  overflow: hidden !important; /* 使用简单的overflow裁剪 */
+  border: 2px solid #d8c9ba !important;
+}
+
+.friend-image-config-modal .avatar-preview .preview-image {
+  border-radius: 0 !important;
+  /* 移除可能导致问题的clip-path和mask */
+}
+
+/* 好友弹窗的背景预览 - 竖向长方形 */
+.friend-image-config-modal .background-preview .preview-image {
+  border-radius: 8px;
+  aspect-ratio: 3/4; /* 竖向长方形比例 */
+}
+
+/* 好友弹窗的响应式设计 */
+@media (max-width: 480px) {
+  .friend-image-config-modal .modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .friend-image-config-modal .avatar-preview {
+    width: 85px;
+    height: 85px;
+  }
+
+  .friend-image-config-modal .background-preview {
+    width: 75px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 360px) {
+  .friend-image-config-modal .modal-content {
+    width: 98%;
+    max-height: 95vh;
+  }
+
+  .friend-image-config-modal .avatar-preview {
+    width: 75px;
+    height: 75px;
+  }
+
+  .friend-image-config-modal .background-preview {
+    width: 65px;
+    height: 87px;
   }
 }
