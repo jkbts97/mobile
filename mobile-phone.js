@@ -215,57 +215,62 @@ class MobilePhone {
 
                                 <!-- 应用图标网格 -->
                                 <div class="app-grid">
+                                    <!-- 第一行：信息，购物，任务 -->
                                     <div class="app-row">
                                         <div class="app-icon" data-app="messages">
                                             <div class="app-icon-bg pink">💬</div>
                                             <span class="app-label">信息</span>
                                         </div>
-                                        <div class="app-icon" data-app="gallery" style="display: none;">
-                                            <div class="app-icon-bg blue">📸</div>
-                                            <span class="app-label">相册</span>
+                                        <div class="app-icon" data-app="shop">
+                                            <div class="app-icon-bg purple">购</div>
+                                            <span class="app-label">购物</span>
                                         </div>
                                         <div class="app-icon" data-app="task">
                                             <div class="app-icon-bg purple">📰</div>
                                             <span class="app-label">任务</span>
                                         </div>
-                                        <div class="app-icon" data-app="settings">
-                                            <div class="app-icon-bg purple">⚙️</div>
-                                            <span class="app-label">设置</span>
-                                        </div>
-                                        <div class="app-icon" data-app="mail" style="display: none;">
-                                            <div class="app-icon-bg orange">✉️</div>
-                                            <span class="app-label">邮件</span>
-                                        </div>
                                     </div>
+                                    <!-- 第二行：论坛，微博，直播 -->
                                     <div class="app-row">
                                         <div class="app-icon" data-app="forum">
                                             <div class="app-icon-bg red">📰</div>
                                             <span class="app-label">论坛</span>
                                         </div>
-
-                                        <div class="app-icon" data-app="shop">
-                                            <div class="app-icon-bg purple">购</div>
-                                            <span class="app-label">购物</span>
+                                        <div class="app-icon" data-app="weibo">
+                                            <div class="app-icon-bg orange"></div>
+                                            <span class="app-label">微博</span>
                                         </div>
-                                        <div class="app-icon" data-app="backpack">
-                                            <div class="app-icon-bg orange">🎒</div>
-                                            <span class="app-label">背包</span>
-                                        </div>
-                                    </div>
-                                     <div class="app-row">
                                         <div class="app-icon" data-app="live">
                                             <div class="app-icon-bg red">🎬</div>
                                             <span class="app-label">直播</span>
                                         </div>
-                                        <div class="app-icon" data-app="weibo">
-                                            <div class="app-icon-bg orange">📱</div>
-                                            <span class="app-label">微博</span>
+                                    </div>
+                                    <!-- 第三行：背包，API，设置 -->
+                                    <div class="app-row">
+                                        <div class="app-icon" data-app="backpack">
+                                            <div class="app-icon-bg orange">🎒</div>
+                                            <span class="app-label">背包</span>
                                         </div>
                                         <div class="app-icon" data-app="api">
                                             <div class="app-icon-bg orange"></div>
-                                            <span class="app-label">api</span>
+                                            <span class="app-label">API</span>
                                         </div>
-                                     </div>
+                                        <div class="app-icon" data-app="settings">
+                                            <div class="app-icon-bg purple">⚙️</div>
+                                            <span class="app-label">设置</span>
+                                        </div>
+                                    </div>
+                                    <!-- 隐藏的应用 -->
+                                    <div style="display: none;">
+                                        <div class="app-icon" data-app="gallery">
+                                            <div class="app-icon-bg blue">📸</div>
+                                            <span class="app-label">相册</span>
+                                        </div>
+                                        <div class="app-icon" data-app="mail">
+                                            <div class="app-icon-bg orange">✉️</div>
+                                            <span class="app-label">邮件</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <!-- 底部小动物装饰 -->
                                 <div class="bottom-decoration">
@@ -540,6 +545,52 @@ class MobilePhone {
           window.messageApp.currentTab = 'add';
           window.messageApp.updateAppContent();
         }
+      } else if (state.view === 'friendsCircle') {
+        // 恢复朋友圈状态
+        console.log('[Mobile Phone] 恢复朋友圈状态...');
+        if (window.messageApp) {
+          // 设置messageApp状态
+          window.messageApp.currentMainTab = 'circle';
+          window.messageApp.currentView = 'list';
+
+          // 确保朋友圈已初始化并激活
+          if (window.messageApp.friendsCircle) {
+            console.log('[Mobile Phone] 激活现有朋友圈实例');
+            window.messageApp.friendsCircle.activate();
+          } else {
+            console.log('[Mobile Phone] 朋友圈未初始化，立即初始化并激活');
+            window.messageApp.initFriendsCircle();
+            // 等待初始化完成后激活
+            setTimeout(() => {
+              if (window.messageApp.friendsCircle) {
+                window.messageApp.friendsCircle.activate();
+              }
+            }, 100);
+          }
+
+          // 更新界面内容
+          window.messageApp.updateAppContent();
+
+          // 延迟确保header正确更新
+          setTimeout(() => {
+            console.log('[Mobile Phone] 延迟更新朋友圈header...');
+            const circleState = {
+              app: 'messages',
+              view: 'friendsCircle',
+              title: '朋友圈',
+              showBackButton: false,
+              showAddButton: true,
+              addButtonIcon: 'fas fa-camera',
+              addButtonAction: () => {
+                if (window.friendsCircle) {
+                  window.friendsCircle.showPublishModal();
+                }
+              },
+            };
+            this.currentAppState = circleState;
+            this.updateAppHeader(circleState);
+          }, 200);
+        }
       }
     } else if (state.app === 'forum') {
       // 如果是论坛应用的特殊状态
@@ -671,6 +722,28 @@ class MobilePhone {
         saveBtn.title = '保存';
         saveBtn.addEventListener('click', () => this.saveAddFriend());
         headerRight.appendChild(saveBtn);
+      } else if (state.view === 'friendsCircle') {
+        // 朋友圈页面：添加生成朋友圈按钮
+        const generateBtn = document.createElement('button');
+        generateBtn.className = 'app-header-btn';
+        generateBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        generateBtn.title = '生成朋友圈';
+        generateBtn.addEventListener('click', () => {
+          this.generateFriendsCircleContent();
+        });
+        headerRight.appendChild(generateBtn);
+
+        // 朋友圈页面：添加相机发布按钮
+        const cameraBtn = document.createElement('button');
+        cameraBtn.className = 'app-header-btn';
+        cameraBtn.innerHTML = '<i class="fas fa-camera"></i>';
+        cameraBtn.title = '发布朋友圈';
+        cameraBtn.addEventListener('click', () => {
+          if (window.friendsCircle) {
+            window.friendsCircle.showPublishModal();
+          }
+        });
+        headerRight.appendChild(cameraBtn);
       }
     } else if (state.app === 'gallery') {
       // 相册应用：添加选择按钮
@@ -1063,6 +1136,41 @@ class MobilePhone {
     }
   }
 
+  // 生成朋友圈内容
+  async generateFriendsCircleContent() {
+    try {
+      console.log('[Mobile Phone] 🎭 生成朋友圈按钮被点击');
+
+      // 显示生成状态提示
+      if (window.showMobileToast) {
+        window.showMobileToast('🎭 正在生成朋友圈内容...', 'info');
+      }
+
+      // 构建发送给AI的消息
+      const message =
+        '用户正在查看朋友圈，请根据朋友圈规则系统，生成3-5个正确的朋友圈格式，根据角色间的关系为每条朋友圈生成0-5条回复。回复请使用与原楼层相同id。请使用正确的三位数楼层id,楼层id不能与历史楼层id重复。请正确使用前缀s或w。严禁代替用户回复。禁止发表情包或颜文字，可以使用emoji。';
+
+      // 发送消息给AI
+      if (window.friendsCircle && window.friendsCircle.sendToAI) {
+        await window.friendsCircle.sendToAI(message);
+
+        if (window.showMobileToast) {
+          window.showMobileToast('✅ 朋友圈内容生成完成', 'success');
+        }
+      } else {
+        console.error('[Mobile Phone] 朋友圈功能未就绪');
+        if (window.showMobileToast) {
+          window.showMobileToast('❌ 朋友圈功能未就绪', 'error');
+        }
+      }
+    } catch (error) {
+      console.error('[Mobile Phone] 生成朋友圈内容失败:', error);
+      if (window.showMobileToast) {
+        window.showMobileToast('❌ 生成失败: ' + error.message, 'error');
+      }
+    }
+  }
+
   // 保存添加好友
   saveAddFriend() {
     console.log('[Mobile Phone] 保存添加好友');
@@ -1384,9 +1492,24 @@ class MobilePhone {
                 </div>
             `;
 
-      // 确保论坛UI模块已加载
+      // 确保论坛UI模块已加载，添加超时和重试机制
       console.log('[Mobile Phone] 加载论坛UI模块...');
-      await this.loadForumApp();
+
+      const loadWithTimeout = (promise, timeout = 15000) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('论坛模块加载超时')), timeout)),
+        ]);
+      };
+
+      try {
+        await loadWithTimeout(this.loadForumApp());
+      } catch (error) {
+        console.error('[Mobile Phone] 论坛模块加载失败，尝试重新加载:', error);
+        // 清理失败的加载状态
+        window._forumAppLoading = null;
+        await loadWithTimeout(this.loadForumApp());
+      }
 
       // 获取当前应用状态，如果已经在论坛应用中，不重复推送状态
       let currentState = this.appStack[this.appStack.length - 1];
@@ -1482,9 +1605,24 @@ class MobilePhone {
                 </div>
             `;
 
-      // 确保微博UI模块已加载
+      // 确保微博UI模块已加载，添加超时和重试机制
       console.log('[Mobile Phone] 加载微博UI模块...');
-      await this.loadWeiboApp();
+
+      const loadWithTimeout = (promise, timeout = 15000) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('微博模块加载超时')), timeout)),
+        ]);
+      };
+
+      try {
+        await loadWithTimeout(this.loadWeiboApp());
+      } catch (error) {
+        console.error('[Mobile Phone] 微博模块加载失败，尝试重新加载:', error);
+        // 清理失败的加载状态
+        window._weiboAppLoading = null;
+        await loadWithTimeout(this.loadWeiboApp());
+      }
 
       // 获取当前应用状态
       const currentState = this.appStack[this.appStack.length - 1] || { view: 'main' };
@@ -2000,11 +2138,23 @@ class MobilePhone {
                 </div>
             `;
 
-      // 确保必要的模块已加载
+      // 确保必要的模块已加载，添加超时控制
       console.log('[Mobile Phone] 确保论坛和微博模块已加载...');
+
+      const loadWithTimeout = (promise, timeout = 10000, name = '') => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error(`${name}加载超时`)), timeout)),
+        ]);
+      };
+
       await Promise.all([
-        this.loadForumApp().catch(e => console.warn('[Mobile Phone] 论坛模块加载失败:', e)),
-        this.loadWeiboApp().catch(e => console.warn('[Mobile Phone] 微博模块加载失败:', e)),
+        loadWithTimeout(this.loadForumApp(), 10000, '论坛模块').catch(e =>
+          console.warn('[Mobile Phone] 论坛模块加载失败:', e),
+        ),
+        loadWithTimeout(this.loadWeiboApp(), 10000, '微博模块').catch(e =>
+          console.warn('[Mobile Phone] 微博模块加载失败:', e),
+        ),
       ]);
 
       // 生成统一的API设置面板HTML
@@ -4278,8 +4428,11 @@ class MobilePhone {
         if (loadedCount === totalFiles) {
           console.log('[Mobile Phone] 所有论坛文件加载完成，等待模块初始化...');
 
-          // 等待论坛模块完全初始化
-          setTimeout(() => {
+          // 等待论坛模块完全初始化，增加重试机制
+          let retryCount = 0;
+          const maxRetries = 5;
+          const checkInitialization = () => {
+            retryCount++;
             if (
               window.forumUI &&
               window.getForumAppContent &&
@@ -4292,6 +4445,9 @@ class MobilePhone {
               console.log('[Mobile Phone] ✅ Forum App 模块加载并初始化完成');
               window._forumAppLoading = null;
               resolve();
+            } else if (retryCount < maxRetries) {
+              console.log(`[Mobile Phone] 论坛模块正在初始化中... (${retryCount}/${maxRetries})`);
+              setTimeout(checkInitialization, 500); // 每500ms检查一次
             } else {
               console.error('[Mobile Phone] ❌ 论坛模块加载完成但全局变量未正确设置');
               console.log('[Mobile Phone] 检查结果:', {
@@ -4306,21 +4462,27 @@ class MobilePhone {
               window._forumAppLoading = null;
               reject(new Error('论坛模块初始化失败'));
             }
-          }, 1000); // 等待1秒让模块完成初始化
+          };
+          setTimeout(checkInitialization, 500); // 首次等待500ms
         }
       };
 
       const handleError = name => {
         console.error(`[Mobile Phone] ${name} 加载失败`);
-        window._forumAppLoading = null;
-        reject(new Error(`${name} 加载失败`));
+        loadedCount++; // 即使失败也要计数，避免永远等待
+        // 检查是否所有文件都已尝试加载（成功或失败）
+        if (loadedCount === totalFiles) {
+          console.error('[Mobile Phone] ❌ 论坛模块加载失败，某些文件无法加载');
+          window._forumAppLoading = null;
+          reject(new Error(`论坛模块加载失败: ${name} 加载失败`));
+        }
       };
 
       // 首先加载 Font Awesome（如果还没有加载）
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = '';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成（论坛应用）');
           checkComplete();
@@ -4444,8 +4606,11 @@ class MobilePhone {
         if (loadedCount === totalFiles) {
           console.log('[Mobile Phone] 所有微博文件加载完成，等待模块初始化...');
 
-          // 等待微博模块完全初始化
-          setTimeout(() => {
+          // 等待微博模块完全初始化，增加重试机制
+          let retryCount = 0;
+          const maxRetries = 5;
+          const checkInitialization = () => {
+            retryCount++;
             if (
               window.weiboUI &&
               window.getWeiboAppContent &&
@@ -4458,6 +4623,9 @@ class MobilePhone {
               console.log('[Mobile Phone] ✅ Weibo App 模块加载并初始化完成');
               window._weiboAppLoading = null;
               resolve();
+            } else if (retryCount < maxRetries) {
+              console.log(`[Mobile Phone] 微博模块正在初始化中... (${retryCount}/${maxRetries})`);
+              setTimeout(checkInitialization, 500); // 每500ms检查一次
             } else {
               console.error('[Mobile Phone] ❌ 微博模块加载完成但全局变量未正确设置');
               console.log('[Mobile Phone] 检查结果:', {
@@ -4472,21 +4640,27 @@ class MobilePhone {
               window._weiboAppLoading = null;
               reject(new Error('微博模块初始化失败'));
             }
-          }, 1000); // 等待1秒让模块完成初始化
+          };
+          setTimeout(checkInitialization, 500); // 首次等待500ms
         }
       };
 
       const handleError = name => {
         console.error(`[Mobile Phone] ${name} 加载失败`);
-        // 不要立即 reject，而是继续加载其他文件
-        checkComplete(); // 仍然计数，但标记为失败
+        loadedCount++; // 即使失败也要计数，避免永远等待
+        // 检查是否所有文件都已尝试加载（成功或失败）
+        if (loadedCount === totalFiles) {
+          console.error('[Mobile Phone] ❌ 微博模块加载失败，某些文件无法加载');
+          window._weiboAppLoading = null;
+          reject(new Error(`微博模块加载失败: ${name} 加载失败`));
+        }
       };
 
       // 首先加载 Font Awesome（如果还没有加载）
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = '';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成');
           checkComplete();
@@ -4619,7 +4793,7 @@ class MobilePhone {
     // 标记正在加载
     window._messageAppLoading = new Promise((resolve, reject) => {
       let loadedCount = 0;
-      const totalFiles = 6; // message-app.css + message-renderer.css + friend-renderer.js + message-renderer.js + message-sender.js + message-app.js
+      const totalFiles = 8; // message-app.css + message-renderer.css + friends-circle.css + friend-renderer.js + message-renderer.js + message-sender.js + friends-circle.js + message-app.js
 
       const checkComplete = () => {
         loadedCount++;
@@ -4667,6 +4841,12 @@ class MobilePhone {
           existingRendererCss.remove();
         }
 
+        const existingFriendsCircleCss = document.querySelector('link[href*="friends-circle.css"]');
+        if (existingFriendsCircleCss) {
+          console.log('[Mobile Phone] 移除已存在的 friends-circle.css');
+          existingFriendsCircleCss.remove();
+        }
+
         const existingScripts = document.querySelectorAll('script[src*="mobile/app/"]');
         if (existingScripts.length > 0) {
           console.log(`[Mobile Phone] 移除 ${existingScripts.length} 个已存在的脚本`);
@@ -4680,6 +4860,7 @@ class MobilePhone {
       const cssFiles = [
         '/scripts/extensions/third-party/mobile/app/message-app.css',
         '/scripts/extensions/third-party/mobile/app/message-renderer.css',
+        '/scripts/extensions/third-party/mobile/app/friends-circle.css',
       ];
 
       cssFiles.forEach(href => {
@@ -4699,6 +4880,7 @@ class MobilePhone {
         '/scripts/extensions/third-party/mobile/app/friend-renderer.js',
         '/scripts/extensions/third-party/mobile/app/message-renderer.js',
         '/scripts/extensions/third-party/mobile/app/message-sender.js',
+        '/scripts/extensions/third-party/mobile/app/friends-circle.js',
         '/scripts/extensions/third-party/mobile/app/message-app.js',
       ];
 

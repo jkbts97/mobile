@@ -1112,6 +1112,169 @@ if (typeof window.MessageRenderer === 'undefined') {
         }
       }
 
+      // 🌟 特殊处理：图片消息（新增）
+      if (
+        messageType === '图片' ||
+        content.includes('[图片:') ||
+        (message.detailedContent && message.detailedContent.includes('<img'))
+      ) {
+        const imageContent = message.detailedContent || content;
+
+        // 为接收的图片消息创建特殊布局
+        if (!isMine && !isMyGroupMessage) {
+          return `
+                <div class="message-detail ${messageClass}" title="图片消息" data-friend-id="${friendId}">
+                    <span class="message-sender">${senderName}</span>
+                    <div class="message-body">
+                        <div class="message-avatar" id="message-avatar-${friendId}">
+                            ${this.getMessageAvatar(isMine || isMyGroupMessage, senderName)}
+                        </div>
+                        <div class="message-content">
+                        <div class="message-meta">
+                            <span class="message-type">图片</span>
+                            ${isGroupMessage ? '<span class="group-badge">群聊</span>' : ''}
+                        </div>
+                            <div class="image-message-content">
+                                ${imageContent}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 发送的图片消息保持原有布局
+        return `
+                <div class="message-detail ${messageClass}" title="图片消息" data-friend-id="${friendId}">
+                    <div class="message-avatar" id="message-avatar-${friendId}">
+                        ${this.getMessageAvatar(isMine || isMyGroupMessage, senderName)}
+                    </div>
+                    <div class="message-content">
+                    <div class="message-meta">
+                        <span class="message-sender">${senderName}</span>
+                        <span class="message-type">图片</span>
+                        ${isGroupMessage ? '<span class="group-badge">群聊</span>' : ''}
+                    </div>
+                        <div class="image-message-content">
+                            ${imageContent}
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
+      // 🌟 新增：特殊处理附件消息（包括图片附件）
+      if (messageType === '附件' && content) {
+        let processedContent = content;
+
+        // 检查是否是图片附件，如果是，解析并渲染为img标签
+        if (content.includes('图片:') || message.fullMatch?.includes('附件|图片:')) {
+          // 🌟 修改：优先使用extra.image中的真实路径
+          console.log(`[Message Renderer] 🔍 处理图片附件消息:`, {
+            content,
+            fullMatch: message.fullMatch,
+            extra: message.extra,
+          });
+
+          let imageUrl = null;
+
+          // 🌟 方法1：优先使用原始消息的extra.image中的真实路径（最可靠）
+          if (message.originalMessageExtra && message.originalMessageExtra.image) {
+            imageUrl = message.originalMessageExtra.image;
+            console.log(`[Message Renderer] ✅ 使用originalMessageExtra.image中的真实路径:`, imageUrl);
+          } else if (message.extra && message.extra.image) {
+            imageUrl = message.extra.image;
+            console.log(`[Message Renderer] ✅ 使用extra.image中的真实路径:`, imageUrl);
+          } else {
+            // 🌟 方法2：解析消息格式获取文件名，然后构建URL
+            const imageRegex = /图片:\s*([^|\]]+)/;
+            const match = content.match(imageRegex) || (message.fullMatch && message.fullMatch.match(imageRegex));
+
+            if (match) {
+              const fileName = match[1].trim();
+              console.log(`[Message Renderer] 🔍 从消息解析到图片文件名:`, fileName);
+
+              // 获取好友名称（优先从消息中获取，否则使用当前好友名）
+              let friendName = senderName;
+              if (message.fullMatch) {
+                const friendMatch = message.fullMatch.match(/\[我方消息\|([^|]+)\|/);
+                if (friendMatch) {
+                  friendName = friendMatch[1];
+                }
+              }
+
+              // 构建图片URL
+              if (window.attachmentSender && typeof window.attachmentSender.buildImageUrl === 'function') {
+                imageUrl = window.attachmentSender.buildImageUrl(friendName, fileName);
+              } else {
+                // 备用方案：使用相对路径，与SillyTavern保持一致
+                imageUrl = `/user/images/${friendName}/${fileName}`;
+              }
+
+              console.log(`[Message Renderer] 🔍 构建的图片URL:`, imageUrl);
+            }
+          }
+
+          if (imageUrl) {
+            // 提取文件名用于显示（从路径中获取）
+            const displayFileName = imageUrl.split('/').pop() || 'image.png';
+
+            // 创建img标签替换原内容 - 使用响应式设计
+            processedContent = `<img src="${imageUrl}" alt="${displayFileName}" class="attachment-image" style="width: 100%; max-width: 100%; height: auto; border-radius: 8px; margin: 4px; cursor: pointer; object-fit: contain;" onclick="this.style.transform=this.style.transform?'':'scale(2)'; setTimeout(()=>this.style.transform='', 3000);" title="点击放大查看: ${displayFileName}" loading="lazy">`;
+
+            console.log(`[Message Renderer] ✅ 已生成图片标签:`, {
+              imageUrl,
+              displayFileName,
+              processedContent: processedContent.substring(0, 100) + '...',
+            });
+          } else {
+            console.warn(`[Message Renderer] ⚠️ 无法获取图片URL，保持原内容`);
+          }
+        }
+
+        // 为接收的附件消息创建特殊布局
+        if (!isMine && !isMyGroupMessage) {
+          return `
+                <div class="message-detail ${messageClass}" title="附件消息" data-friend-id="${friendId}">
+                    <span class="message-sender">${senderName}</span>
+                    <div class="message-body">
+                        <div class="message-avatar" id="message-avatar-${friendId}">
+                            ${this.getMessageAvatar(isMine || isMyGroupMessage, senderName)}
+                        </div>
+                        <div class="message-content">
+                        <div class="message-meta">
+                            <span class="message-type">附件</span>
+                            ${isGroupMessage ? '<span class="group-badge">群聊</span>' : ''}
+                        </div>
+                            <div class="attachment-message-content">
+                                ${processedContent}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 发送的附件消息保持原有布局
+        return `
+                <div class="message-detail ${messageClass}" title="附件消息" data-friend-id="${friendId}">
+                    <div class="message-avatar" id="message-avatar-${friendId}">
+                        ${this.getMessageAvatar(isMine || isMyGroupMessage, senderName)}
+                    </div>
+                    <div class="message-content">
+                    <div class="message-meta">
+                        <span class="message-sender">${senderName}</span>
+                        <span class="message-type">附件</span>
+                        ${isGroupMessage ? '<span class="group-badge">群聊</span>' : ''}
+                    </div>
+                        <div class="attachment-message-content">
+                            ${processedContent}
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
       // 🌟 特殊处理：表情包消息
       if (messageType === '表情包' && content) {
         // 为接收的表情包消息创建特殊布局

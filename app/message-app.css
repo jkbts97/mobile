@@ -13,8 +13,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #cec5c0 0%, #cebaab 100%);
+  color: #333;
   border-radius: 20px 20px 0 0;
 }
 
@@ -294,8 +294,8 @@
   display: flex;
   align-items: center;
   padding: 15px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #cec5c0;
+  color: #333;
   border-radius: 20px 20px 0 0;
 }
 
@@ -355,8 +355,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #9291a3;
+  box-shadow: 0 0 0 3px rgba(146, 145, 163, 0.1);
 }
 
 .form-input::placeholder {
@@ -366,7 +366,7 @@
 .add-friend-submit {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #9291a3 0%, #cec5c0 100%);
   color: white;
   border: none;
   border-radius: 15px;
@@ -562,19 +562,18 @@
 }
 
 .tab-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  background: rgba(146, 145, 163, 0.1);
+  color: #9291a3;
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, #9291a3 0%, #cebaab 100%) !important;
   color: white !important;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  color: #fff;
+  box-shadow: 0 4px 12px rgba(146, 145, 163, 0.3);
   border-bottom: none !important;
 }
 .tab-btn.active span {
-  color: #fff !important;
+  color: white !important;
 }
 .tab-icon {
   font-size: 16px;
@@ -631,7 +630,7 @@
 
 .refresh-friend-list {
   padding: 8px 12px;
-  background: #667eea;
+  background: linear-gradient(135deg, #cebaab 0%, #9291a3 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -671,8 +670,8 @@
 }
 
 .delete-friend-item:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  border-color: #9291a3;
+  box-shadow: 0 4px 12px rgba(146, 145, 163, 0.1);
 }
 
 .friend-info {
@@ -911,12 +910,12 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #667eea;
+  color: #9291a3;
 }
 
 .chat-detail-btn:hover {
   background: #f5f5f5;
-  border-color: #667eea;
+  border-color: #9291a3;
 }
 
 .detail-icon {
@@ -925,20 +924,20 @@
 
 /* 好友选中状态 */
 .message-item.selected {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border-color: #667eea;
+  background: rgba(146, 145, 163, 0.1);
+  border-color: #9291a3;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 12px rgba(146, 145, 163, 0.2);
 }
 
 .message-item.selected .friend-avatar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #9291a3;
   color: white;
   transform: scale(1.05);
 }
 
 .message-item.selected .friend-name {
-  color: #667eea;
+  color: #9291a3;
   font-weight: 600;
 }
 
@@ -975,8 +974,8 @@
 }
 
 .message-list-footer #message-send-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  border-color: #9291a3;
+  box-shadow: 0 0 0 2px rgba(146, 145, 163, 0.2);
 }
 
 .message-list-footer .send-tools {
@@ -1007,7 +1006,7 @@
 }
 
 .message-list-footer .send-message-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #9291a3 0%, #cebaab 100%);
   color: white;
   border: none;
   border-radius: 18px;
@@ -1330,7 +1329,7 @@
 
 .refresh-group-list {
   padding: 8px 12px;
-  background: #667eea;
+  background: linear-gradient(135deg, #cec5c0 0%, #9291a3 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1370,8 +1369,8 @@
 }
 
 .delete-group-item:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  border-color: #9291a3;
+  box-shadow: 0 4px 12px rgba(146, 145, 163, 0.1);
 }
 
 .group-info {

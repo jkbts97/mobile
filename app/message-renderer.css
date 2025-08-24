@@ -127,6 +127,15 @@
   animation: messageSlideIn 0.3s ease-out;
 }
 
+/* 附件消息需要更大的宽度来显示图片 */
+.message-detail[title='附件'] {
+  max-width: 85% !important;
+}
+
+.message-detail[title='图片'] {
+  max-width: 85% !important;
+}
+
 .message-detail.message-sent {
   color: white;
   margin: 8px 0 !important; /* 增加用户消息的上下间距到8px */
@@ -361,6 +370,15 @@
   .message-detail {
     max-width: 90%;
     padding: 0;
+  }
+
+  /* 附件消息需要更大的宽度来显示图片 */
+  .message-detail[title='附件'] {
+    max-width: 95% !important;
+  }
+
+  .message-detail[title='图片'] {
+    max-width: 95% !important;
   }
 
   .message-avatar {
@@ -1985,6 +2003,37 @@
   transform: scale(1.05);
 }
 
+/* 附件图片样式 - 响应式设计 */
+.attachment-image {
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 8px;
+  margin: 4px 0;
+  cursor: pointer;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.attachment-image:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 附件消息内容容器 */
+.attachment-message-content {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.image-message-content {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 /* 响应式设计 */
 @media (max-width: 480px) {
   #sticker-input-panel .special-panel-content {
@@ -2002,6 +2051,20 @@
   .message-detail[title='表情包'] .qq-sticker-image {
     max-width: 120px !important;
     max-height: 120px !important;
+  }
+
+  /* 手机端附件图片响应式 */
+  .attachment-image {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 2px 0 !important;
+  }
+
+  .attachment-message-content,
+  .image-message-content {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 

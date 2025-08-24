@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>应用图标测试</title>
+    <link rel="stylesheet" href="mobile-phone.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f5f5;
+      }
+      .test-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      .icon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+      .icon-demo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        background: #fafafa;
+      }
+      .app-icon-bg {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        position: relative;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      }
+      .app-icon-bg.pink {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      }
+      .app-icon-bg.purple {
+        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      }
+      .app-icon-bg.red {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+      }
+      .app-icon-bg.orange {
+        background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
+      }
+      .app-icon-bg.blue {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+      }
+      .app-icon-bg.green {
+        background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+      }
+
+      .icon-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: #333;
+        text-align: center;
+      }
+      .icon-description {
+        font-size: 10px;
+        color: #666;
+        text-align: center;
+        margin-top: 5px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+      }
+      .new-icons {
+        border: 2px solid #4caf50;
+        background: #f8fff8;
+      }
+      .new-badge {
+        background: #4caf50;
+        color: white;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>应用图标展示</h1>
+      <p class="subtitle">蚀刻版图标系统 - 所有图标都使用CSS绘制</p>
+
+      <div class="icon-grid">
+        <!-- 现有图标 -->
+        <div class="icon-demo">
+          <div class="app-icon" data-app="messages">
+            <div class="app-icon-bg pink"></div>
+          </div>
+          <div class="icon-label">信息</div>
+          <div class="icon-description">聊天气泡图标</div>
+        </div>
+
+        <div class="icon-demo">
+          <div class="app-icon" data-app="task">
+            <div class="app-icon-bg purple"></div>
+          </div>
+          <div class="icon-label">任务</div>
+          <div class="icon-description">文档+勾选图标</div>
+        </div>
+
+        <div class="icon-demo">
+          <div class="app-icon" data-app="forum">
+            <div class="app-icon-bg red"></div>
+          </div>
+          <div class="icon-label">论坛</div>
+          <div class="icon-description">多个圆形图标</div>
+        </div>
+
+        <div class="icon-demo">
+          <div class="app-icon" data-app="shop">
+            <div class="app-icon-bg orange"></div>
+          </div>
+          <div class="icon-label">购物</div>
+          <div class="icon-description">购物袋+星星图标</div>
+        </div>
+
+        <div class="icon-demo">
+          <div class="app-icon" data-app="live">
+            <div class="app-icon-bg red">🎬</div>
+          </div>
+          <div class="icon-label">直播</div>
+          <div class="icon-description">音符图标</div>
+        </div>
+
+        <div class="icon-demo">
+          <div class="app-icon" data-app="backpack">
+            <div class="app-icon-bg blue"></div>
+          </div>
+          <div class="icon-label">背包</div>
+          <div class="icon-description">背包轮廓图标</div>
+        </div>
+
+        <div class="icon-demo">
+          <div class="app-icon" data-app="settings">
+            <div class="app-icon-bg purple"></div>
+          </div>
+          <div class="icon-label">设置</div>
+          <div class="icon-description">滑块控制图标</div>
+        </div>
+
+        <!-- 新增图标 -->
+        <div class="icon-demo new-icons">
+          <div class="app-icon" data-app="weibo">
+            <div class="app-icon-bg orange"></div>
+          </div>
+          <div class="icon-label">微博</div>
+          <div class="icon-description">Font Awesome 眼睛图标</div>
+          <div class="new-badge">新增</div>
+        </div>
+
+        <div class="icon-demo new-icons">
+          <div class="app-icon" data-app="api">
+            <div class="app-icon-bg orange"></div>
+          </div>
+          <div class="icon-label">API</div>
+          <div class="icon-description">Font Awesome 插头图标</div>
+          <div class="new-badge">新增</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px">
+        <h3 style="margin-top: 0; color: #333">设计说明</h3>
+        <ul style="color: #666; line-height: 1.6">
+          <li><strong>微博图标</strong>: 使用Font Awesome的眼睛图标(fa-eye)，象征观看和浏览微博内容</li>
+          <li><strong>API图标</strong>: 使用Font Awesome的插头图标(fa-plug)，象征API接口的连接功能</li>
+          <li><strong>设计风格</strong>: 直接使用Font Awesome图标，保持专业和统一的视觉效果</li>
+          <li><strong>颜色搭配</strong>: 使用半透明黑色，与橙色背景形成良好对比</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

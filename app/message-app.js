@@ -75,13 +75,18 @@ async function importSillyTavernModules() {
 if (typeof window.MessageApp === 'undefined') {
   class MessageApp {
     constructor() {
-      this.currentView = 'list'; // 'list', 'addFriend', 'messageDetail'
+      this.currentView = 'list'; // 'list', 'addFriend', 'messageDetail', 'friendsCircle'
       this.currentTab = 'add'; // 'add', 'delete', 'createGroup', 'deleteGroup'
+      this.currentMainTab = 'friends'; // 'friends', 'circle' - 主要页面切换
       this.friendRenderer = null;
       this.currentFriendId = null;
       this.currentFriendName = null;
       this.currentIsGroup = null; // 当前聊天是否为群聊
       this.currentSelectedFriend = null; // 当前选中的好友，用于发送消息
+
+      // 朋友圈相关
+      this.friendsCircle = null;
+      this.friendsCircleInitialized = false;
 
       // 实时监控相关
       this.realtimeMonitor = null;
@@ -128,6 +133,16 @@ if (typeof window.MessageApp === 'undefined') {
       setTimeout(() => {
         this.integrateRealTimeSync();
       }, 2000);
+
+      // 延迟初始化朋友圈功能
+      setTimeout(() => {
+        this.initFriendsCircle();
+      }, 1000);
+
+      // 延迟加载附件发送器（静默加载，不显示面板）
+      setTimeout(() => {
+        this.loadAttachmentSenderSilently();
+      }, 1500);
     }
 
     // 设置增量渲染器
@@ -1529,11 +1544,193 @@ if (typeof window.MessageApp === 'undefined') {
       }, 100);
     }
 
+    // 初始化朋友圈功能
+    initFriendsCircle() {
+      try {
+        console.log('[Message App] 初始化朋友圈功能...');
+
+        // 如果已经初始化过，直接返回
+        if (this.friendsCircle && this.friendsCircleInitialized) {
+          console.log('[Message App] 朋友圈已初始化，跳过重复初始化');
+          return;
+        }
+
+        // 检查是否已有全局朋友圈实例
+        if (window.friendsCircle && !this.friendsCircle) {
+          console.log('[Message App] 使用现有的全局朋友圈实例');
+          this.friendsCircle = window.friendsCircle;
+          this.friendsCircleInitialized = true;
+          return;
+        }
+
+        // 检查朋友圈类是否已加载
+        if (typeof window.FriendsCircle === 'undefined') {
+          console.warn('[Message App] 朋友圈模块未加载，延迟初始化');
+          setTimeout(() => {
+            this.initFriendsCircle();
+          }, 1000);
+          return;
+        }
+
+        // 只有在没有实例时才创建新实例
+        if (!this.friendsCircle) {
+          console.log('[Message App] 创建新的朋友圈实例');
+          this.friendsCircle = new window.FriendsCircle();
+          this.friendsCircleInitialized = true;
+
+          // 导出到全局，供其他组件使用
+          window.friendsCircle = this.friendsCircle;
+
+          // 监听朋友圈更新事件（只绑定一次）
+          if (!this.friendsCircleEventBound) {
+            window.addEventListener('friendsCircleUpdate', event => {
+              this.handleFriendsCircleUpdate(event.detail);
+            });
+            this.friendsCircleEventBound = true;
+          }
+        }
+
+        console.log('[Message App] 朋友圈功能初始化完成');
+      } catch (error) {
+        console.error('[Message App] 朋友圈功能初始化失败:', error);
+      }
+    }
+
+    // 处理朋友圈更新事件
+    handleFriendsCircleUpdate(detail) {
+      try {
+        if (this.currentMainTab === 'circle' && this.currentView === 'list') {
+          // 如果当前在朋友圈页面，刷新界面
+          this.updateAppContent();
+        }
+      } catch (error) {
+        console.error('[Message App] 处理朋友圈更新失败:', error);
+      }
+    }
+
+    // 切换主要页面标签
+    async switchMainTab(tabName) {
+      console.log(`[Message App] 切换主要标签页: ${tabName}`);
+      this.currentMainTab = tabName;
+
+      if (tabName === 'circle') {
+        // 切换到朋友圈
+        await this.showFriendsCircle();
+      } else {
+        // 切换到好友列表
+        this.showMessageList();
+      }
+    }
+
+    // 显示好友列表页面
+    showMessageList() {
+      console.log('[Message App] 显示好友列表页面');
+      this.currentMainTab = 'friends';
+      this.currentView = 'list';
+
+      // 停用朋友圈功能
+      if (this.friendsCircle) {
+        this.friendsCircle.deactivate();
+      }
+
+      // 更新界面
+      this.updateAppContent();
+
+      // 通知主框架更新应用状态
+      if (window.mobilePhone) {
+        const messageState = {
+          app: 'messages',
+          view: 'messageList',
+          title: '信息',
+          showBackButton: false,
+          showAddButton: true,
+          addButtonIcon: 'fas fa-plus',
+          addButtonAction: () => {
+            if (window.messageApp) {
+              window.messageApp.showAddFriend();
+            }
+          },
+        };
+        window.mobilePhone.currentAppState = messageState;
+        window.mobilePhone.updateAppHeader(messageState);
+      }
+    }
+
+    // 显示朋友圈页面
+    async showFriendsCircle() {
+      console.log('[Message App] 显示朋友圈页面');
+      this.currentMainTab = 'circle';
+      this.currentView = 'list';
+
+      // 确保朋友圈已初始化
+      if (!this.friendsCircle) {
+        console.log('[Message App] 朋友圈未初始化，尝试初始化...');
+
+        // 首先检查是否有全局实例
+        if (window.friendsCircle) {
+          console.log('[Message App] 使用现有的全局朋友圈实例');
+          this.friendsCircle = window.friendsCircle;
+        } else {
+          // 如果没有全局实例，才创建新的
+          this.initFriendsCircle();
+
+          // 等待朋友圈初始化完成
+          let retryCount = 0;
+          while (!this.friendsCircle && retryCount < 10) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retryCount++;
+          }
+
+          if (!this.friendsCircle) {
+            console.error('[Message App] 朋友圈初始化失败');
+            this.updateAppContent();
+            return;
+          }
+        }
+      }
+
+      // 激活朋友圈功能
+      this.friendsCircle.activate();
+
+      // 等待朋友圈数据加载完成
+      try {
+        await this.friendsCircle.refreshFriendsCircle();
+      } catch (error) {
+        console.error('[Message App] 朋友圈数据加载失败:', error);
+      }
+
+      // 更新界面
+      this.updateAppContent();
+
+      // 通知主框架更新应用状态
+      if (window.mobilePhone) {
+        const circleState = {
+          app: 'messages',
+          view: 'friendsCircle',
+          title: '朋友圈',
+          showBackButton: false,
+          showAddButton: true,
+          addButtonIcon: 'fas fa-camera',
+          addButtonAction: () => {
+            if (window.friendsCircle) {
+              window.friendsCircle.showPublishModal();
+            }
+          },
+        };
+        window.mobilePhone.currentAppState = circleState;
+        window.mobilePhone.updateAppHeader(circleState);
+      }
+    }
+
     // 获取应用内容
     getAppContent() {
       switch (this.currentView) {
         case 'list':
-          return this.renderMessageList();
+          if (this.currentMainTab === 'circle') {
+            return this.renderFriendsCircle();
+          } else {
+            return this.renderMessageList();
+          }
         case 'addFriend':
           return this.renderAddFriend();
         case 'messageDetail':
@@ -1541,6 +1738,47 @@ if (typeof window.MessageApp === 'undefined') {
         default:
           return this.renderMessageList();
       }
+    }
+
+    // 渲染朋友圈页面
+    renderFriendsCircle() {
+      if (!this.friendsCircle || !this.friendsCircle.renderer) {
+        return `
+          <div class="friends-circle-loading">
+            <div class="loading-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <div class="loading-text">朋友圈加载中...</div>
+          </div>
+          ${this.renderTabSwitcher()}
+        `;
+      }
+
+      const circleContent = this.friendsCircle.renderer.renderFriendsCirclePage();
+      return `
+        <div class="messages-app">
+          ${circleContent}
+          ${this.renderTabSwitcher()}
+        </div>
+      `;
+    }
+
+    // 渲染底部切换栏
+    renderTabSwitcher() {
+      return `
+        <div class="message-tab-switcher">
+          <button class="tab-btn ${this.currentMainTab === 'friends' ? 'active' : ''}"
+                  onclick="window.messageApp?.switchMainTab('friends')">
+            <i class="fas fa-user-friends"></i>
+            <span>好友</span>
+          </button>
+          <button class="tab-btn ${this.currentMainTab === 'circle' ? 'active' : ''}"
+                  onclick="window.messageApp?.switchMainTab('circle')">
+            <i class="fas fa-globe"></i>
+            <span>朋友圈</span>
+          </button>
+        </div>
+      `;
     }
 
     // 渲染消息列表
@@ -1567,6 +1805,7 @@ if (typeof window.MessageApp === 'undefined') {
                 <div class="message-list" id="message-list">
                     ${friendsHtml}
                 </div>
+                ${this.renderTabSwitcher()}
             </div>
         `;
     }
@@ -2264,6 +2503,7 @@ if (typeof window.MessageApp === 'undefined') {
       const detailStickerBtn = appContent.querySelector('#detail-sticker-btn');
       const detailVoiceBtn = appContent.querySelector('#detail-voice-btn');
       const detailRedpackBtn = appContent.querySelector('#detail-redpack-btn');
+      const detailAttachmentBtn = appContent.querySelector('#detail-attachment-btn');
 
       // 确保MessageSender已加载
       if (!window.messageSender) {
@@ -2339,6 +2579,13 @@ if (typeof window.MessageApp === 'undefined') {
       if (detailRedpackBtn) {
         detailRedpackBtn.addEventListener('click', () => {
           this.showRedpackPanel();
+        });
+      }
+
+      if (detailAttachmentBtn) {
+        detailAttachmentBtn.addEventListener('click', () => {
+          console.log('[Message App] 🔍 附件按钮被点击');
+          this.showAttachmentPanel();
         });
       }
     }
@@ -3144,6 +3391,358 @@ if (typeof window.MessageApp === 'undefined') {
       console.log('红包消息已插入:', redpackMessage);
     }
 
+    // 显示附件面板
+    showAttachmentPanel() {
+      console.log('[Message App] 🔍 开始显示附件面板');
+
+      // 检查是否已存在附件面板
+      const existingPanel = document.getElementById('attachment-input-panel');
+      if (existingPanel) {
+        console.log('[Message App] 🔍 移除已存在的附件面板');
+        existingPanel.remove();
+      }
+
+      // 确保AttachmentSender已加载
+      console.log('[Message App] 🔍 检查AttachmentSender状态:', !!window.attachmentSender);
+      if (!window.attachmentSender) {
+        console.warn('[Message App] AttachmentSender未加载，尝试加载...');
+        this.loadAttachmentSender();
+        // 显示加载提示
+        this.showToast('正在加载附件功能...', 'info');
+        return;
+      }
+
+      // 设置当前聊天对象
+      console.log('[Message App] 🔍 当前聊天对象:', {
+        friendId: this.currentFriendId,
+        friendName: this.currentFriendName,
+        isGroup: this.isCurrentChatGroup(),
+      });
+
+      if (this.currentFriendId) {
+        const isGroup = this.isCurrentChatGroup();
+        window.attachmentSender.setCurrentChat(this.currentFriendId, this.currentFriendName, isGroup);
+        console.log('[Message App] 🔍 已设置AttachmentSender聊天对象');
+      } else {
+        console.warn('[Message App] ⚠️ 当前没有选择聊天对象');
+      }
+
+      // 创建附件输入面板
+      const panel = document.createElement('div');
+      panel.id = 'attachment-input-panel';
+      panel.className = 'special-panel';
+      panel.innerHTML = `
+            <div class="special-panel-content" style="max-width: 500px; width: 90%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                    <h3 style="margin: 0; color: #333; font-size: 18px;">📁 发送附件</h3>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()"
+                            style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 5px;">✕</button>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="file-drop-zone" style="
+                        border: 2px dashed #ddd;
+                        border-radius: 8px;
+                        padding: 40px 20px;
+                        text-align: center;
+                        background: #fafafa;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    ">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📎</div>
+                        <div style="font-size: 16px; color: #666; margin-bottom: 10px;">点击选择文件或拖拽文件到此处</div>
+                        <div style="font-size: 12px; color: #999;">
+                            支持图片、文档、压缩包等文件类型<br>
+                            最大文件大小：10MB
+                        </div>
+                        <input type="file" id="attachment-file-input" multiple
+                               accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z"
+                               style="display: none;">
+                    </div>
+                </div>
+
+                <div id="attachment-preview-area" style="margin-bottom: 20px; display: none;">
+                    <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">选中的文件：</h4>
+                    <div id="attachment-file-list" style="max-height: 200px; overflow-y: auto;"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()"
+                            style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px; background: #f8f9fa; color: #333; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
+                        取消
+                    </button>
+                    <button id="attachment-send-confirm-btn" disabled
+                            style="padding: 10px 20px; border: none; border-radius: 6px; background: #6c757d; color: white; cursor: not-allowed; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">
+                        发送附件
+                    </button>
+                </div>
+            </div>
+        `;
+
+      document.body.appendChild(panel);
+
+      // 绑定事件
+      this.bindAttachmentPanelEvents(panel);
+    }
+
+    // 绑定附件面板事件
+    bindAttachmentPanelEvents(panel) {
+      const fileInput = panel.querySelector('#attachment-file-input');
+      const dropZone = panel.querySelector('.file-drop-zone');
+      const previewArea = panel.querySelector('#attachment-preview-area');
+      const fileList = panel.querySelector('#attachment-file-list');
+      const sendBtn = panel.querySelector('#attachment-send-confirm-btn');
+
+      let selectedFiles = [];
+
+      // 文件选择事件
+      if (fileInput) {
+        fileInput.addEventListener('change', e => {
+          this.handleFileSelection(e.target.files, selectedFiles, fileList, previewArea, sendBtn);
+        });
+      }
+
+      // 拖拽区域事件
+      if (dropZone) {
+        dropZone.addEventListener('click', () => {
+          fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', e => {
+          e.preventDefault();
+          dropZone.style.borderColor = '#007bff';
+          dropZone.style.backgroundColor = '#f0f8ff';
+        });
+
+        dropZone.addEventListener('dragleave', e => {
+          e.preventDefault();
+          dropZone.style.borderColor = '#ddd';
+          dropZone.style.backgroundColor = '#fafafa';
+        });
+
+        dropZone.addEventListener('drop', e => {
+          e.preventDefault();
+          dropZone.style.borderColor = '#ddd';
+          dropZone.style.backgroundColor = '#fafafa';
+
+          const files = e.dataTransfer.files;
+          this.handleFileSelection(files, selectedFiles, fileList, previewArea, sendBtn);
+        });
+      }
+
+      // 发送按钮事件
+      if (sendBtn) {
+        sendBtn.addEventListener('click', async () => {
+          console.log('[Message App] 🔍 发送附件按钮被点击');
+          console.log('[Message App] 🔍 选中文件数量:', selectedFiles.length);
+
+          if (selectedFiles.length === 0) {
+            console.warn('[Message App] ⚠️ 没有选中的文件');
+            return;
+          }
+
+          sendBtn.disabled = true;
+          sendBtn.textContent = '发送中...';
+          sendBtn.style.background = '#6c757d';
+
+          try {
+            console.log('[Message App] 🔍 开始处理文件选择...');
+            const results = await window.attachmentSender.handleFileSelection(selectedFiles);
+            console.log('[Message App] 🔍 文件处理结果:', results);
+
+            // 检查结果
+            const successCount = results.filter(r => r.success).length;
+            const failCount = results.length - successCount;
+
+            console.log('[Message App] 🔍 处理统计:', { successCount, failCount });
+
+            if (successCount > 0) {
+              this.showToast(`成功发送 ${successCount} 个附件`, 'success');
+            }
+
+            if (failCount > 0) {
+              const errors = results
+                .filter(r => !r.success)
+                .map(r => r.errors.join(', '))
+                .join('; ');
+              console.error('[Message App] ❌ 发送失败的错误:', errors);
+              this.showToast(`${failCount} 个附件发送失败: ${errors}`, 'error');
+            }
+
+            // 关闭面板
+            panel.remove();
+          } catch (error) {
+            console.error('[Message App] ❌ 发送附件失败:', error);
+            this.showToast('发送附件失败: ' + error.message, 'error');
+
+            sendBtn.disabled = false;
+            sendBtn.textContent = '发送附件';
+            sendBtn.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+          }
+        });
+      }
+    }
+
+    // 加载附件发送器
+    loadAttachmentSender() {
+      if (window.attachmentSender) {
+        return;
+      }
+
+      // 检查脚本是否已经存在
+      const existingScript = document.querySelector('script[src*="attachment-sender.js"]');
+      if (existingScript) {
+        console.log('[Message App] 附件发送器脚本已存在');
+        return;
+      }
+
+      // 创建脚本标签
+      const script = document.createElement('script');
+      script.src = 'scripts/extensions/third-party/mobile/app/attachment-sender.js';
+      script.onload = () => {
+        console.log('[Message App] ✅ 附件发送器脚本加载完成');
+        // 不自动显示面板，只在用户点击时显示
+      };
+      script.onerror = error => {
+        console.error('[Message App] ❌ 附件发送器脚本加载失败:', error);
+        this.showToast('附件功能加载失败', 'error');
+      };
+
+      document.head.appendChild(script);
+    }
+
+    // 静默加载附件发送器（不显示面板）
+    loadAttachmentSenderSilently() {
+      if (window.attachmentSender) {
+        return;
+      }
+
+      // 检查脚本是否已经存在
+      const existingScript = document.querySelector('script[src*="attachment-sender.js"]');
+      if (existingScript) {
+        console.log('[Message App] 附件发送器脚本已存在');
+        return;
+      }
+
+      // 创建脚本标签
+      const script = document.createElement('script');
+      script.src = 'scripts/extensions/third-party/mobile/app/attachment-sender.js';
+      script.onload = () => {
+        console.log('[Message App] ✅ 附件发送器脚本静默加载完成');
+      };
+      script.onerror = error => {
+        console.error('[Message App] ❌ 附件发送器脚本加载失败:', error);
+      };
+
+      document.head.appendChild(script);
+    }
+
+    // 处理文件选择
+    handleFileSelection(files, selectedFiles, fileList, previewArea, sendBtn) {
+      // 清空之前的选择
+      selectedFiles.length = 0;
+
+      // 添加新选择的文件
+      for (const file of files) {
+        selectedFiles.push(file);
+      }
+
+      // 更新预览
+      this.updateFilePreview(selectedFiles, fileList, previewArea, sendBtn);
+    }
+
+    // 更新文件预览
+    updateFilePreview(selectedFiles, fileList, previewArea, sendBtn) {
+      if (selectedFiles.length === 0) {
+        previewArea.style.display = 'none';
+        sendBtn.disabled = true;
+        sendBtn.style.background = '#6c757d';
+        sendBtn.style.cursor = 'not-allowed';
+        return;
+      }
+
+      // 显示预览区域
+      previewArea.style.display = 'block';
+
+      // 清空文件列表
+      fileList.innerHTML = '';
+
+      // 为每个文件创建预览项
+      selectedFiles.forEach((file, index) => {
+        const preview = window.attachmentSender.createFilePreview(file);
+        const validation = window.attachmentSender.validateFile(file);
+
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-preview-item';
+        fileItem.style.cssText = `
+          display: flex;
+          align-items: center;
+          padding: 10px;
+          margin-bottom: 8px;
+          border: 1px solid ${validation.isValid ? '#ddd' : '#dc3545'};
+          border-radius: 6px;
+          background: ${validation.isValid ? '#fff' : '#fff5f5'};
+        `;
+
+        fileItem.innerHTML = `
+          <div style="font-size: 24px; margin-right: 12px;">${preview.icon}</div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 500; color: #333; margin-bottom: 2px; word-break: break-all;">
+              ${preview.fileName}
+            </div>
+            <div style="font-size: 12px; color: #666;">
+              ${preview.fileSize} • ${preview.category}
+            </div>
+            ${
+              !validation.isValid
+                ? `
+              <div style="font-size: 12px; color: #dc3545; margin-top: 4px;">
+                ${validation.errors.join(', ')}
+              </div>
+            `
+                : ''
+            }
+          </div>
+          <button onclick="this.parentElement.remove(); window.messageApp.removeFileFromSelection(${index})"
+                  style="background: none; border: none; color: #999; cursor: pointer; padding: 4px; font-size: 16px;">
+            ✕
+          </button>
+        `;
+
+        // 如果是图片，添加预览内容
+        if (preview.previewContent) {
+          const previewDiv = document.createElement('div');
+          previewDiv.innerHTML = preview.previewContent;
+          previewDiv.style.marginLeft = '36px';
+          fileItem.appendChild(previewDiv);
+        }
+
+        fileList.appendChild(fileItem);
+      });
+
+      // 检查是否有有效文件
+      const hasValidFiles = selectedFiles.some(file => window.attachmentSender.validateFile(file).isValid);
+
+      // 更新发送按钮状态
+      if (hasValidFiles) {
+        sendBtn.disabled = false;
+        sendBtn.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+        sendBtn.style.cursor = 'pointer';
+        sendBtn.textContent = `发送附件 (${selectedFiles.length})`;
+      } else {
+        sendBtn.disabled = true;
+        sendBtn.style.background = '#6c757d';
+        sendBtn.style.cursor = 'not-allowed';
+        sendBtn.textContent = '无有效文件';
+      }
+    }
+
+    // 从选择中移除文件
+    removeFileFromSelection(index) {
+      // 这个方法会在全局作用域中被调用，所以需要通过window.messageApp访问
+      // 实际的移除逻辑在updateFilePreview中处理
+    }
+
     // 显示提示
     showToast(message, type = 'info') {
       const toast = document.createElement('div');
@@ -3375,6 +3974,7 @@ if (typeof window.MessageApp === 'undefined') {
                                     <button class="send-tool-btn" id="detail-sticker-btn" title="表情包"><i class="fas fa-image"></i></button>
                                     <button class="send-tool-btn" id="detail-voice-btn" title="语音"><i class="fas fa-microphone"></i></button>
                                     <button class="send-tool-btn" id="detail-redpack-btn" title="红包"><i class="fas fa-gift"></i></button>
+                                    <button class="send-tool-btn" id="detail-attachment-btn" title="附件"><i class="fas fa-folder"></i></button>
                                 </div>
 
                                 <button class="send-message-btn" id="detail-send-btn"><i class="fas fa-paper-plane"></i></button>
@@ -3403,6 +4003,7 @@ if (typeof window.MessageApp === 'undefined') {
                                     <button class="send-tool-btn" id="detail-sticker-btn" title="表情包"><i class="fas fa-image"></i></button>
                                     <button class="send-tool-btn" id="detail-voice-btn" title="语音"><i class="fas fa-microphone"></i></button>
                                     <button class="send-tool-btn" id="detail-redpack-btn" title="红包"><i class="fas fa-gift"></i></button>
+                                    <button class="send-tool-btn" id="detail-attachment-btn" title="附件"><i class="fas fa-folder"></i></button>
                                 </div>
 
                                 <button class="send-message-btn" id="detail-send-btn"><i class="fas fa-paper-plane"></i></button>
@@ -3451,6 +4052,7 @@ if (typeof window.MessageApp === 'undefined') {
                                     <button class="send-tool-btn" id="detail-sticker-btn" title="表情包"><i class="fas fa-image"></i></button>
                                     <button class="send-tool-btn" id="detail-voice-btn" title="语音"><i class="fas fa-microphone"></i></button>
                                     <button class="send-tool-btn" id="detail-redpack-btn" title="红包"><i class="fas fa-gift"></i></button>
+                                    <button class="send-tool-btn" id="detail-attachment-btn" title="附件"><i class="fas fa-folder"></i></button>
                                 </div>
 
                                 <button class="send-message-btn" id="detail-send-btn"><i class="fas fa-paper-plane"></i></button>
@@ -3514,6 +4116,7 @@ if (typeof window.MessageApp === 'undefined') {
                                         <button class="send-tool-btn" id="detail-sticker-btn" title="表情包">🎭</button>
                                         <button class="send-tool-btn" id="detail-voice-btn" title="语音">🎤</button>
                                         <button class="send-tool-btn" id="detail-redpack-btn" title="红包">🧧</button>
+                                        <button class="send-tool-btn" id="detail-attachment-btn" title="附件">📁</button>
                                     </div>
 
                                     <button class="send-message-btn" id="detail-send-btn">发送</button>
@@ -3775,6 +4378,308 @@ if (typeof window.MessageApp === 'undefined') {
     getRandomAvatar() {
       // 返回空字符串，不显示表情符号，只显示背景图片
       return '';
+    }
+
+    // 🌟 新增：格式化文件大小
+    formatFileSizeHelper(bytes) {
+      if (bytes === 0) return '0 Bytes';
+
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // 🌟 新增：处理新的图片消息
+    handleNewImageMessage(imageInfo) {
+      try {
+        console.log('[Message App] 🔍 处理新图片消息:', imageInfo);
+
+        // 检查是否为当前聊天对象的消息
+        if (imageInfo.chatTarget !== this.currentFriendId) {
+          console.log('[Message App] 🔍 图片消息不属于当前聊天对象，跳过');
+          return;
+        }
+
+        // 创建图片消息数据 - 明确标记为用户发送
+        const imageMessage = {
+          type: 'sent', // 用户发送的消息
+          subType: 'image', // 图片类型
+          isUser: true, // 明确标记为用户消息
+          senderType: 'user', // 发送者类型
+          friendName: imageInfo.chatName,
+          qqNumber: imageInfo.chatTarget,
+          content: '[图片]', // 简化内容显示
+          imagePath: imageInfo.imagePath,
+          fileName: imageInfo.fileName,
+          fileSize: imageInfo.fileSize,
+          fileType: imageInfo.fileType,
+          time: imageInfo.time,
+          timestamp: Date.now(),
+          isImage: true,
+          // 🌟 关键：生成简洁的HTML显示内容
+          detailedContent: this.generateSimpleImageHTML(imageInfo.imagePath, imageInfo.fileName),
+        };
+
+        console.log('[Message App] 🔍 创建的图片消息数据:', imageMessage);
+
+        // 添加到当前消息列表
+        this.addImageMessageToCurrentChat(imageMessage);
+
+        // 直接在界面中显示图片消息
+        this.displayImageMessageDirectly(imageInfo);
+
+        // 刷新界面显示
+        this.refreshMessageDisplay();
+      } catch (error) {
+        console.error('[Message App] ❌ 处理新图片消息失败:', error);
+      }
+    }
+
+    // 🌟 新增：生成图片HTML内容
+    generateImageHTML(imagePath, fileName) {
+      // 参考data-extractor.js的实现
+      return `<img src="${imagePath}" alt="${fileName}"
+        class="qq-image-message"
+        style="max-width: 200px; max-height: 200px; border-radius: 8px; margin: 4px; cursor: pointer; background: transparent;"
+        onclick="this.style.transform='scale(1.5)'; setTimeout(() => this.style.transform='scale(1)', 2000);"
+        title="${fileName}">`;
+    }
+
+    // 🌟 新增：生成简洁的图片HTML内容 - 用户发送的图片
+    generateSimpleImageHTML(imagePath, fileName) {
+      return `<img src="${imagePath}" alt="${fileName}"
+        class="user-sent-image"
+        style="
+          max-width: 200px;
+          max-height: 300px;
+          border-radius: 12px;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          object-fit: cover;
+        "
+        onclick="this.style.transform='scale(1.2)'; setTimeout(() => this.style.transform='scale(1)', 1500);"
+        title="点击放大">`;
+    }
+
+    // 🌟 新增：添加图片消息到当前聊天
+    addImageMessageToCurrentChat(imageMessage) {
+      try {
+        console.log('[Message App] 🔍 添加图片消息到聊天，当前好友ID:', this.currentFriendId);
+        console.log('[Message App] 🔍 friendsData存在:', !!this.friendsData);
+        console.log('[Message App] 🔍 friendsData类型:', typeof this.friendsData);
+
+        // 确保friendsData存在
+        if (!this.friendsData) {
+          console.warn('[Message App] ⚠️ friendsData不存在，初始化...');
+          this.friendsData = {};
+        }
+
+        // 确保当前好友数据存在
+        if (!this.friendsData[this.currentFriendId]) {
+          console.warn('[Message App] ⚠️ 当前好友数据不存在，创建...');
+          this.friendsData[this.currentFriendId] = {
+            friendId: this.currentFriendId,
+            friendName: this.currentFriendName || imageMessage.friendName,
+            messages: [],
+            lastMessage: '',
+            lastTime: '',
+          };
+        }
+
+        // 添加到消息列表
+        if (!this.friendsData[this.currentFriendId].messages) {
+          this.friendsData[this.currentFriendId].messages = [];
+        }
+
+        this.friendsData[this.currentFriendId].messages.push(imageMessage);
+
+        // 更新最后消息
+        this.friendsData[this.currentFriendId].lastMessage = '[图片消息]';
+        this.friendsData[this.currentFriendId].lastTime = imageMessage.time;
+
+        console.log('[Message App] ✅ 图片消息已添加到聊天记录');
+        console.log('[Message App] 🔍 当前好友消息数量:', this.friendsData[this.currentFriendId].messages.length);
+      } catch (error) {
+        console.error('[Message App] ❌ 添加图片消息失败:', error);
+      }
+    }
+
+    // 🌟 新增：刷新消息显示
+    refreshMessageDisplay() {
+      try {
+        console.log('[Message App] 🔍 开始刷新消息显示');
+        console.log('[Message App] 🔍 当前好友ID:', this.currentFriendId);
+        console.log('[Message App] 🔍 friendsData存在:', !!this.friendsData);
+
+        // 确保friendsData存在
+        if (!this.friendsData) {
+          console.warn('[Message App] ⚠️ friendsData不存在，无法刷新消息显示');
+          return;
+        }
+
+        // 刷新当前聊天的消息显示
+        if (this.currentFriendId && window.messageRenderer) {
+          console.log('[Message App] 🔍 刷新消息显示');
+
+          // 获取当前好友的消息
+          const friendData = this.friendsData[this.currentFriendId];
+          console.log('[Message App] 🔍 当前好友数据:', friendData);
+
+          if (friendData && friendData.messages) {
+            console.log('[Message App] 🔍 当前好友消息数量:', friendData.messages.length);
+
+            // 调用消息渲染器更新显示
+            if (typeof window.messageRenderer.renderMessages === 'function') {
+              console.log('[Message App] 🔍 使用renderMessages方法');
+              window.messageRenderer.renderMessages(friendData.messages);
+            } else if (typeof window.messageRenderer.refreshCurrentMessages === 'function') {
+              console.log('[Message App] 🔍 使用refreshCurrentMessages方法');
+              window.messageRenderer.refreshCurrentMessages();
+            } else {
+              console.warn('[Message App] ⚠️ 找不到合适的消息渲染方法');
+            }
+          } else {
+            console.warn('[Message App] ⚠️ 当前好友数据或消息列表不存在');
+          }
+        } else {
+          console.warn('[Message App] ⚠️ currentFriendId或messageRenderer不存在');
+        }
+
+        // 刷新好友列表（更新最后消息显示）
+        console.log('[Message App] 🔍 刷新好友列表UI');
+        this.refreshFriendListUI();
+
+        console.log('[Message App] ✅ 消息显示刷新完成');
+      } catch (error) {
+        console.error('[Message App] ❌ 刷新消息显示失败:', error);
+      }
+    }
+
+    // 🌟 新增：直接在消息列表中显示图片消息（简化版本）
+    displayImageMessageDirectly(imageInfo) {
+      try {
+        console.log('[Message App] 🔍 直接显示图片消息:', imageInfo);
+
+        // 查找消息列表容器
+        const messageContainer =
+          document.querySelector('.message-list') ||
+          document.querySelector('#message-list') ||
+          document.querySelector('.messages-container');
+
+        if (!messageContainer) {
+          console.warn('[Message App] ⚠️ 找不到消息列表容器，尝试创建...');
+          // 如果找不到容器，尝试在当前页面中创建一个临时显示
+          this.createTemporaryImageDisplay(imageInfo);
+          return;
+        }
+
+        // 创建图片消息HTML - 简洁的右侧显示
+        const imageMessageHTML = `
+          <div class="message-detail sent image-message" style="
+            display: flex;
+            justify-content: flex-end;
+            margin: 8px 10px;
+            padding: 0;
+          ">
+            <div class="user-image-container" style="
+              max-width: 70%;
+              display: flex;
+              justify-content: flex-end;
+            ">
+              <img src="${imageInfo.imagePath}"
+                   alt="${imageInfo.fileName}"
+                   class="user-sent-image"
+                   style="
+                     max-width: 200px;
+                     max-height: 300px;
+                     border-radius: 12px;
+                     cursor: pointer;
+                     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                     object-fit: cover;
+                   "
+                   onclick="this.style.transform='scale(1.2)'; setTimeout(() => this.style.transform='scale(1)', 1500);"
+                   title="点击放大">
+            </div>
+          </div>
+        `;
+
+        // 添加到消息容器
+        messageContainer.insertAdjacentHTML('beforeend', imageMessageHTML);
+
+        // 滚动到底部
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+
+        console.log('[Message App] ✅ 图片消息已直接显示在界面中');
+      } catch (error) {
+        console.error('[Message App] ❌ 直接显示图片消息失败:', error);
+      }
+    }
+
+    // 🌟 新增：创建临时图片显示
+    createTemporaryImageDisplay(imageInfo) {
+      try {
+        console.log('[Message App] 🔍 创建临时图片显示');
+
+        // 在页面顶部创建一个临时的图片显示区域
+        const tempDisplay = document.createElement('div');
+        tempDisplay.id = 'temp-image-display';
+        tempDisplay.style.cssText = `
+          position: fixed;
+          top: 10px;
+          right: 10px;
+          z-index: 9999;
+          background: white;
+          border: 2px solid #4CAF50;
+          border-radius: 8px;
+          padding: 10px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+          max-width: 300px;
+        `;
+
+        tempDisplay.innerHTML = `
+          <div style="margin-bottom: 8px; font-weight: bold; color: #4CAF50;">
+            📱 新图片消息
+          </div>
+          <div style="margin-bottom: 8px;">
+            <strong>发送给:</strong> ${imageInfo.chatName}
+          </div>
+          <div style="margin-bottom: 8px;">
+            <img src="${imageInfo.imagePath}"
+                 alt="${imageInfo.fileName}"
+                 style="max-width: 100%; border-radius: 4px; cursor: pointer;"
+                 onclick="this.style.transform='scale(1.2)'; setTimeout(() => this.style.transform='scale(1)', 1000);">
+          </div>
+          <div style="font-size: 12px; color: #666;">
+            ${imageInfo.fileName} | ${this.formatFileSizeHelper(imageInfo.fileSize)}
+          </div>
+          <button onclick="this.parentElement.remove()"
+                  style="margin-top: 8px; padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            关闭
+          </button>
+        `;
+
+        // 移除之前的临时显示
+        const existingTemp = document.getElementById('temp-image-display');
+        if (existingTemp) {
+          existingTemp.remove();
+        }
+
+        // 添加到页面
+        document.body.appendChild(tempDisplay);
+
+        // 5秒后自动移除
+        setTimeout(() => {
+          if (tempDisplay.parentElement) {
+            tempDisplay.remove();
+          }
+        }, 5000);
+
+        console.log('[Message App] ✅ 临时图片显示已创建');
+      } catch (error) {
+        console.error('[Message App] ❌ 创建临时图片显示失败:', error);
+      }
     }
 
     // 显示消息

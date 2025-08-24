@@ -1,5 +1,8 @@
 /* 手机前端框架 - 可爱的iOS风格样式 */
 
+/* 引入Font Awesome */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
 /* 触发按钮 */
 .mobile-phone-trigger {
   position: absolute;
@@ -2139,6 +2142,36 @@
   background-position: 100% center, center center;
 }
 
+/* 8. "微博"图标 */
+.app-icon[data-app='weibo'] .app-icon-bg::before {
+  content: '\f06e';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  font-size: 28px;
+  color: rgba(0, 0, 0, 0.3);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* 9. "API"图标 */
+.app-icon[data-app='api'] .app-icon-bg::before {
+  content: '\f1e6';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  font-size: 28px;
+  color: rgba(0, 0, 0, 0.3);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
 .config-section {
   padding: 10px !important;
 }
@@ -2227,4 +2260,3 @@
 .shop-accent-btn:hover {
   filter: brightness(1.05);
 }
-
