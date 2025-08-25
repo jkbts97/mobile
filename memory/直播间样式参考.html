@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>直播中 - 模拟界面 (最终版)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --phone-gradient: linear-gradient(135deg, #fde9ff 0%, #e3eeff 100%);
+            --header-bg: #fff;
+            --screen-bg: #f7f8fc;
+            --modal-bg: #ffffff;
+            --primary-pink: #fb7299;
+            --danger-red: #ff4d4f;
+            --button-gradient: linear-gradient(45deg, #fe8c8c 0%, #f7739a 100%);
+            --danmaku-gift-bg: linear-gradient(90deg, rgba(251, 114, 153, 0.08), rgba(255, 221, 96, 0.08));
+            --text-primary: #333333;
+            --text-secondary: #888888;
+            --text-system: #b2b2b2;
+            --border-color: #ededf0;
+            --button-bg: #f0f2f5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #3c3c3c; }
+        
+        .phone {
+            width: 414px; height: 800px;
+            background: var(--phone-gradient);
+            border-radius: 40px; padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 4px 4px #fff, inset 0 -4px 4px #d4d4d4;
+            position: relative;
+        }
+        .phone-inner { width: 100%; height: 100%; background-color: #000; border-radius: 30px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+        .dynamic-island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 120px; height: 30px; background-color: #000; border-radius: 15px; z-index: 100; }
+        .screen { background-color: var(--screen-bg); flex-grow: 1; color: var(--text-primary); display: flex; flex-direction: column; padding-top: 50px; }
+        
+        .live-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--header-bg); box-shadow: 0 2px 10px rgba(180, 180, 210, 0.1); }
+        .header-left { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold; }
+        .header-left i { font-size: 18px; color: var(--primary-pink); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .viewer-count { display: flex; align-items: center; gap: 5px; font-size: 14px; color: var(--text-secondary); background: #f0f2f5; padding: 4px 8px; border-radius: 12px; }
+        .viewer-count i { color: var(--primary-pink); }
+        .header-btn { background: none; border: none; font-size: 20px; cursor: pointer; transition: opacity 0.2s; }
+        .gift-log-btn { color: var(--primary-pink); }
+        
+        /* ✨ [新增] 结束直播按钮样式 */
+        #end-stream-btn { color: var(--danger-red); }
+        .video-placeholder {
+            width: calc(100% - 30px); height: 180px;
+            background-color: #000;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80' width='80' height='80'%3E%3Crect fill='%23050505' width='80' height='80'/%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M10 10 L60 10 L60 60 L10 60 Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            border-radius: 12px; margin: 15px auto 0 auto;
+            display: flex; flex-direction: column; justify-content: space-between;
+            text-align: center; font-style: italic; position: relative; padding: 15px 20px;
+        }
+        .live-status-top { color: #fff; font-size: 14px; font-style: normal; text-align: left; }
+        .live-content-text { color: var(--text-secondary); font-size: 16px; line-height: 1.8; margin: auto; transition: opacity 0.5s ease; }
+        .live-status-bottom { color: #fff; font-size: 14px; font-weight: bold; font-style: normal; text-align: left; display: flex; align-items: center; gap: 6px; transition: opacity 0.3s; }
+        .live-dot { width: 8px; height: 8px; background-color: var(--danger-red); border-radius: 50%; animation: breathing 1.5s infinite ease-in-out; }
+        @keyframes breathing { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } }
+        
+        .interaction-panel { padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .interaction-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .interaction-header h4 { font-size: 16px; font-weight: bold; }
+        
+        .interaction-header .interact-btn {
+            background: var(--button-gradient); border: none; color: #fff;
+            padding: 8px 16px; border-radius: 16px; font-size: 12px;
+            font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(251, 114, 153, 0.4);
+            transition: all 0.2s ease;
+        }
+        .interaction-header .interact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(251, 114, 153, 0.5); }
+        .interaction-header .interact-btn:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(251, 114, 153, 0.4); }
+        .recommended-interactions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .rec-btn { background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .rec-btn:hover { background-color: #e8eaf0; }
+        /* ✨ [新增] 按钮禁用样式 */
+        button:disabled, .rec-btn:disabled { cursor: not-allowed; opacity: 0.6; box-shadow: none !important; transform: none !important; }
+        
+        .danmaku-container { flex-grow: 1; padding: 15px; overflow-y: scroll; scroll-behavior: smooth; }
+        .danmaku-container::-webkit-scrollbar { width: 6px; }
+        .danmaku-container::-webkit-scrollbar-track { background: #f0f2f5; border-radius: 3px; }
+        .danmaku-container::-webkit-scrollbar-thumb { background: #dcdfe6; border-radius: 3px; }
+        .danmaku-container::-webkit-scrollbar-thumb:hover { background: #c0c4cc; }
+        
+        .danmaku-list { display: flex; flex-direction: column; gap: 12px; }
+        .danmaku-item { max-width: 90%; animation: fadeIn 0.5s ease; font-size: 14px; line-height: 1.5; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .danmaku-item.normal .username { color: #1e90ff; font-weight: bold; }
+        .danmaku-item.normal .content { color: var(--text-primary); margin-left: 8px; word-break: break-all; }
+        
+        .danmaku-item.gift {
+            display: inline-block; background: var(--danmaku-gift-bg);
+            padding: 6px 12px; border-radius: 20px;
+            border: 1px solid rgba(251, 114, 153, 0.2); font-size: 13px;
+        }
+        .danmaku-item.gift .username { color: var(--primary-pink); font-weight: bold; }
+        .danmaku-item.gift .content { color: #efa51a; font-weight: bold; margin-left: 5px; }
+        .danmaku-item.gift i { margin-right: 5px; color: var(--primary-pink); }
+        
+        /* ✨ [新增] 系统消息弹幕样式 */
+        .danmaku-item.system {
+            text-align: center;
+            width: 100%;
+            max-width: 100%;
+        }
+        .danmaku-item.system span {
+            background-color: #f0f2f5;
+            color: var(--text-system);
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-style: italic;
+        }
+        /* 弹窗样式... */
+        .modal { position: absolute; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 200; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--modal-bg); border-radius: 12px; padding: 25px; width: 85%; border: 1px solid var(--border-color); position: relative; animation: slideUp 0.3s ease-out; color: var(--text-primary); }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .modal-header h3 { font-size: 18px; }
+        .modal-close-btn { background:none; border:none; color: var(--text-secondary); font-size: 24px; cursor: pointer;}
+        #gift-modal .gift-list { list-style: none; max-height: 250px; overflow-y: auto;}
+        #gift-modal .gift-list li { padding: 10px 0; border-bottom: 1px dashed var(--border-color); }
+        #gift-modal .gift-list li .username { color: var(--primary-pink); font-weight: bold; }
+        #gift-modal .gift-list li .gift-name { color: #e8a200; margin-left: 10px; }
+        #gift-modal .gift-list li:last-child { border-bottom: none; }
+        #interaction-form textarea { width: 100%; height: 80px; background-color:#fff; border: 1px solid #ddd; color: var(--text-primary); padding: 10px; border-radius: 8px; resize: none; margin-bottom: 15px; font-size: 14px; }
+        #interaction-form .submit-btn { width: 100%; background: var(--button-gradient); border: none; color: #fff; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(251, 114, 153, 0.4); }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="phone-inner">
+            <div class="dynamic-island"></div>
+            <div class="screen">
+                <header class="live-header">
+                    <div class="header-left"><i class="fas fa-arrow-left"></i><span id="live-status-text">直播中</span></div>
+                    <div class="header-right">
+                        <div class="viewer-count"><i class="fas fa-user-friends"></i><span id="viewer-count-num">1.2k</span></div>
+                        <button class="header-btn gift-log-btn" id="gift-log-btn"><i class="fas fa-gift"></i></button>
+                        <!-- ✨ [新增] 结束直播按钮 -->
+                        <button class="header-btn" id="end-stream-btn" title="结束直播"><i class="fas fa-power-off"></i></button>
+                    </div>
+                </header>
+                <div class="video-placeholder">
+                    <div class="live-status-top">🎵 正在直播</div>
+                    <p class="live-content-text" id="live-content-text">（你微笑着调整了一下耳机，准备开始今天的杂谈直播。）</p>
+                    <div class="live-status-bottom" id="live-status-bottom"><div class="live-dot"></div><span>LIVE</span></div>    
+                </div>
+                <div class="interaction-panel">
+                     <div class="interaction-header">
+                        <h4>推荐互动：</h4>
+                        <button class="interact-btn" id="interact-btn"><i class="fas fa-pen-nib"></i> 自定义互动</button>
+                    </div>
+                    <div class="recommended-interactions" id="recommended-interactions">
+                        <button class="rec-btn">🎤 唱首歌吧！</button><button class="rec-btn">💬 聊聊最近的趣事</button>
+                        <button class="rec-btn">🎮 一起玩个游戏？</button><button class="rec-btn">💖 念一下我的ID</button>
+                    </div>
+                </div>
+                <div class="danmaku-container" id="danmaku-container">
+                    <div class="danmaku-list" id="danmaku-list"></div>
+                </div>
+            </div>
+            
+            <!-- 弹窗部分 ... -->
+            <div id="gift-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header"><h3>礼物流水</h3><button class="modal-close-btn">&times;</button></div>
+                    <ul class="gift-list" id="gift-list-log"></ul>
+                </div>
+            </div>
+            <div id="interaction-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header"><h3>自定义互动</h3><button class="modal-close-btn">&times;</button></div>
+                    <form id="interaction-form">
+                        <textarea id="custom-interaction-input" placeholder="输入你想说的内容..."></textarea>
+                        <button type="submit" class="submit-btn">发送</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM元素获取
+            const liveStatusText = document.getElementById('live-status-text');
+            const liveContentText = document.getElementById('live-content-text');
+            const liveStatusBottom = document.getElementById('live-status-bottom');
+            const danmakuContainer = document.getElementById('danmaku-container');
+            const danmakuList = document.getElementById('danmaku-list');
+            const giftLogList = document.getElementById('gift-list-log');
+            const viewerCountSpan = document.getElementById('viewer-count-num');
+            const giftLogBtn = document.getElementById('gift-log-btn');
+            const interactBtn = document.getElementById('interact-btn');
+            const endStreamBtn = document.getElementById('end-stream-btn'); // 新增
+            const recBtns = document.querySelectorAll('.rec-btn');
+            const allModals = document.querySelectorAll('.modal');
+            const closeBtns = document.querySelectorAll('.modal-close-btn');
+            const interactionForm = document.getElementById('interaction-form');
+            const customInteractionInput = document.getElementById('custom-interaction-input');
+            // ✨ [新增] 用于存储定时器的变量
+            let danmakuInterval, viewerInterval, sceneInterval;
+            const liveScenes = ["（你拿起桌边的水杯喝了一口，清了清嗓子，看着屏幕上滚动的弹幕，笑容更加温柔。）","（一首情歌唱毕，你的脸颊微微泛红，轻声说着谢谢大家的礼物，眼神中流转着动人的光彩。）","（你讲起一件最近遇到的糗事，自己都忍不住笑了起来，清脆的笑声通过麦克风传遍了整个直播间。）","（你认真地盯着屏幕，念着一个用户的ID，并对他的支持表示感谢，态度十分诚恳。）"];
+            const sampleUsers = ["朝沐雨", "温屿", "霍谨", "秦倦", "夏阳", "零", "甜心小宝贝", "B站最靓的仔", "今天也要加油鸭", "永远单推你"];
+            const sampleComments = ["主播今天也好可爱！", "声音太好听了叭！", "刚来，今天播什么呀？", "哈哈哈笑死我了", "已三连，主播加油！", "这唱功，专业级的！", "AWSL", "前排合影！", "打卡~", "学到了学到了"];
+            const sampleGifts = ["小星星", "应援棒", "B坷拉", "专属情书", "摩天大楼"];
+            const showModal = (modal) => modal.classList.add('active');
+            const hideAllModals = () => allModals.forEach(m => m.classList.remove('active'));
+            function addDanmaku(user, content, type = 'normal') {
+                const item = document.createElement('div');
+                item.classList.add('danmaku-item', type);
+                
+                switch(type) {
+                    case 'gift':
+                        item.innerHTML = `<i class="fas fa-gift"></i> <span class="username">${user}</span> <span class="content">送出 ${content}</span>`;
+                        const giftLogItem = document.createElement('li');
+                        giftLogItem.innerHTML = `<span class="username">${user}</span>送出 <span class="gift-name">${content}</span>`;
+                        giftLogList.prepend(giftLogItem);
+                        break;
+                    case 'system':
+                        item.innerHTML = `<span>${content}</span>`;
+                        break;
+                    case 'normal':
+                    default:
+                        item.innerHTML = `<span class="username">${user}:</span><span class="content">${content}</span>`;
+                        break;
+                }
+                danmakuList.appendChild(item);
+                if (danmakuList.children.length > 100) {
+                    danmakuList.removeChild(danmakuList.firstChild);
+                }
+                danmakuContainer.scrollTop = danmakuContainer.scrollHeight;
+            }
+            // ✨ [新增] 结束直播的函数
+            function endBroadcast() {
+                // 1. 清除所有定时器
+                clearInterval(danmakuInterval);
+                clearInterval(viewerInterval);
+                clearInterval(sceneInterval);
+                // 2. 更新UI状态
+                liveStatusText.textContent = "直播已结束";
+                liveContentText.textContent = "直播已结束，感谢您的观看！";
+                liveContentText.style.fontWeight = "bold";
+                liveStatusBottom.style.opacity = '0';
+                // 3. 禁用所有互动按钮
+                giftLogBtn.disabled = true;
+                interactBtn.disabled = true;
+                endStreamBtn.disabled = true;
+                recBtns.forEach(btn => btn.disabled = true);
+                
+                // 4. 添加系统下播消息
+                setTimeout(() => {
+                    addDanmaku(null, '（系统）主播已结束本次直播', 'system');
+                }, 1000);
+            }
+            // --- 事件绑定 ---
+            giftLogBtn.addEventListener('click', () => showModal(document.getElementById('gift-modal')));
+            interactBtn.addEventListener('click', () => showModal(document.getElementById('interaction-modal')));
+            closeBtns.forEach(btn => btn.addEventListener('click', hideAllModals));
+            recBtns.forEach(btn => btn.addEventListener('click', () => addDanmaku("你", btn.textContent)));
+            interactionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = customInteractionInput.value.trim();
+                if (text) {
+                    addDanmaku("你", text);
+                    customInteractionInput.value = "";
+                    hideAllModals();
+                }
+            });
+            // ✨ [新增] 结束直播按钮的点击事件
+            endStreamBtn.addEventListener('click', () => {
+                if (confirm('您确定要结束直播吗？')) {
+                    endBroadcast();
+                }
+            });
+            // --- 启动模拟直播 ---
+            function startBroadcast() {
+                danmakuInterval = setInterval(() => {
+                    const randomUser = sampleUsers[Math.floor(Math.random() * sampleUsers.length)];
+                    if (Math.random() < 0.1) {
+                        const randomGift = sampleGifts[Math.floor(Math.random() * sampleGifts.length)];
+                        addDanmaku(randomUser, randomGift, 'gift');
+                    } else {
+                        const randomComment = sampleComments[Math.floor(Math.random() * sampleComments.length)];
+                        addDanmaku(randomUser, randomComment, 'normal');
+                    }
+                }, 800);
+                viewerInterval = setInterval(() => {
+                    let currentViewers = parseFloat(viewerCountSpan.textContent) * 1000;
+                    let change = (Math.random() - 0.45) * 50;
+                    currentViewers = Math.max(500, currentViewers + change);
+                    viewerCountSpan.textContent = (currentViewers / 1000).toFixed(1) + 'k';
+                }, 3000);
+                let sceneIndex = 0;
+                sceneInterval = setInterval(() => {
+                    sceneIndex = (sceneIndex + 1) % liveScenes.length;
+                    liveContentText.style.opacity = 0;
+                    setTimeout(() => {
+                        liveContentText.textContent = liveScenes[sceneIndex];
+                        liveContentText.style.opacity = 1;
+                    }, 500);
+                }, 15000);
+            }
+            
+            startBroadcast(); // 开始直播
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2474 @@
+[Friends Circle Debug] 元素查找结果: {overlay: true, closeBtn: true, textBtn: true, imageBtn: true}
+friends-circle.js:1793 [Friends Circle Debug] 手机容器查找结果: true
+friends-circle.js:1797 [Friends Circle Debug] 弹窗已添加到手机容器
+friends-circle.js:1848 [Friends Circle Debug] 发布弹窗显示完成
+friends-circle.js:1812 [Friends Circle Debug] 弹窗位置和大小: DOMRect {x: 0, y: 0, width: 595.3333740234375, height: 869.3333740234375, top: 0, …}
+friends-circle.js:1813 [Friends Circle Debug] 弹窗关键样式: {display: 'flex', position: 'fixed', zIndex: '9999', visibility: 'visible', opacity: '1', …}
+friends-circle.js:1827 [Friends Circle Debug] 弹窗内部元素: {overlay: true, overlayRect: DOMRect, content: true, contentRect: DOMRect, buttonsCount: 3}
+friends-circle.js:1837 [Friends Circle Debug] 按钮 0: {className: 'modal-close', rect: DOMRect, style: {…}}
+friends-circle.js:1837 [Friends Circle Debug] 按钮 1: {className: 'publish-option-btn text-btn', rect: DOMRect, style: {…}}
+friends-circle.js:1837 [Friends Circle Debug] 按钮 2: {className: 'publish-option-btn image-btn', rect: DOMRect, style: {…}}
+friends-circle.js:1786 [Friends Circle Debug] 点击了发图片按钮
+friends-circle.js:2162 [Friends Circle] 发布按钮事件已绑定
+polling-xhr.js:139  GET http://localhost:6621/socket.io/?EIO=4&transport=polling&t=5j4hfpsd net::ERR_CONNECTION_REFUSED
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134Understand this error
+index.ts:72 Error: xhr poll errorError: xhr poll error
+    at polling.onError (transport.js:39:37)
+    at V.<anonymous> (polling-xhr.js:55:18)
+    at $.emit (index.js:136:20)
+    at V._onError (polling-xhr.js:161:14)
+    at polling-xhr.js:135:30
+(anonymous) @ index.ts:72
+$.emit @ index.js:136
+onerror @ socket.js:439
+$.emit @ index.js:136
+r @ manager.js:124
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337Understand this error
+context-monitor.js:844 [Mobile Context 21:51:50] 成功获取聊天消息: 32 条记录 {chatId: '娱乐圈敛财系统 - 2025-08-22@12h41m52s', isGroup: false, fallbackMode: false}
+polling-xhr.js:139  GET http://localhost:6621/socket.io/?EIO=4&transport=polling&t=5ja5hmrj net::ERR_CONNECTION_REFUSED
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134Understand this error
+index.ts:72 Error: xhr poll errorError: xhr poll error
+    at polling.onError (transport.js:39:37)
+    at V.<anonymous> (polling-xhr.js:55:18)
+    at $.emit (index.js:136:20)
+    at V._onError (polling-xhr.js:161:14)
+    at polling-xhr.js:135:30
+(anonymous) @ index.ts:72
+$.emit @ index.js:136
+onerror @ socket.js:439
+$.emit @ index.js:136
+r @ manager.js:124
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337
+setTimeout
+reconnect @ manager.js:330
+(anonymous) @ manager.js:340
+r @ manager.js:126
+$.emit @ index.js:136
+_onError @ socket.js:495
+$.emit @ index.js:136
+onError @ transport.js:39
+(anonymous) @ polling-xhr.js:55
+$.emit @ index.js:136
+_onError @ polling-xhr.js:161
+(anonymous) @ polling-xhr.js:135
+setTimeout
+n.onreadystatechange @ polling-xhr.js:134
+XMLHttpRequest.send
+_create @ polling-xhr.js:139
+V @ polling-xhr.js:75
+request @ polling-xhr.js:253
+doPoll @ polling-xhr.js:52
+_poll @ polling.js:59
+doOpen @ polling.js:19
+open @ transport.js:47
+_open @ socket.js:197
+ee @ socket.js:150
+te @ socket.js:565
+ne @ socket.js:725
+open @ manager.js:111
+(anonymous) @ manager.js:337Understand this error
+friends-circle.js:2172 [Friends Circle] 处理图片文件选择: {fileName: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', fileSize: 73853, fileType: 'image/jpeg', elementsProvided: true}
+friends-circle.js:2187 [Friends Circle] 开始验证文件...
+friends-circle.js:2189 [Friends Circle] 文件验证结果: {isValid: true, errors: Array(0)}
+friends-circle.js:2197 [Friends Circle] 文件验证成功，开始显示预览...
+friends-circle.js:2237 [Friends Circle] 开始显示图片预览: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg
+friends-circle.js:2241 [Friends Circle] 预览元素检查: {previewArea: true, previewImage: true, imageName: true, imageSize: true, dropZone: true}
+friends-circle.js:2256 [Friends Circle] 创建预览URL: blob:http://127.0.0.1:8000/91fc87a3-e8c1-47ad-9091-9febbc7c0a30
+friends-circle.js:2268 [Friends Circle] 设置文件名: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg
+friends-circle.js:2273 [Friends Circle] 设置文件大小: 72.12 KB
+friends-circle.js:2282 [Friends Circle] 图片预览显示完成
+friends-circle.js:2206 [Friends Circle] 文件信息已存储: {selectedImageFile: true, selectedImageFileName: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', thisInstanceId: 'FriendsCircleRenderer', globalInstanceExists: true, globalInstanceSame: false}
+friends-circle.js:2216 [Friends Circle] 检测到不同的实例，同步文件信息到全局实例
+handleImageFileSelection @ friends-circle.js:2216
+(anonymous) @ friends-circle.js:2094Understand this warning
+friends-circle.js:2225 [Friends Circle] 发布按钮已启用
+friends-circle.js:2230 [Friends Circle] 图片文件选择处理完成
+friends-circle.js:2261 [Friends Circle] 预览图片加载完成
+context-monitor.js:844 [Mobile Context 21:52:00] 成功获取聊天消息: 32 条记录 {chatId: '娱乐圈敛财系统 - 2025-08-22@12h41m52s', isGroup: false, fallbackMode: false}
+friends-circle.js:2152 [Friends Circle] 发布按钮被点击
+friends-circle.js:2153 [Friends Circle] 检查全局朋友圈实例: true
+friends-circle.js:2154 [Friends Circle] 检查handleImagePublish方法: function
+friends-circle.js:2983 [Friends Circle] 开始处理图片发布...
+friends-circle.js:2984 [Friends Circle] this上下文检查: {thisExists: true, thisConstructorName: 'FriendsCircle', hasSelectedImageFile: true, selectedImageFileName: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', globalInstanceExists: true, …}
+friends-circle.js:3015 [Friends Circle] 弹窗元素检查: {imageDescInput: true, textInput: true, publishBtn: true, uploadStatus: true, uploadText: true, …}
+friends-circle.js:3033 [Friends Circle] 发布数据检查: {imageDescription: '', textContent: '给大家看风景', hasImageFile: true, imageFileName: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', selectedImageFileExists: true}
+friends-circle.js:3048 [Friends Circle] 发布验证通过: {hasDescription: false, hasImageFile: true, imageFileName: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg'}
+friends-circle.js:3066 [Friends Circle] 开始上传图片文件: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg
+api.js:57 [quick-reply-menu Debug] fetchQuickReplies called.
+api.js:68 [quick-reply-menu] Fetching standard Quick Replies...
+api.js:183 [quick-reply-menu Debug] Final fetch results - Chat (incl. JS): 0, Global: 2
+friends-circle.js:3087 [Friends Circle] 图片已附加到SillyTavern: {success: true, fileUrl: 'attached_to_sillytavern', fileName: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', fileSize: 73853, fileType: 'image/jpeg', …}
+friends-circle.js:3155 [Friends Circle] 发送朋友圈格式: [朋友圈|{{user}}|483920|s543|图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg|给大家看风景]
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:3324 [Friends Circle] 找到最新图片URL: /user/images/娱乐圈敛财系统/1756007168289_3785981062854319.png
+friends-circle.js:3174 [Friends Circle] 获取到最新图片信息: {hasUrl: true, hasHtml: false}
+friends-circle.js:3203 [Friends Circle] 立即存储图片朋友圈数据: {id: 's543', author: '沐夕', friendId: '483920', type: 'visual', imageDescription: '图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', …}
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's709', type: 'visual', hasImageDescription: true, imageDescription: '图片: IMG_1160(20250821-022207).PNG', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">我好看吗</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">图片: IMG_1160(20250821-022207).PNG</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 600001 的头像配置: https://i.postimg.cc/RZJns5zh/4.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w108', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">又一个通宵。灵感和安眠药，总得选一个。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's117', type: 'visual', hasImageDescription: true, imageDescription: '一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">捕获月亮的一角。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似乎还挂着一根极细微的、几乎难以察觉的长发。光线从侧面打来，勾勒出耳坠冰冷的金属轮廓和头发柔和的光泽，构成一种脆弱而病态的美感。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's121', type: 'visual', hasImageDescription: true, imageDescription: '一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">沐沐不肯睡觉，非要缠着我，真拿它没办法呀~🥺</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一只白色的波斯猫，微微歪着头，浅粉色的眼眸湿漉漉地看着镜头，眼神无辜又纯洁，嘴角带着浅浅的微笑，背景是温馨的卧室一角。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w114', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">夏天令人作呕的明亮，只会让阴影无处遁形。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w113', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">市场的本质是信息不对称。掌握定义权，就掌握了规则。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's119', type: 'visual', hasImageDescription: true, imageDescription: '一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">收工。梦里见。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的茶几上，他微微仰着头，闭着眼睛，一只修长的手搭在额头上，另一只手随意地垂下，指间夹着一根没有点燃的烟。整张照片色调很暗，有种疲惫又松弛的氛围。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's122', type: 'visual', hasImageDescription: true, imageDescription: '一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">训练后的冰淇淋，是世界上最美味的东西！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的商业街，能看到五光十色的霓虹灯牌和来来往往的人群。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w112', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">难得清闲，有没有什么打发时间的好电影推荐？老片子最好。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w111', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">在纯粹的黑与白之间，最能看清骨骼的轮廓和欲望的形状。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's120', type: 'visual', hasImageDescription: true, imageDescription: '照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">决策的意义，在于对未来下注。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上，背景是模糊的、能看到城市夜景的巨大落地窗。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's115', type: 'visual', hasImageDescription: true, imageDescription: '一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">晨跑十公里，再加两个小时器械，爽！又是充满能量的一天！💪</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着一件黑色的无袖背心，露出流畅结实的手臂线条，对着镜头笑得一脸灿烂，还能看见浅浅的梨涡。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w110', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">我讨厌夏天。蝉鸣，汗水，无法冷静的颜色，一切都过于喧闹。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's118', type: 'visual', hasImageDescription: true, imageDescription: '视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">带Lucky出来放风！它好像比我还开心！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞盘。视频的最后，夏阳把镜头转向自己，海风吹乱了他的金发，他对着镜头笑得一脸灿烂，背景是蔚蓝的大海和金色的沙滩。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w109', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">转发文章：《AI数字人技术对未来影视行业冲击的五点观察》。|冗余的正在被淘汰，未来的属于掌握效率的少数人。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's116', type: 'visual', hasImageDescription: true, imageDescription: '一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">新买的沐浴露味道好奇怪……睡不着了……有好闻的推荐吗？/委屈</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水汽氤氲，他微微嘟着嘴，眼神看起来有些委屈又无辜。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's543', type: 'visual', hasImageDescription: true, imageDescription: '图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jp', hasContent: true, …}
+friends-circle.js:1254 [Friends Circle Debug] 使用图片URL: /user/images/娱乐圈敛财系统/1756007168289_3785981062854319.png
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">给大家看风景</div>
+            
+            <div class="circle-image-container">
+              <img src="/user/images/娱乐圈敛财系统/1756007168289_3785981062854319.png"
+                   alt="图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg"
+                   class="circle-image"
+                   onclick="this.style.transform=this.style.transform?'':'scale(2)'; setTimeout(()=>this.style.transform='', 3000);"
+                   loading="lazy"
+                   onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span class=\'image-description\'>图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg</span></div>'">
+            </div>
+          
+          </div>
+        
+friends-circle.js:2754 [Friends Circle] 发送消息给AI: 用户发送朋友圈，请使用规定的朋友圈回复格式生成3-5条可能的好友回复，仅限有好友id的好友参与朋友圈回复。请注意，你是在为现有的用户朋友圈生成回复，只生成回复，禁止重复生成用户的朋友圈格式。
+[朋友圈|{{user}}|483920|s543|图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg|给大家看风景]
+script.js:3984 Generate entered
+VM346867 mobile-phone.js:3189 [Mobile Phone] Toast显示: success - 消息已准备好，请在主界面点击发送
+friends-circle.js:3229 [Friends Circle] 等待SillyTavern处理附件消息...
+friends-circle.js:3246 [Friends Circle] 图片朋友圈发送成功
+message-app.js:3910 [Message App] 事件绑定完成
+index.js:20 [QR2] calling {args: Array(1), functionToCall: ƒ}
+script.js:4296 Core/all messages: 33/33
+world-info.js:4601 [WI] Adding 23 entries to prompt (23) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+index.js:20 [QR2] calling {args: Array(1), functionToCall: ƒ}
+script.js:4357 skipWIAN not active, adding WIAN
+handler.ts:597 [Prompt Template] dry run: false
+friends-circle.js:3217 [Friends Circle] 手动触发朋友圈解析，确保用户发送的内容被解析...
+friends-circle.js:736 [Friends Circle] 执行增量更新：从消息索引 685 到 687
+friends-circle.js:327 [Friends Circle] 增量解析：总消息数 687，上次处理到 685
+friends-circle.js:379 [Friends Circle] 增量解析到新视觉朋友圈: 沐夕 (s543) at index 686
+friends-circle.js:503 [Friends Circle] 增量解析完成，发现 1 个新增/更新项
+friends-circle.js:700 [Friends Circle] 增量更新完成：新增 0 条，更新 1 条，总计 17 条
+friends-circle.js:746 [Friends Circle] 增量更新成功，处理了 1 个新增/更新项
+friends-circle.js:764 [Friends Circle] 数据刷新完成
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's543', type: 'visual', hasImageDescription: true, imageDescription: '图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jp', hasContent: true, …}
+friends-circle.js:1254 [Friends Circle Debug] 使用图片URL: /user/images/娱乐圈敛财系统/1756007168289_3785981062854319.png
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">给大家看风景</div>
+            
+            <div class="circle-image-container">
+              <img src="/user/images/娱乐圈敛财系统/1756007168289_3785981062854319.png"
+                   alt="图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg"
+                   class="circle-image"
+                   onclick="this.style.transform=this.style.transform?'':'scale(2)'; setTimeout(()=>this.style.transform='', 3000);"
+                   loading="lazy"
+                   onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span class=\'image-description\'>图片: pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg</span></div>'">
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's709', type: 'visual', hasImageDescription: true, imageDescription: '图片: IMG_1160(20250821-022207).PNG', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">我好看吗</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">图片: IMG_1160(20250821-022207).PNG</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 600001 的头像配置: https://i.postimg.cc/RZJns5zh/4.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w108', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">又一个通宵。灵感和安眠药，总得选一个。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's117', type: 'visual', hasImageDescription: true, imageDescription: '一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">捕获月亮的一角。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似乎还挂着一根极细微的、几乎难以察觉的长发。光线从侧面打来，勾勒出耳坠冰冷的金属轮廓和头发柔和的光泽，构成一种脆弱而病态的美感。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's121', type: 'visual', hasImageDescription: true, imageDescription: '一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">沐沐不肯睡觉，非要缠着我，真拿它没办法呀~🥺</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一只白色的波斯猫，微微歪着头，浅粉色的眼眸湿漉漉地看着镜头，眼神无辜又纯洁，嘴角带着浅浅的微笑，背景是温馨的卧室一角。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w114', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">夏天令人作呕的明亮，只会让阴影无处遁形。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w113', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">市场的本质是信息不对称。掌握定义权，就掌握了规则。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's119', type: 'visual', hasImageDescription: true, imageDescription: '一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">收工。梦里见。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的茶几上，他微微仰着头，闭着眼睛，一只修长的手搭在额头上，另一只手随意地垂下，指间夹着一根没有点燃的烟。整张照片色调很暗，有种疲惫又松弛的氛围。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's122', type: 'visual', hasImageDescription: true, imageDescription: '一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">训练后的冰淇淋，是世界上最美味的东西！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的商业街，能看到五光十色的霓虹灯牌和来来往往的人群。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w112', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">难得清闲，有没有什么打发时间的好电影推荐？老片子最好。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w111', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">在纯粹的黑与白之间，最能看清骨骼的轮廓和欲望的形状。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's120', type: 'visual', hasImageDescription: true, imageDescription: '照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">决策的意义，在于对未来下注。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上，背景是模糊的、能看到城市夜景的巨大落地窗。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's115', type: 'visual', hasImageDescription: true, imageDescription: '一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">晨跑十公里，再加两个小时器械，爽！又是充满能量的一天！💪</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着一件黑色的无袖背心，露出流畅结实的手臂线条，对着镜头笑得一脸灿烂，还能看见浅浅的梨涡。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w110', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">我讨厌夏天。蝉鸣，汗水，无法冷静的颜色，一切都过于喧闹。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's118', type: 'visual', hasImageDescription: true, imageDescription: '视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">带Lucky出来放风！它好像比我还开心！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞盘。视频的最后，夏阳把镜头转向自己，海风吹乱了他的金发，他对着镜头笑得一脸灿烂，背景是蔚蓝的大海和金色的沙滩。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w109', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">转发文章：《AI数字人技术对未来影视行业冲击的五点观察》。|冗余的正在被淘汰，未来的属于掌握效率的少数人。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's116', type: 'visual', hasImageDescription: true, imageDescription: '一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">新买的沐浴露味道好奇怪……睡不着了……有好闻的推荐吗？/委屈</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水汽氤氲，他微微嘟着嘴，眼神看起来有些委屈又无辜。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+message-app.js:3910 [Message App] 事件绑定完成
+VM346866 forum-auto-listener.js:196 [Forum Auto Listener] 检测到新消息: +1 (32 -> 33)
+VM346866 forum-auto-listener.js:206 [Forum Auto Listener] 当前阈值: 5
+VM346866 forum-auto-listener.js:246 [Forum Auto Listener] 增量 1 未达到阈值 5
+VM346866 forum-auto-listener.js:1188 [Forum Auto Listener] ℹ️ 监听中 (1/5)
+VM346867 mobile-phone.js:3189 [Mobile Phone] Toast显示: success - 朋友圈发布成功！
+[Friends Circle] 开始从SillyTavern提取图片信息...
+friends-circle.js:3357 [Friends Circle] 使用SillyTavern.getContext()获取聊天数据: 33 条消息
+friends-circle.js:3380 [Friends Circle] 检查最近的消息: (5) [{…}, {…}, {…}, {…}, {…}]
+friends-circle.js:3411 [Friends Circle] 从extra提取图片信息: {imageUrl: '/user/images/娱乐圈敛财系统/1756007522279_6780116655849220.jpeg', fileName: '1756007522279_6780116655849220.jpeg'}
+friends-circle.js:3471 [Friends Circle] 更新已存在朋友圈的图片信息: {id: 's543', imageUrl: '/user/images/娱乐圈敛财系统/1756007522279_6780116655849220.jpeg', imageFileName: '1756007522279_6780116655849220.jpeg', hasHtmlContent: false}
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's543', type: 'visual', hasImageDescription: true, imageDescription: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', hasContent: true, …}
+friends-circle.js:1254 [Friends Circle Debug] 使用图片URL: /user/images/娱乐圈敛财系统/1756007522279_6780116655849220.jpeg
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">给大家看风景</div>
+            
+            <div class="circle-image-container">
+              <img src="/user/images/娱乐圈敛财系统/1756007522279_6780116655849220.jpeg"
+                   alt="pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg"
+                   class="circle-image"
+                   onclick="this.style.transform=this.style.transform?'':'scale(2)'; setTimeout(()=>this.style.transform='', 3000);"
+                   loading="lazy"
+                   onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span class=\'image-description\'>pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg</span></div>'">
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's709', type: 'visual', hasImageDescription: true, imageDescription: '图片: IMG_1160(20250821-022207).PNG', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">我好看吗</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">图片: IMG_1160(20250821-022207).PNG</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 600001 的头像配置: https://i.postimg.cc/RZJns5zh/4.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w108', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">又一个通宵。灵感和安眠药，总得选一个。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's117', type: 'visual', hasImageDescription: true, imageDescription: '一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">捕获月亮的一角。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似乎还挂着一根极细微的、几乎难以察觉的长发。光线从侧面打来，勾勒出耳坠冰冷的金属轮廓和头发柔和的光泽，构成一种脆弱而病态的美感。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's121', type: 'visual', hasImageDescription: true, imageDescription: '一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">沐沐不肯睡觉，非要缠着我，真拿它没办法呀~🥺</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一只白色的波斯猫，微微歪着头，浅粉色的眼眸湿漉漉地看着镜头，眼神无辜又纯洁，嘴角带着浅浅的微笑，背景是温馨的卧室一角。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w114', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">夏天令人作呕的明亮，只会让阴影无处遁形。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w113', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">市场的本质是信息不对称。掌握定义权，就掌握了规则。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's119', type: 'visual', hasImageDescription: true, imageDescription: '一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">收工。梦里见。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的茶几上，他微微仰着头，闭着眼睛，一只修长的手搭在额头上，另一只手随意地垂下，指间夹着一根没有点燃的烟。整张照片色调很暗，有种疲惫又松弛的氛围。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's122', type: 'visual', hasImageDescription: true, imageDescription: '一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">训练后的冰淇淋，是世界上最美味的东西！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的商业街，能看到五光十色的霓虹灯牌和来来往往的人群。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w112', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">难得清闲，有没有什么打发时间的好电影推荐？老片子最好。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w111', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">在纯粹的黑与白之间，最能看清骨骼的轮廓和欲望的形状。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's120', type: 'visual', hasImageDescription: true, imageDescription: '照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">决策的意义，在于对未来下注。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上，背景是模糊的、能看到城市夜景的巨大落地窗。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's115', type: 'visual', hasImageDescription: true, imageDescription: '一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">晨跑十公里，再加两个小时器械，爽！又是充满能量的一天！💪</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着一件黑色的无袖背心，露出流畅结实的手臂线条，对着镜头笑得一脸灿烂，还能看见浅浅的梨涡。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w110', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">我讨厌夏天。蝉鸣，汗水，无法冷静的颜色，一切都过于喧闹。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's118', type: 'visual', hasImageDescription: true, imageDescription: '视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">带Lucky出来放风！它好像比我还开心！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞盘。视频的最后，夏阳把镜头转向自己，海风吹乱了他的金发，他对着镜头笑得一脸灿烂，背景是蔚蓝的大海和金色的沙滩。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w109', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">转发文章：《AI数字人技术对未来影视行业冲击的五点观察》。|冗余的正在被淘汰，未来的属于掌握效率的少数人。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's116', type: 'visual', hasImageDescription: true, imageDescription: '一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">新买的沐浴露味道好奇怪……睡不着了……有好闻的推荐吗？/委屈</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水汽氤氲，他微微嘟着嘴，眼神看起来有些委屈又无辜。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:3517 [Friends Circle] 清理SillyTavern附件状态...
+friends-circle.js:3522 [Friends Circle] 找到SillyTavern重置按钮，准备点击
+friends-circle.js:3524 [Friends Circle] SillyTavern附件已重置
+message-app.js:3910 [Message App] 事件绑定完成
+[Friends Circle] 收到MESSAGE_RECEIVED事件: 33
+friends-circle.js:915 [Friends Circle] 消息计数检查: 当前=34, 上次=32, messageId=33
+friends-circle.js:944 [Friends Circle] ✅ 检测到新消息，消息数量从 32 增加到 34
+friends-circle.js:951 [Friends Circle] 开始更新朋友圈数据...
+friends-circle.js:736 [Friends Circle] 执行增量更新：从消息索引 687 到 834
+friends-circle.js:327 [Friends Circle] 增量解析：总消息数 834，上次处理到 687
+friends-circle.js:496 [Friends Circle] 增量解析到对已存在朋友圈的新回复: 秦倦 -> s543 at index 758
+friends-circle.js:496 [Friends Circle] 增量解析到对已存在朋友圈的新回复: 零 -> s543 at index 769
+friends-circle.js:496 [Friends Circle] 增量解析到对已存在朋友圈的新回复: 夏阳 -> s543 at index 780
+friends-circle.js:496 [Friends Circle] 增量解析到对已存在朋友圈的新回复: 霍谨 -> s543 at index 791
+friends-circle.js:496 [Friends Circle] 增量解析到对已存在朋友圈的新回复: 温屿 -> s543 at index 802
+friends-circle.js:503 [Friends Circle] 增量解析完成，发现 1 个新增/更新项
+friends-circle.js:662 [Friends Circle] 更新已存在朋友圈 s543 的回复，新增 5 条回复
+friends-circle.js:700 [Friends Circle] 增量更新完成：新增 0 条，更新 1 条，总计 17 条
+friends-circle.js:746 [Friends Circle] 增量更新成功，处理了 1 个新增/更新项
+friends-circle.js:764 [Friends Circle] 数据刷新完成
+friends-circle.js:956 [Friends Circle] 朋友圈页面处于活跃状态，立即更新界面
+friends-circle.js:2499 [Friends Circle] 更新朋友圈显示...
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's543', type: 'visual', hasImageDescription: true, imageDescription: 'pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg', hasContent: true, …}
+friends-circle.js:1254 [Friends Circle Debug] 使用图片URL: /user/images/娱乐圈敛财系统/1756007522279_6780116655849220.jpeg
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">给大家看风景</div>
+            
+            <div class="circle-image-container">
+              <img src="/user/images/娱乐圈敛财系统/1756007522279_6780116655849220.jpeg"
+                   alt="pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg"
+                   class="circle-image"
+                   onclick="this.style.transform=this.style.transform?'':'scale(2)'; setTimeout(()=>this.style.transform='', 3000);"
+                   loading="lazy"
+                   onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span class=\'image-description\'>pic_5tu_big_6672913_670a23992dce1-thumb-650.jpg</span></div>'">
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 600001 的头像配置: https://i.postimg.cc/RZJns5zh/4.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1645 [Friends Circle] 找到用户头像配置: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1170 [Friends Circle] 使用用户头像: https://i.postimg.cc/0N6Z0HV0/2.jpg
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's709', type: 'visual', hasImageDescription: true, imageDescription: '图片: IMG_1160(20250821-022207).PNG', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">我好看吗</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">图片: IMG_1160(20250821-022207).PNG</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 600001 的头像配置: https://i.postimg.cc/RZJns5zh/4.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w108', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">又一个通宵。灵感和安眠药，总得选一个。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's117', type: 'visual', hasImageDescription: true, imageDescription: '一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">捕获月亮的一角。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张经过精心布光的照片。画面中央，一枚精致的、月牙形状的银色耳坠静静躺在黑色丝绒上。耳坠的弯钩处，似乎还挂着一根极细微的、几乎难以察觉的长发。光线从侧面打来，勾勒出耳坠冰冷的金属轮廓和头发柔和的光泽，构成一种脆弱而病态的美感。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's121', type: 'visual', hasImageDescription: true, imageDescription: '一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">沐沐不肯睡觉，非要缠着我，真拿它没办法呀~🥺</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张自拍。镜头微俯，朝沐雨穿着一身洁白的丝质睡裙，白色长发柔顺地披散在肩上。他坐在地毯上，怀里抱着一只白色的波斯猫，微微歪着头，浅粉色的眼眸湿漉漉地看着镜头，眼神无辜又纯洁，嘴角带着浅浅的微笑，背景是温馨的卧室一角。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w114', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">夏天令人作呕的明亮，只会让阴影无处遁形。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w113', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">市场的本质是信息不对称。掌握定义权，就掌握了规则。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's119', type: 'visual', hasImageDescription: true, imageDescription: '一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">收工。梦里见。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片。昏暗的片场休息室里，只有一盏落地灯亮着。秦倦靠在老旧的皮质沙发上，双腿交叠随意地搭在前面的茶几上，他微微仰着头，闭着眼睛，一只修长的手搭在额头上，另一只手随意地垂下，指间夹着一根没有点燃的烟。整张照片色调很暗，有种疲惫又松弛的氛围。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's122', type: 'visual', hasImageDescription: true, imageDescription: '一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">训练后的冰淇淋，是世界上最美味的东西！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张照片，一只修长有力的手正举着一个甜筒冰淇淋，冰淇淋尖顶上还点缀着一颗红色的樱桃。背景是热闹繁华的商业街，能看到五光十色的霓虹灯牌和来来往往的人群。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/kXdZX9T3/5.jpg friendId: 500002
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w112', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">难得清闲，有没有什么打发时间的好电影推荐？老片子最好。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w111', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">在纯粹的黑与白之间，最能看清骨骼的轮廓和欲望的形状。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's120', type: 'visual', hasImageDescription: true, imageDescription: '照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">决策的意义，在于对未来下注。</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">照片是一只戴着顶级名表的手，正握着一支钢笔，在一份全是外文的文件上签下名字。照片的焦点在手表和笔尖上，背景是模糊的、能看到城市夜景的巨大落地窗。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's115', type: 'visual', hasImageDescription: true, imageDescription: '一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">晨跑十公里，再加两个小时器械，爽！又是充满能量的一天！💪</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张从健身房镜子前拍的自拍照。照片里的青年有着一头被汗水浸湿的金发，几缕发丝贴在饱满的额头上。他穿着一件黑色的无袖背心，露出流畅结实的手臂线条，对着镜头笑得一脸灿烂，还能看见浅浅的梨涡。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 200005
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w110', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">我讨厌夏天。蝉鸣，汗水，无法冷静的颜色，一切都过于喧闹。</div>
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 300004 的头像配置: https://i.postimg.cc/FHHT7Kcq/10.png
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/FHHT7Kcq/10.png friendId: 300004
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's118', type: 'visual', hasImageDescription: true, imageDescription: '视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">带Lucky出来放风！它好像比我还开心！</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">视频。镜头随着主人的步伐在沙滩上晃动，一只金毛寻回犬兴奋地在前面奔跑，不时回头，嘴里叼着一个红色的飞盘。视频的最后，夏阳把镜头转向自己，海风吹乱了他的金发，他对着镜头笑得一脸灿烂，背景是蔚蓝的大海和金色的沙滩。</span>
+            </div>
+          
+          </div>
+        
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1174 [Friends Circle] 使用好友头像: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg friendId: 400003
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 'w109', type: 'text', hasImageDescription: false, imageDescription: undefined, hasContent: true, …}
+friends-circle.js:1276 [Friends Circle Debug] 生成的文字朋友圈HTML: <div class="text-circle-content">转发文章：《AI数字人技术对未来影视行业冲击的五点观察》。|冗余的正在被淘汰，未来的属于掌握效率的少数人。</div>
+friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:1365 [Friends Circle] 找到好友 400003 的头像配置: https://i.postimg.cc/7Yd5TsTk/霍谨3.jpg
+friends-circle.js:1422 [Friends Circle] 开始获取当前用户名...
+friends-circle.js:1482 [Friends Circle] 尝试获取选中的persona名称...
+friends-circle.js:1489 [Friends Circle] 从DOM获取选中persona名称: 沐夕
+friends-circle.js:1427 [Friends Circle] 从persona系统获取用户名: 沐夕
+friends-circle.js:1174 [Friends Circle] 使用好友头像: data:image/svg+xml;base64,CiAgICAgICAgPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjRERBMEREIi8+CiAgICAgICAgICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgICAgICAgICA8cGF0aCBkPSJNMTAgMzJDMTAgMjYuNDc3MSAxNC40NzcxIDIyIDE5IDIySDIxQzI1LjUyMjkgMjIgMzAgMjYuNDc3MSAzMCAzMlYzNEgxMFYzMloiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgICA8L3N2Zz4KICAgICAg friendId: 100006
+friends-circle.js:1220 [Friends Circle Debug] 渲染朋友圈内容: {id: 's116', type: 'visual', hasImageDescription: true, imageDescription: '一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水', hasContent: true, …}
+friends-circle.js:1263 [Friends Circle Debug] 使用占位符图片
+friends-circle.js:1272 [Friends Circle Debug] 生成的视觉朋友圈HTML: 
+          <div class="visual-circle-content">
+            <div class="text-content">新买的沐浴露味道好奇怪……睡不着了……有好闻的推荐吗？/委屈</div>
+            
+            <div class="image-placeholder">
+              <i class="fas fa-image"></i>
+              <span class="image-description">一张怼脸自拍。镜头里的少年皮肤白皙，刚刚洗完澡，几缕湿漉漉的白色长发贴在脸颊，衬得那双浅粉色的眼眸水汽氤氲，他微微嘟着嘴，眼神看起来有些委屈又无辜。</span>
+            </div>
+          
+          </div>
+        
+2friends-circle.js:1365 [Friends Circle] 找到好友 500002 的头像配置: https://i.postimg.cc/kXdZX9T3/5.jpg
+friends-circle.js:2504 [Friends Circle] 朋友圈显示更新完成
+message-app.js:725 [Message App] ✅ 新消息: 32 → 34
+message-app.js:734 [Message App] 处理消息接收事件失败: TypeError: this.refreshMessages is not a function
+    at MessageApp.onMessageReceived (message-app.js:729:14)
+    at EventEmitter.emit (eventemitter.js:146:36)
+    at async StreamingProcessor.onFinishStreaming (script.js:3626:13)
+    at async finishGenerating (script.js:5116:17)
+onMessageReceived @ message-app.js:734
+EventEmitter.emit @ eventemitter.js:146
+await in EventEmitter.emit
+onFinishStreaming @ script.js:3626
+await in onFinishStreaming
+finishGenerating @ script.js:5116
+await in finishGenerating
+Generate @ script.js:5129Understand this error
+index.js:20 [QR2] calling {args: Array(2), functionToCall: ƒ}
+message-app.js:3910 [Message App] 事件绑定完成
+script.js:3984 Generate entered
+script.js:4296 Core/all messages: 34/34
+world-info.js:4601 [WI] Hypothetically adding 23 entries to prompt (23) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+script.js:4357 skipWIAN not active, adding WIAN
+handler.ts:597 [Prompt Template] dry run: true
+context-monitor.js:844 [Mobile Context 21:52:24] 成功获取聊天消息: 34 条记录 {chatId: '娱乐圈敛财系统 - 2025-08-22@12h41m52s', isGroup: false, fallbackMode: false}
+message-app.js:254 [Message App] 找不到消息列表容器
+refreshFriendListUI @ message-app.js:254
+triggerIncrementalRender @ real-time-sync.js:362
+performIncrementalSync @ real-time-sync.js:275
+await in performIncrementalSync
+performSync @ real-time-sync.js:94
+await in performSync
+(anonymous) @ real-time-sync.js:43Understand this warning
+message-app.js:462 [Message App] 👥 处理好友列表更新: {chatId: '娱乐圈敛财系统 - 2025-08-22@12h41m52s', messageCount: undefined, friendCount: 6, hasNewMessages: true, hasNewFriends: false, …}
+message-app.js:466 [Message App] 🔄 检测到新好友或消息，刷新好友列表
+message-app.js:254 [Message App] 找不到消息列表容器
