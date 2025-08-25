@@ -718,11 +718,6 @@ ${
 
     // 获取当前配置
     getConfig() {
-      // 确保currentConfig存在，如果不存在则使用默认配置
-      if (!this.currentConfig) {
-        console.warn('[Style Config Manager] currentConfig不存在，使用默认配置');
-        this.currentConfig = { ...DEFAULT_STYLE_CONFIG };
-      }
       return JSON.parse(JSON.stringify(this.currentConfig));
     }
 
@@ -1100,41 +1095,11 @@ ${
       console.log('[Style Config Manager] 配置已重置为默认值');
     }
 
-    // 强制重新初始化（用于修复问题）
-    async forceReinitialize() {
-      try {
-        console.log('[Style Config Manager] 🔄 强制重新初始化...');
-
-        // 重置状态
-        this.isReady = false;
-        this.configLoaded = false;
-        this.currentConfig = { ...DEFAULT_STYLE_CONFIG };
-
-        // 重新初始化
-        await this.init();
-
-        console.log('[Style Config Manager] ✅ 强制重新初始化完成');
-        return true;
-      } catch (error) {
-        console.error('[Style Config Manager] ❌ 强制重新初始化失败:', error);
-        return false;
-      }
-    }
-
     // 获取设置应用的HTML内容
     getSettingsAppContent() {
-      try {
-        const config = this.getConfig(); // 使用getConfig()确保获取最新配置
+      const config = this.getConfig(); // 使用getConfig()确保获取最新配置
 
-        // 确保配置对象的所有必要属性都存在
-        if (!config.homeScreen) config.homeScreen = DEFAULT_STYLE_CONFIG.homeScreen;
-        if (!config.messagesApp) config.messagesApp = DEFAULT_STYLE_CONFIG.messagesApp;
-        if (!config.messageSentAvatar) config.messageSentAvatar = DEFAULT_STYLE_CONFIG.messageSentAvatar;
-        if (!config.messageReceivedAvatars) config.messageReceivedAvatars = DEFAULT_STYLE_CONFIG.messageReceivedAvatars;
-        if (!config.friendBackgrounds) config.friendBackgrounds = DEFAULT_STYLE_CONFIG.friendBackgrounds;
-        if (!config.customStyles) config.customStyles = DEFAULT_STYLE_CONFIG.customStyles;
-
-        return `
+      return `
             <div class="style-config-app">
                 <div class="style-config-header">
                     <h2>🎨 移动端界面样式设置</h2>
@@ -2640,45 +2605,15 @@ ${
                 </style>
             </div>
         `;
-      } catch (error) {
-        console.error('[Style Config Manager] 生成设置应用内容失败:', error);
-        return `
-          <div class="style-config-app">
-            <div class="style-config-header">
-              <h2>🎨 移动端界面样式设置</h2>
-              <p style="color: #e53e3e;">⚠️ 样式配置器加载失败，请刷新页面重试</p>
-            </div>
-            <div class="error-content" style="padding: 20px; text-align: center;">
-              <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
-              <h3>配置加载失败</h3>
-              <p>错误信息: ${error.message}</p>
-              <button onclick="window.location.reload()" style="
-                padding: 10px 20px;
-                background: #3182ce;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                margin-top: 16px;
-              ">刷新页面</button>
-            </div>
-          </div>
-        `;
-      }
     }
 
     // 异步加载配置列表内容
     async loadConfigListContent() {
       try {
         const configListContainer = document.getElementById('config-list-container');
-        if (!configListContainer) {
-          console.warn('[Style Config Manager] 配置列表容器不存在');
-          return;
-        }
+        if (!configListContainer) return;
 
-        console.log('[Style Config Manager] 开始加载配置列表...');
         const configs = await this.getAllStyleConfigs();
-        console.log('[Style Config Manager] 获取到配置列表:', configs);
 
         let configListHTML = '';
 
@@ -5576,37 +5511,4 @@ ${
   }
 
   console.log('[Style Config Manager] 样式配置管理器模块加载完成');
-
-  // 添加全局修复函数
-  // @ts-ignore - 添加全局函数
-  window.fixStyleConfigManager = async function () {
-    console.log('[Style Config Manager] 🔧 开始修复样式配置管理器...');
-
-    try {
-      // 如果实例存在，尝试重新初始化
-      if (window.styleConfigManager) {
-        const success = await window.styleConfigManager.forceReinitialize();
-        if (success) {
-          console.log('[Style Config Manager] ✅ 修复成功');
-          return true;
-        }
-      }
-
-      // 如果重新初始化失败，创建新实例
-      console.log('[Style Config Manager] 创建新的样式配置管理器实例...');
-      window.styleConfigManager = new StyleConfigManager();
-
-      // 等待初始化完成
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      console.log('[Style Config Manager] ✅ 新实例创建成功');
-      return true;
-    } catch (error) {
-      console.error('[Style Config Manager] ❌ 修复失败:', error);
-      return false;
-    }
-  };
-
-  console.log('[Style Config Manager] 💡 可用的修复命令:');
-  console.log('  - fixStyleConfigManager() - 修复样式配置管理器');
 } // 结束 if (typeof window.StyleConfigManager === 'undefined') 检查
