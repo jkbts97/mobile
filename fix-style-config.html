@@ -27,8 +27,6 @@
             margin-top: 10px;
             font-family: monospace;
             white-space: pre-wrap;
-            max-height: 300px;
-            overflow-y: auto;
         }
         .success {
             border-color: #28a745;
@@ -50,7 +48,6 @@
             border-radius: 4px;
             cursor: pointer;
             margin: 5px;
-            font-size: 14px;
         }
         button:hover {
             background: #0056b3;
@@ -68,222 +65,306 @@
         .warning-btn:hover {
             background: #e0a800;
         }
-        .step {
-            margin: 15px 0;
-            padding: 15px;
-            border-left: 4px solid #007bff;
-            background: #f8f9fa;
-        }
-        .step h4 {
-            margin: 0 0 10px 0;
-            color: #007bff;
-        }
     </style>
 </head>
 <body>
     <h1>🔧 样式配置器修复工具</h1>
     
     <div class="fix-container">
-        <h2>问题描述</h2>
-        <p>当清空浏览器localStorage后，样式配置器可能出现以下问题：</p>
-        <ul>
-            <li>点击"样式编辑器"或"配置管理"按钮无响应</li>
-            <li>配置列表不显示</li>
-            <li>界面卡在设置页面</li>
-        </ul>
-    </div>
-
-    <div class="fix-container">
-        <h2>🔍 诊断工具</h2>
-        <p>首先运行诊断来检查当前状态：</p>
-        <button onclick="runDiagnostic()">运行诊断</button>
-        <div id="diagnosticResult" class="fix-result" style="display: none;"></div>
-    </div>
-
-    <div class="fix-container">
-        <h2>🛠️ 修复步骤</h2>
+        <h2>问题诊断</h2>
+        <p>当样式配置器无法正常显示时，使用此工具进行诊断和修复。</p>
         
-        <div class="step">
-            <h4>步骤 1: 强制修复UI</h4>
-            <p>尝试强制修复样式配置器界面</p>
-            <button onclick="fixUI()">修复界面</button>
-        </div>
+        <button onclick="diagnoseIssue()">🔍 诊断问题</button>
+        <button onclick="checkLocalStorage()">📦 检查本地存储</button>
+        <button onclick="checkGlobalObjects()">🌐 检查全局对象</button>
+        
+        <div id="diagnoseResult" class="fix-result" style="display: none;"></div>
+    </div>
 
-        <div class="step">
-            <h4>步骤 2: 重新初始化配置管理器</h4>
-            <p>如果步骤1无效，尝试重新初始化</p>
-            <button onclick="reinitializeManager()">重新初始化</button>
-        </div>
-
-        <div class="step">
-            <h4>步骤 3: 创建默认配置</h4>
-            <p>创建一个新的默认配置文件</p>
-            <button onclick="createDefaultConfig()">创建默认配置</button>
-        </div>
-
-        <div class="step">
-            <h4>步骤 4: 清理并重置</h4>
-            <p>⚠️ 这将清除所有样式配置数据并重置为默认状态</p>
-            <button class="danger-btn" onclick="resetAll()">完全重置</button>
-        </div>
-
+    <div class="fix-container">
+        <h2>修复操作</h2>
+        <p>根据诊断结果选择合适的修复方法：</p>
+        
+        <button onclick="fixStyleConfigManager()">🔧 修复样式配置器</button>
+        <button onclick="resetToDefault()" class="warning-btn">⚠️ 重置为默认配置</button>
+        <button onclick="clearAllData()" class="danger-btn">🗑️ 清除所有数据</button>
+        
         <div id="fixResult" class="fix-result" style="display: none;"></div>
     </div>
 
     <div class="fix-container">
-        <h2>📋 手动操作指南</h2>
-        <p>如果自动修复无效，请按以下步骤手动操作：</p>
-        <ol>
-            <li>在浏览器控制台中运行：<code>debugStyleConfig()</code></li>
-            <li>检查输出信息，确认问题所在</li>
-            <li>运行：<code>fixStyleConfigUI()</code></li>
-            <li>如果仍有问题，刷新页面并重新进入样式配置器</li>
-        </ol>
+        <h2>手动操作</h2>
+        <p>如果自动修复失败，可以尝试手动操作：</p>
+        
+        <button onclick="createDefaultConfig()">📝 创建默认配置</button>
+        <button onclick="reloadStyleConfig()">🔄 重新加载配置</button>
+        <button onclick="testStyleConfig()">🧪 测试配置功能</button>
+        
+        <div id="manualResult" class="fix-result" style="display: none;"></div>
     </div>
 
     <script>
-        function log(message, type = 'info') {
-            const resultDiv = document.getElementById('fixResult');
-            resultDiv.style.display = 'block';
-            resultDiv.className = `fix-result ${type}`;
-            resultDiv.textContent += `[${new Date().toLocaleTimeString()}] ${message}\n`;
-            console.log(message);
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            element.className = `fix-result ${type}`;
         }
 
-        function clearLog() {
-            const resultDiv = document.getElementById('fixResult');
-            resultDiv.textContent = '';
-            resultDiv.style.display = 'none';
-        }
-
-        function runDiagnostic() {
-            clearLog();
-            const diagnosticDiv = document.getElementById('diagnosticResult');
-            diagnosticDiv.style.display = 'block';
-            diagnosticDiv.className = 'fix-result';
+        function diagnoseIssue() {
+            let diagnosis = '=== 样式配置器诊断报告 ===\n\n';
             
-            let diagnosticInfo = '';
+            // 检查全局对象
+            diagnosis += '1. 全局对象检查:\n';
+            diagnosis += `   - window.StyleConfigManager: ${!!window.StyleConfigManager}\n`;
+            diagnosis += `   - window.styleConfigManager: ${!!window.styleConfigManager}\n`;
+            diagnosis += `   - window.getStyleConfigAppContent: ${!!window.getStyleConfigAppContent}\n`;
+            diagnosis += `   - window.bindStyleConfigEvents: ${!!window.bindStyleConfigEvents}\n`;
+            diagnosis += `   - window.fixStyleConfigManager: ${!!window.fixStyleConfigManager}\n\n`;
             
-            try {
-                // 检查是否在SillyTavern环境中
-                if (typeof window.debugStyleConfig === 'function') {
-                    diagnosticInfo += '✅ 在SillyTavern环境中，运行详细诊断...\n\n';
-                    
-                    // 捕获console.log输出
-                    const originalLog = console.log;
-                    const logs = [];
-                    console.log = function(...args) {
-                        logs.push(args.join(' '));
-                        originalLog.apply(console, arguments);
-                    };
-                    
-                    window.debugStyleConfig();
-                    
-                    // 恢复console.log
-                    console.log = originalLog;
-                    
-                    diagnosticInfo += logs.join('\n');
-                } else {
-                    diagnosticInfo += '❌ 不在SillyTavern环境中或样式配置管理器未加载\n';
-                    diagnosticInfo += '请在SillyTavern的移动端界面中使用此工具\n';
+            // 检查实例状态
+            if (window.styleConfigManager) {
+                diagnosis += '2. 实例状态检查:\n';
+                try {
+                    diagnosis += `   - isReady: ${window.styleConfigManager.isReady}\n`;
+                    diagnosis += `   - configLoaded: ${window.styleConfigManager.configLoaded}\n`;
+                    diagnosis += `   - currentConfig存在: ${!!window.styleConfigManager.currentConfig}\n`;
+                } catch (error) {
+                    diagnosis += `   - 检查实例状态时出错: ${error.message}\n`;
                 }
-            } catch (error) {
-                diagnosticInfo += `❌ 诊断失败: ${error.message}\n`;
+                diagnosis += '\n';
             }
             
-            diagnosticDiv.textContent = diagnosticInfo;
-        }
-
-        function fixUI() {
-            clearLog();
-            log('开始修复UI...', 'info');
-            
-            try {
-                if (typeof window.fixStyleConfigUI === 'function') {
-                    window.fixStyleConfigUI();
-                    log('✅ UI修复命令已执行，请检查样式配置器是否正常', 'success');
-                } else {
-                    log('❌ 修复函数不可用，请确保在SillyTavern环境中运行', 'error');
+            // 检查localStorage
+            diagnosis += '3. 本地存储检查:\n';
+            let configCount = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('style_config')) {
+                    configCount++;
+                    diagnosis += `   - ${key}\n`;
                 }
-            } catch (error) {
-                log(`❌ 修复失败: ${error.message}`, 'error');
             }
+            diagnosis += `   - 配置文件总数: ${configCount}\n\n`;
+            
+            // 检查DOM元素
+            diagnosis += '4. DOM元素检查:\n';
+            diagnosis += `   - #config-list-container: ${!!document.getElementById('config-list-container')}\n`;
+            diagnosis += `   - .style-config-app: ${!!document.querySelector('.style-config-app')}\n`;
+            diagnosis += `   - .tab-panel[data-tab="editor"]: ${!!document.querySelector('.tab-panel[data-tab="editor"]')}\n\n`;
+            
+            // 建议
+            diagnosis += '5. 修复建议:\n';
+            if (!window.styleConfigManager) {
+                diagnosis += '   - 样式配置管理器实例不存在，建议重新创建\n';
+            } else if (!window.styleConfigManager.isReady) {
+                diagnosis += '   - 样式配置管理器未就绪，建议重新初始化\n';
+            } else if (configCount === 0) {
+                diagnosis += '   - 没有找到配置文件，建议创建默认配置\n';
+            } else {
+                diagnosis += '   - 基本检查通过，可能是界面渲染问题\n';
+            }
+            
+            showResult('diagnoseResult', diagnosis, 'info');
         }
 
-        function reinitializeManager() {
-            clearLog();
-            log('重新初始化配置管理器...', 'info');
+        function checkLocalStorage() {
+            let result = '=== 本地存储详细信息 ===\n\n';
             
-            try {
-                // 删除现有实例
-                if (window.styleConfigManager) {
-                    delete window.styleConfigManager;
-                    log('已删除现有配置管理器实例', 'info');
+            const configKeys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('style_config')) {
+                    configKeys.push(key);
                 }
+            }
+            
+            if (configKeys.length === 0) {
+                result += '没有找到任何样式配置文件\n';
+            } else {
+                configKeys.forEach(key => {
+                    try {
+                        const value = localStorage.getItem(key);
+                        const parsed = JSON.parse(value);
+                        result += `${key}:\n`;
+                        result += `  - 大小: ${value.length} 字符\n`;
+                        result += `  - 包含属性: ${Object.keys(parsed).join(', ')}\n\n`;
+                    } catch (error) {
+                        result += `${key}: 解析失败 - ${error.message}\n\n`;
+                    }
+                });
+            }
+            
+            showResult('diagnoseResult', result, 'info');
+        }
+
+        function checkGlobalObjects() {
+            let result = '=== 全局对象详细信息 ===\n\n';
+            
+            if (window.styleConfigManager) {
+                result += 'styleConfigManager 实例信息:\n';
+                try {
+                    const instance = window.styleConfigManager;
+                    result += `  - 类型: ${typeof instance}\n`;
+                    result += `  - 构造函数: ${instance.constructor.name}\n`;
+                    result += `  - isReady: ${instance.isReady}\n`;
+                    result += `  - configLoaded: ${instance.configLoaded}\n`;
+                    result += `  - 方法数量: ${Object.getOwnPropertyNames(Object.getPrototypeOf(instance)).length}\n`;
+                    
+                    if (instance.currentConfig) {
+                        result += `  - 当前配置属性: ${Object.keys(instance.currentConfig).join(', ')}\n`;
+                    }
+                } catch (error) {
+                    result += `  - 检查实例时出错: ${error.message}\n`;
+                }
+            } else {
+                result += 'styleConfigManager 实例不存在\n';
+            }
+            
+            result += '\n可用的全局函数:\n';
+            const globalFunctions = [
+                'getStyleConfigAppContent',
+                'bindStyleConfigEvents', 
+                'fixStyleConfigManager'
+            ];
+            
+            globalFunctions.forEach(func => {
+                result += `  - ${func}: ${typeof window[func]}\n`;
+            });
+            
+            showResult('diagnoseResult', result, 'info');
+        }
+
+        async function fixStyleConfigManager() {
+            try {
+                showResult('fixResult', '正在修复样式配置管理器...', 'info');
                 
-                // 重新创建实例
-                if (window.StyleConfigManager) {
-                    window.styleConfigManager = new window.StyleConfigManager();
-                    log('✅ 配置管理器重新初始化完成', 'success');
+                if (typeof window.fixStyleConfigManager === 'function') {
+                    const success = await window.fixStyleConfigManager();
+                    if (success) {
+                        showResult('fixResult', '✅ 样式配置管理器修复成功！\n\n请刷新页面或重新打开样式配置器。', 'success');
+                    } else {
+                        showResult('fixResult', '❌ 自动修复失败，请尝试手动操作。', 'error');
+                    }
                 } else {
-                    log('❌ StyleConfigManager类不可用', 'error');
+                    showResult('fixResult', '❌ 修复函数不可用，请确保样式配置管理器模块已加载。', 'error');
                 }
             } catch (error) {
-                log(`❌ 重新初始化失败: ${error.message}`, 'error');
+                showResult('fixResult', `❌ 修复过程中出错: ${error.message}`, 'error');
+            }
+        }
+
+        function resetToDefault() {
+            try {
+                if (window.styleConfigManager && typeof window.styleConfigManager.resetStyles === 'function') {
+                    window.styleConfigManager.resetStyles();
+                    showResult('fixResult', '✅ 配置已重置为默认值', 'success');
+                } else {
+                    showResult('fixResult', '❌ 无法重置配置，样式配置管理器不可用', 'error');
+                }
+            } catch (error) {
+                showResult('fixResult', `❌ 重置配置时出错: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ 这将删除所有样式配置数据，确定要继续吗？')) {
+                try {
+                    let deletedCount = 0;
+                    const keysToDelete = [];
+                    
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.includes('style_config')) {
+                            keysToDelete.push(key);
+                        }
+                    }
+                    
+                    keysToDelete.forEach(key => {
+                        localStorage.removeItem(key);
+                        deletedCount++;
+                    });
+                    
+                    showResult('fixResult', `✅ 已删除 ${deletedCount} 个配置文件\n\n请刷新页面重新开始。`, 'warning');
+                } catch (error) {
+                    showResult('fixResult', `❌ 清除数据时出错: ${error.message}`, 'error');
+                }
             }
         }
 
         function createDefaultConfig() {
-            clearLog();
-            log('创建默认配置...', 'info');
-            
             try {
-                if (window.styleConfigManager && window.styleConfigManager.saveConfig) {
-                    window.styleConfigManager.saveConfig();
-                    log('✅ 默认配置已创建', 'success');
+                const defaultConfig = {
+                    homeScreen: { backgroundImage: '', backgroundColor: '#f0f2f5' },
+                    messagesApp: { backgroundImage: '', backgroundColor: '#ffffff' },
+                    messageSentAvatar: { backgroundImage: '', backgroundColor: '#007bff' },
+                    messageReceivedAvatars: [],
+                    friendBackgrounds: [],
+                    customStyles: { css: '' }
+                };
+                
+                const storageKey = 'sillytavern_mobile_mobile_style_config.json';
+                localStorage.setItem(storageKey, JSON.stringify(defaultConfig));
+                
+                showResult('manualResult', '✅ 默认配置已创建\n\n请刷新样式配置器。', 'success');
+            } catch (error) {
+                showResult('manualResult', `❌ 创建默认配置时出错: ${error.message}`, 'error');
+            }
+        }
+
+        function reloadStyleConfig() {
+            try {
+                if (window.styleConfigManager && typeof window.styleConfigManager.loadConfig === 'function') {
+                    window.styleConfigManager.loadConfig().then(() => {
+                        showResult('manualResult', '✅ 配置重新加载完成', 'success');
+                    }).catch(error => {
+                        showResult('manualResult', `❌ 重新加载配置失败: ${error.message}`, 'error');
+                    });
                 } else {
-                    log('❌ 配置管理器不可用', 'error');
+                    showResult('manualResult', '❌ 无法重新加载配置，样式配置管理器不可用', 'error');
                 }
             } catch (error) {
-                log(`❌ 创建默认配置失败: ${error.message}`, 'error');
+                showResult('manualResult', `❌ 重新加载配置时出错: ${error.message}`, 'error');
             }
         }
 
-        function resetAll() {
-            if (!confirm('⚠️ 这将删除所有样式配置数据！\n\n确定要继续吗？')) {
-                return;
-            }
-            
-            clearLog();
-            log('开始完全重置...', 'warning');
-            
+        function testStyleConfig() {
             try {
-                // 清理localStorage中的配置
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && key.includes('style_config')) {
-                        keysToRemove.push(key);
+                let testResult = '=== 功能测试结果 ===\n\n';
+                
+                // 测试内容生成
+                if (typeof window.getStyleConfigAppContent === 'function') {
+                    try {
+                        const content = window.getStyleConfigAppContent();
+                        testResult += `✅ 内容生成: 成功 (${content.length} 字符)\n`;
+                    } catch (error) {
+                        testResult += `❌ 内容生成: 失败 - ${error.message}\n`;
                     }
+                } else {
+                    testResult += `❌ 内容生成: 函数不存在\n`;
                 }
                 
-                keysToRemove.forEach(key => {
-                    localStorage.removeItem(key);
-                    log(`已删除: ${key}`, 'info');
-                });
+                // 测试事件绑定
+                if (typeof window.bindStyleConfigEvents === 'function') {
+                    try {
+                        window.bindStyleConfigEvents();
+                        testResult += `✅ 事件绑定: 成功\n`;
+                    } catch (error) {
+                        testResult += `❌ 事件绑定: 失败 - ${error.message}\n`;
+                    }
+                } else {
+                    testResult += `❌ 事件绑定: 函数不存在\n`;
+                }
                 
-                // 重新初始化
-                reinitializeManager();
-                
-                log('✅ 完全重置完成，请刷新页面', 'success');
+                showResult('manualResult', testResult, 'info');
             } catch (error) {
-                log(`❌ 重置失败: ${error.message}`, 'error');
+                showResult('manualResult', `❌ 测试过程中出错: ${error.message}`, 'error');
             }
         }
 
-        // 页面加载时自动运行诊断
+        // 页面加载时自动诊断
         window.onload = function() {
-            setTimeout(runDiagnostic, 1000);
+            setTimeout(diagnoseIssue, 1000);
         };
     </script>
 </body>

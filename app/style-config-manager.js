@@ -718,6 +718,11 @@ ${
 
     // 获取当前配置
     getConfig() {
+      // 确保currentConfig存在，如果不存在则使用默认配置
+      if (!this.currentConfig) {
+        console.warn('[Style Config Manager] currentConfig不存在，使用默认配置');
+        this.currentConfig = { ...DEFAULT_STYLE_CONFIG };
+      }
       return JSON.parse(JSON.stringify(this.currentConfig));
     }
 
@@ -1095,11 +1100,41 @@ ${
       console.log('[Style Config Manager] 配置已重置为默认值');
     }
 
+    // 强制重新初始化（用于修复问题）
+    async forceReinitialize() {
+      try {
+        console.log('[Style Config Manager] 🔄 强制重新初始化...');
+
+        // 重置状态
+        this.isReady = false;
+        this.configLoaded = false;
+        this.currentConfig = { ...DEFAULT_STYLE_CONFIG };
+
+        // 重新初始化
+        await this.init();
+
+        console.log('[Style Config Manager] ✅ 强制重新初始化完成');
+        return true;
+      } catch (error) {
+        console.error('[Style Config Manager] ❌ 强制重新初始化失败:', error);
+        return false;
+      }
+    }
+
     // 获取设置应用的HTML内容
     getSettingsAppContent() {
-      const config = this.getConfig(); // 使用getConfig()确保获取最新配置
+      try {
+        const config = this.getConfig(); // 使用getConfig()确保获取最新配置
 
-      return `
+        // 确保配置对象的所有必要属性都存在
+        if (!config.homeScreen) config.homeScreen = DEFAULT_STYLE_CONFIG.homeScreen;
+        if (!config.messagesApp) config.messagesApp = DEFAULT_STYLE_CONFIG.messagesApp;
+        if (!config.messageSentAvatar) config.messageSentAvatar = DEFAULT_STYLE_CONFIG.messageSentAvatar;
+        if (!config.messageReceivedAvatars) config.messageReceivedAvatars = DEFAULT_STYLE_CONFIG.messageReceivedAvatars;
+        if (!config.friendBackgrounds) config.friendBackgrounds = DEFAULT_STYLE_CONFIG.friendBackgrounds;
+        if (!config.customStyles) config.customStyles = DEFAULT_STYLE_CONFIG.customStyles;
+
+        return `
             <div class="style-config-app">
                 <div class="style-config-header">
                     <h2>🎨 移动端界面样式设置</h2>
@@ -2605,21 +2640,45 @@ ${
                 </style>
             </div>
         `;
+      } catch (error) {
+        console.error('[Style Config Manager] 生成设置应用内容失败:', error);
+        return `
+          <div class="style-config-app">
+            <div class="style-config-header">
+              <h2>🎨 移动端界面样式设置</h2>
+              <p style="color: #e53e3e;">⚠️ 样式配置器加载失败，请刷新页面重试</p>
+            </div>
+            <div class="error-content" style="padding: 20px; text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+              <h3>配置加载失败</h3>
+              <p>错误信息: ${error.message}</p>
+              <button onclick="window.location.reload()" style="
+                padding: 10px 20px;
+                background: #3182ce;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                margin-top: 16px;
+              ">刷新页面</button>
+            </div>
+          </div>
+        `;
+      }
     }
 
     // 异步加载配置列表内容
     async loadConfigListContent() {
       try {
-        console.log('[Style Config Manager] 开始加载配置列表内容...');
         const configListContainer = document.getElementById('config-list-container');
         if (!configListContainer) {
-          console.error('[Style Config Manager] 找不到配置列表容器元素');
+          console.warn('[Style Config Manager] 配置列表容器不存在');
           return;
         }
 
-        console.log('[Style Config Manager] 获取所有样式配置...');
+        console.log('[Style Config Manager] 开始加载配置列表...');
         const configs = await this.getAllStyleConfigs();
-        console.log('[Style Config Manager] 找到配置数量:', configs.length);
+        console.log('[Style Config Manager] 获取到配置列表:', configs);
 
         let configListHTML = '';
 
@@ -3651,37 +3710,23 @@ ${
 
     // 处理标签页切换
     handleTabSwitch(tabHeader) {
-      try {
-        // @ts-ignore - EventTarget getAttribute
-        const targetTab = tabHeader.getAttribute('data-tab');
-        console.log('[Style Config Manager] 切换到标签页:', targetTab);
+      // @ts-ignore - EventTarget getAttribute
+      const targetTab = tabHeader.getAttribute('data-tab');
 
-        // 更新标签页状态
-        document.querySelectorAll('.tab-header').forEach(header => {
-          header.classList.remove('active');
-        });
-        document.querySelectorAll('.tab-panel').forEach(panel => {
-          panel.classList.remove('active');
-        });
+      // 更新标签页状态
+      document.querySelectorAll('.tab-header').forEach(header => {
+        header.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
 
-        tabHeader.classList.add('active');
-        const targetPanel = document.querySelector(`[data-tab="${targetTab}"].tab-panel`);
-        if (targetPanel) {
-          targetPanel.classList.add('active');
-          console.log('[Style Config Manager] 标签页切换成功:', targetTab);
-        } else {
-          console.error('[Style Config Manager] 找不到目标标签页面板:', targetTab);
-        }
+      tabHeader.classList.add('active');
+      document.querySelector(`[data-tab="${targetTab}"].tab-panel`).classList.add('active');
 
-        // 如果切换到配置管理标签页，加载配置列表
-        if (targetTab === 'manager') {
-          console.log('[Style Config Manager] 加载配置管理页面内容...');
-          setTimeout(() => {
-            this.loadConfigListContent();
-          }, 100);
-        }
-      } catch (error) {
-        console.error('[Style Config Manager] 标签页切换失败:', error);
+      // 如果切换到配置管理标签页，加载配置列表
+      if (targetTab === 'manager') {
+        this.loadConfigListContent();
       }
     }
 
@@ -5530,135 +5575,38 @@ ${
     }, 1000);
   }
 
-  // 添加调试函数
-  window.debugStyleConfig = function () {
-    console.log('=== 样式配置管理器调试信息 ===');
-    console.log('StyleConfigManager类存在:', !!window.StyleConfigManager);
-    console.log('styleConfigManager实例存在:', !!window.styleConfigManager);
-    console.log('配置管理器准备就绪:', window.styleConfigManager ? window.styleConfigManager.isConfigReady() : 'N/A');
-
-    // 检查DOM元素
-    const configApp = document.querySelector('.style-config-app');
-    console.log('样式配置应用DOM存在:', !!configApp);
-
-    const tabHeaders = document.querySelectorAll('.tab-header');
-    console.log('标签页头部数量:', tabHeaders.length);
-
-    const tabPanels = document.querySelectorAll('.tab-panel');
-    console.log('标签页面板数量:', tabPanels.length);
-
-    const activeTab = document.querySelector('.tab-header.active');
-    console.log('当前活动标签页:', activeTab ? activeTab.getAttribute('data-tab') : 'none');
-
-    const activePanel = document.querySelector('.tab-panel.active');
-    console.log('当前活动面板:', activePanel ? activePanel.getAttribute('data-tab') : 'none');
-
-    const configListContainer = document.getElementById('config-list-container');
-    console.log('配置列表容器存在:', !!configListContainer);
-    if (configListContainer) {
-      console.log('配置列表容器内容长度:', configListContainer.innerHTML.length);
-    }
-
-    // 检查localStorage
-    const storageKeys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.includes('style_config')) {
-        storageKeys.push(key);
-      }
-    }
-    console.log('localStorage中的配置键:', storageKeys);
-
-    console.log('=== 调试信息结束 ===');
-  };
-
-  // 添加强制修复函数
-  window.fixStyleConfigUI = function () {
-    console.log('[Style Config Fix] 开始修复样式配置界面...');
-
-    try {
-      // 1. 强制显示配置管理标签页
-      const managerTab = document.querySelector('.tab-header[data-tab="manager"]');
-      const managerPanel = document.querySelector('.tab-panel[data-tab="manager"]');
-
-      if (managerTab && managerPanel) {
-        console.log('[Style Config Fix] 强制切换到配置管理标签页...');
-
-        // 移除所有active类
-        document.querySelectorAll('.tab-header').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-
-        // 添加active类到配置管理标签页
-        managerTab.classList.add('active');
-        managerPanel.classList.add('active');
-
-        console.log('[Style Config Fix] 标签页切换完成');
-      } else {
-        console.error('[Style Config Fix] 找不到配置管理标签页元素');
-      }
-
-      // 2. 强制刷新配置列表
-      if (window.styleConfigManager && window.styleConfigManager.loadConfigListContent) {
-        console.log('[Style Config Fix] 强制刷新配置列表...');
-        setTimeout(() => {
-          window.styleConfigManager.loadConfigListContent();
-        }, 500);
-      }
-
-      // 3. 重新绑定事件
-      if (window.styleConfigManager && window.styleConfigManager.bindSettingsEvents) {
-        console.log('[Style Config Fix] 重新绑定事件...');
-        setTimeout(() => {
-          window.styleConfigManager.bindSettingsEvents();
-        }, 1000);
-      }
-
-      console.log('[Style Config Fix] 修复完成，请检查界面是否正常');
-    } catch (error) {
-      console.error('[Style Config Fix] 修复失败:', error);
-    }
-  };
-
-  // 添加强制显示配置管理页面的函数
-  window.forceShowConfigManager = function () {
-    console.log('[Style Config Fix] 强制显示配置管理页面...');
-
-    try {
-      // 直接操作DOM，强制显示配置管理页面
-      const editorPanel = document.querySelector('.tab-panel[data-tab="editor"]');
-      const managerPanel = document.querySelector('.tab-panel[data-tab="manager"]');
-      const editorTab = document.querySelector('.tab-header[data-tab="editor"]');
-      const managerTab = document.querySelector('.tab-header[data-tab="manager"]');
-
-      if (editorPanel) {
-        editorPanel.style.display = 'none';
-        editorPanel.classList.remove('active');
-      }
-
-      if (managerPanel) {
-        managerPanel.style.display = 'block';
-        managerPanel.classList.add('active');
-      }
-
-      if (editorTab) {
-        editorTab.classList.remove('active');
-      }
-
-      if (managerTab) {
-        managerTab.classList.add('active');
-      }
-
-      // 强制加载配置列表
-      if (window.styleConfigManager && window.styleConfigManager.loadConfigListContent) {
-        window.styleConfigManager.loadConfigListContent();
-      }
-
-      console.log('[Style Config Fix] 强制显示完成');
-    } catch (error) {
-      console.error('[Style Config Fix] 强制显示失败:', error);
-    }
-  };
-
   console.log('[Style Config Manager] 样式配置管理器模块加载完成');
-  console.log('[Style Config Manager] 💡 使用 debugStyleConfig() 函数进行调试');
+
+  // 添加全局修复函数
+  // @ts-ignore - 添加全局函数
+  window.fixStyleConfigManager = async function () {
+    console.log('[Style Config Manager] 🔧 开始修复样式配置管理器...');
+
+    try {
+      // 如果实例存在，尝试重新初始化
+      if (window.styleConfigManager) {
+        const success = await window.styleConfigManager.forceReinitialize();
+        if (success) {
+          console.log('[Style Config Manager] ✅ 修复成功');
+          return true;
+        }
+      }
+
+      // 如果重新初始化失败，创建新实例
+      console.log('[Style Config Manager] 创建新的样式配置管理器实例...');
+      window.styleConfigManager = new StyleConfigManager();
+
+      // 等待初始化完成
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('[Style Config Manager] ✅ 新实例创建成功');
+      return true;
+    } catch (error) {
+      console.error('[Style Config Manager] ❌ 修复失败:', error);
+      return false;
+    }
+  };
+
+  console.log('[Style Config Manager] 💡 可用的修复命令:');
+  console.log('  - fixStyleConfigManager() - 修复样式配置管理器');
 } // 结束 if (typeof window.StyleConfigManager === 'undefined') 检查

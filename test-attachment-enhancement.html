@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>附件发送功能增强测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        .error {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <h1>📎 附件发送功能增强测试</h1>
+    
+    <div class="test-container">
+        <h2>功能说明</h2>
+        <p>本次增强为附件发送弹窗添加了以下功能：</p>
+        <ul>
+            <li>✅ 在发送附件时添加指导文本："请按照线上聊天私聊（群聊）消息中的要求和格式生成角色回复，回复需要符合角色人设和当前剧情"</li>
+            <li>✅ 新增附加消息输入框，用户可以输入额外的文本消息</li>
+            <li>✅ 支持换行分割，每行作为单独的消息发送</li>
+            <li>✅ 使用正确的消息格式：[我方消息|好友名|好友ID|文字|用户输入内容]</li>
+            <li>✅ 保持原有附件发送逻辑不变</li>
+        </ul>
+    </div>
+
+    <div class="test-container">
+        <h2>测试消息构建逻辑</h2>
+        <p>输入测试数据来验证消息构建逻辑：</p>
+        
+        <div style="margin-bottom: 15px;">
+            <label>好友名称：</label>
+            <input type="text" id="friendName" value="秦倦" style="margin-left: 10px; padding: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>好友ID：</label>
+            <input type="text" id="friendId" value="500002" style="margin-left: 10px; padding: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>是否群聊：</label>
+            <input type="checkbox" id="isGroup" style="margin-left: 10px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>附件文件名：</label>
+            <input type="text" id="fileName" value="IMG_1160(20250821-022207).PNG" style="margin-left: 10px; padding: 5px; width: 300px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>附加消息内容：</label>
+            <textarea id="additionalMessages" placeholder="输入附加消息内容，支持多行...">这是第一条消息
+这是第二条消息
+这是第三条消息</textarea>
+        </div>
+        
+        <button onclick="testMessageBuilding()">🧪 测试消息构建</button>
+        
+        <div id="testResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>预期输出示例</h2>
+        <div class="test-result">
+向秦倦（500002）发送消息
+
+请按照线上聊天私聊消息中的要求和格式生成角色回复，回复需要符合角色人设和当前剧情
+
+[我方消息|秦倦|500002|文字|这是第一条消息]
+[我方消息|秦倦|500002|文字|这是第二条消息]
+[我方消息|秦倦|500002|文字|这是第三条消息]
+
+[我方消息|秦倦|500002|附件|图片: IMG_1160(20250821-022207).PNG]
+        </div>
+    </div>
+
+    <script>
+        function testMessageBuilding() {
+            const friendName = document.getElementById('friendName').value;
+            const friendId = document.getElementById('friendId').value;
+            const isGroup = document.getElementById('isGroup').checked;
+            const fileName = document.getElementById('fileName').value;
+            const additionalMessages = document.getElementById('additionalMessages').value;
+            
+            // 模拟attachment-sender的消息构建逻辑
+            let messageContent = '';
+            
+            if (isGroup) {
+                messageContent = `向${friendName}（${friendId}）发送群聊消息\n\n`;
+                messageContent += `请按照线上聊天群聊消息中的要求和格式生成角色回复，回复需要符合角色人设和当前剧情\n\n`;
+            } else {
+                messageContent = `向${friendName}（${friendId}）发送消息\n\n`;
+                messageContent += `请按照线上聊天私聊消息中的要求和格式生成角色回复，回复需要符合角色人设和当前剧情\n\n`;
+            }
+            
+            // 处理附加消息
+            if (additionalMessages && additionalMessages.trim()) {
+                const messageLines = additionalMessages.split('\n').filter(line => line.trim());
+                
+                for (const line of messageLines) {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        messageContent += `[我方消息|${friendName}|${friendId}|文字|${trimmedLine}]\n`;
+                    }
+                }
+                messageContent += '\n';
+            }
+            
+            // 添加附件信息
+            const isImage = fileName.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp|bmp)$/);
+            if (isImage) {
+                messageContent += `[我方消息|${friendName}|${friendId}|附件|图片: ${fileName}]`;
+            } else {
+                messageContent += `[我方消息|${friendName}|${friendId}|附件|附件: ${fileName}]`;
+            }
+            
+            // 显示结果
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.textContent = messageContent;
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result success';
+            
+            console.log('构建的消息内容:', messageContent);
+        }
+        
+        // 页面加载时自动运行一次测试
+        window.onload = function() {
+            testMessageBuilding();
+        };
+    </script>
+</body>
+</html>
