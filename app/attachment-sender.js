@@ -375,7 +375,7 @@ if (typeof window !== 'undefined') {
     }
 
     // 发送附件消息到SillyTavern聊天
-    async sendAttachmentMessage(uploadResult) {
+    async sendAttachmentMessage(uploadResult, additionalMessages = '') {
       console.log('[AttachmentSender] 🔍 开始发送附件消息');
       console.log('[AttachmentSender] 🔍 当前聊天对象:', {
         target: this.currentChatTarget,
@@ -404,20 +404,32 @@ if (typeof window !== 'undefined') {
         if (this.isCurrentChatGroup) {
           // 群聊格式
           messageContent = `向${this.currentChatName}（${this.currentChatTarget}）发送群聊消息\n\n`;
+          messageContent += `请按照线上聊天群聊消息中的要求和格式生成角色回复，回复需要符合角色人设和当前剧情\n\n`;
         } else {
           // 私聊格式
           messageContent = `向${this.currentChatName}（${this.currentChatTarget}）发送消息\n\n`;
+          messageContent += `请按照线上聊天私聊消息中的要求和格式生成角色回复，回复需要符合角色人设和当前剧情\n\n`;
+        }
+
+        // 处理用户输入的附加消息
+        if (additionalMessages && additionalMessages.trim()) {
+          console.log('[AttachmentSender] 🔍 处理附加消息:', additionalMessages);
+          const messageLines = additionalMessages.split('\n').filter(line => line.trim());
+
+          for (const line of messageLines) {
+            const trimmedLine = line.trim();
+            if (trimmedLine) {
+              messageContent += `[我方消息|${this.currentChatName}|${this.currentChatTarget}|文字|${trimmedLine}]\n`;
+            }
+          }
+          messageContent += '\n';
         }
 
         // 根据文件类型添加不同的消息格式 - 使用message-app能解析的格式
         if (category === 'image') {
-          messageContent += `[我方消息|${this.currentChatName}|${this.currentChatTarget}|附件|图片: ${
-            uploadResult.fileName
-          }]`;
+          messageContent += `[我方消息|${this.currentChatName}|${this.currentChatTarget}|附件|图片: ${uploadResult.fileName}]`;
         } else {
-          messageContent += `[我方消息|${this.currentChatName}|${this.currentChatTarget}|附件|附件: ${
-            uploadResult.fileName
-          } (${fileSize})]`;
+          messageContent += `[我方消息|${this.currentChatName}|${this.currentChatTarget}|附件|附件: ${uploadResult.fileName} (${fileSize})]`;
         }
 
         console.log('[AttachmentSender] 🔍 构建的消息内容:', messageContent);
@@ -882,7 +894,7 @@ if (typeof window !== 'undefined') {
             friendName,
             friendId,
             fileName,
-            fullMatch
+            fullMatch,
           });
 
           // 构建图片URL
@@ -905,7 +917,7 @@ if (typeof window !== 'undefined') {
             friendId,
             fileName,
             actualFileName,
-            imageUrl
+            imageUrl,
           });
         }
 
@@ -959,9 +971,10 @@ if (typeof window !== 'undefined') {
           console.log(`[AttachmentSender] 🔍 检查图片:`, src);
 
           // 检查是否是同一个好友的图片目录
-          if (src.includes(`/user/images/${encodeURIComponent(friendName)}/`) ||
-              src.includes(`/user/images/${friendName}/`)) {
-
+          if (
+            src.includes(`/user/images/${encodeURIComponent(friendName)}/`) ||
+            src.includes(`/user/images/${friendName}/`)
+          ) {
             const urlParts = src.split('/');
             const fileName = urlParts[urlParts.length - 1];
 
@@ -979,7 +992,8 @@ if (typeof window !== 'undefined') {
         // 方法2: 从SillyTavern消息数据中查找
         if (window.chat && Array.isArray(window.chat)) {
           console.log(`[AttachmentSender] 🔍 从SillyTavern聊天数据查找...`);
-          for (const message of window.chat.slice(-10)) { // 检查最近10条消息
+          for (const message of window.chat.slice(-10)) {
+            // 检查最近10条消息
             if (message.extra && message.extra.image) {
               const imagePath = message.extra.image;
               console.log(`[AttachmentSender] 🔍 检查消息图片:`, imagePath);
@@ -994,19 +1008,23 @@ if (typeof window !== 'undefined') {
         }
 
         // 方法3: 检查页面中最新的图片（按时间戳）
-        const allImages = Array.from(existingImages).map(img => {
-          const src = img.src;
-          const fileName = src.split('/').pop();
-          const timestampMatch = fileName.match(/(\d{13})/); // 匹配13位时间戳
-          return {
-            src,
-            fileName,
-            timestamp: timestampMatch ? parseInt(timestampMatch[1]) : 0
-          };
-        }).filter(item =>
-          item.src.includes(`/user/images/${encodeURIComponent(friendName)}/`) ||
-          item.src.includes(`/user/images/${friendName}/`)
-        ).sort((a, b) => b.timestamp - a.timestamp); // 按时间戳降序排列
+        const allImages = Array.from(existingImages)
+          .map(img => {
+            const src = img.src;
+            const fileName = src.split('/').pop();
+            const timestampMatch = fileName.match(/(\d{13})/); // 匹配13位时间戳
+            return {
+              src,
+              fileName,
+              timestamp: timestampMatch ? parseInt(timestampMatch[1]) : 0,
+            };
+          })
+          .filter(
+            item =>
+              item.src.includes(`/user/images/${encodeURIComponent(friendName)}/`) ||
+              item.src.includes(`/user/images/${friendName}/`),
+          )
+          .sort((a, b) => b.timestamp - a.timestamp); // 按时间戳降序排列
 
         if (allImages.length > 0) {
           const newestImage = allImages[0];
@@ -1017,7 +1035,6 @@ if (typeof window !== 'undefined') {
         // 备用方案：使用原始文件名
         console.warn(`[AttachmentSender] ⚠️ 无法找到真实文件名，使用原始ID:`, fileId);
         return fileId.includes('.') ? fileId : `${fileId}.png`;
-
       } catch (error) {
         console.error(`[AttachmentSender] ❌ 查找真实文件名失败:`, error);
         return fileId.includes('.') ? fileId : `${fileId}.png`;
@@ -1025,8 +1042,9 @@ if (typeof window !== 'undefined') {
     }
 
     // 处理文件选择
-    async handleFileSelection(files) {
+    async handleFileSelection(files, additionalMessages = '') {
       console.log('[AttachmentSender] 🔍 开始处理文件选择，文件数量:', files.length);
+      console.log('[AttachmentSender] 🔍 附加消息:', additionalMessages);
       const results = [];
 
       for (const file of files) {
@@ -1058,7 +1076,7 @@ if (typeof window !== 'undefined') {
         if (uploadResult.success) {
           // 发送消息
           console.log('[AttachmentSender] 🔍 开始发送附件消息...');
-          const sendSuccess = await this.sendAttachmentMessage(uploadResult);
+          const sendSuccess = await this.sendAttachmentMessage(uploadResult, additionalMessages);
           console.log('[AttachmentSender] 🔍 消息发送结果:', sendSuccess);
 
           results.push({
@@ -1312,7 +1330,7 @@ if (typeof window !== 'undefined') {
   console.log('  - testImageMessageParsing() - 测试新的图片消息解析功能');
 
   // 🌟 新增：测试新的图片消息解析功能
-  window.testImageMessageParsing = function(testMessage = '[我方消息|络络|555555|附件|图片: 760e7464a688a0bb.png]') {
+  window.testImageMessageParsing = function (testMessage = '[我方消息|络络|555555|附件|图片: 760e7464a688a0bb.png]') {
     console.log('[AttachmentSender] 🧪 开始测试图片消息解析功能...');
 
     if (!window.attachmentSender) {
@@ -1323,7 +1341,7 @@ if (typeof window !== 'undefined') {
     try {
       console.log('[AttachmentSender] 🧪 测试输入:', testMessage);
 
-            // 测试解析功能
+      // 测试解析功能
       const result = window.attachmentSender.parseImageMessageFormat(testMessage);
       console.log('[AttachmentSender] 🧪 解析结果:', result);
 
@@ -1340,26 +1358,26 @@ if (typeof window !== 'undefined') {
         originalMessage: testMessage,
         parsedResult: result,
         serverUrl: serverUrl,
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
       };
     } catch (error) {
       console.error('[AttachmentSender] 🧪 测试失败:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   };
 
   // 🌟 新增：批量测试多种图片消息格式
-  window.testMultipleImageFormats = function() {
+  window.testMultipleImageFormats = function () {
     console.log('[AttachmentSender] 🧪 开始批量测试多种图片消息格式...');
 
     const testCases = [
       '[我方消息|络络|555555|附件|图片: 760e7464a688a0bb.png]',
       '[我方消息|Alice|123456|附件|图片: image123.jpg]',
       '[我方消息|测试用户|999999|附件|图片: test_image_2024.png]',
-      '这是一段包含多个图片的文本 [我方消息|用户1|111|附件|图片: pic1.png] 以及 [我方消息|用户2|222|附件|图片: pic2.jpg] 的消息'
+      '这是一段包含多个图片的文本 [我方消息|用户1|111|附件|图片: pic1.png] 以及 [我方消息|用户2|222|附件|图片: pic2.jpg] 的消息',
     ];
 
     const results = [];
@@ -1372,7 +1390,7 @@ if (typeof window !== 'undefined') {
       results.push({
         testCase: i + 1,
         input: testCase,
-        result: result
+        result: result,
       });
     }
 

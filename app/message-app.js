@@ -3466,6 +3466,16 @@ if (typeof window.MessageApp === 'undefined') {
                     <div id="attachment-file-list" style="max-height: 200px; overflow-y: auto;"></div>
                 </div>
 
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">附加消息（可选）：</h4>
+                    <textarea id="attachment-message-input" placeholder="输入要一起发送的消息内容，支持换行发送多条消息..."
+                              style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical; font-size: 14px; font-family: inherit; box-sizing: border-box;"
+                              maxlength="1000"></textarea>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                        提示：每行内容将作为单独的消息发送，最多1000字符
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button onclick="this.parentElement.parentElement.parentElement.remove()"
                             style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px; background: #f8f9fa; color: #333; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
@@ -3541,13 +3551,19 @@ if (typeof window.MessageApp === 'undefined') {
             return;
           }
 
+          // 获取附加消息内容
+          const messageInput = panel.querySelector('#attachment-message-input');
+          const additionalMessages = messageInput ? messageInput.value.trim() : '';
+          console.log('[Message App] 🔍 附加消息内容:', additionalMessages);
+
           sendBtn.disabled = true;
           sendBtn.textContent = '发送中...';
           sendBtn.style.background = '#6c757d';
 
           try {
             console.log('[Message App] 🔍 开始处理文件选择...');
-            const results = await window.attachmentSender.handleFileSelection(selectedFiles);
+            // 将附加消息传递给attachmentSender
+            const results = await window.attachmentSender.handleFileSelection(selectedFiles, additionalMessages);
             console.log('[Message App] 🔍 文件处理结果:', results);
 
             // 检查结果
