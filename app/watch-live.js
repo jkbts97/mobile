@@ -718,6 +718,8 @@ if (typeof window.WatchLiveApp === 'undefined') {
       this.isTyping = false; // 是否正在打字机效果
       this.pendingAppearDanmakuSigs = new Set(); // 待逐条出现的弹幕签名
       this.pendingAppearGiftSigs = new Set(); // 待逐条出现的礼物签名
+      this.saveTimeout = null;
+      this.saveDebounceMs = 2000; // 2秒防抖
 
       this.init();
     }
@@ -851,15 +853,30 @@ if (typeof window.WatchLiveApp === 'undefined') {
         // 转换历史弹幕格式
         await this.convertLiveToHistory();
 
-        // 更新状态
+        // 完全重置状态，确保下次进入时是全新状态
         this.stateManager.endLive();
+        this.stateManager.clearAllData(); // 清空所有数据
         this.currentView = 'start';
+
+        // 重置其他状态
+        this.isInitialized = false; // 重置初始化状态
+        this.lastRenderTime = 0;
+
+        // 清理定时器
+        if (this.scrollTimeout) {
+          clearTimeout(this.scrollTimeout);
+          this.scrollTimeout = null;
+        }
+        if (this.typingTimer) {
+          clearInterval(this.typingTimer);
+          this.typingTimer = null;
+        }
 
         // 更新界面
         this.updateAppContent();
 
         this.showToast('已退出直播间', 'success');
-        console.log('[Watch Live App] 已退出直播间');
+        console.log('[Watch Live App] 已退出直播间，状态已完全重置');
       } catch (error) {
         console.error('[Watch Live App] 退出直播间失败:', error);
         this.showToast('退出直播间失败: ' + error.message, 'error');
@@ -1063,25 +1080,7 @@ if (typeof window.WatchLiveApp === 'undefined') {
      * 渲染直播间列表界面
      */
     renderListView() {
-      // 如果正在等待直播间列表，显示加载状态
-      if (this.isWaitingForLiveList) {
-        return `
-          <div class="live-app">
-            <div class="live-list-container">
-              <div class="live-list-header">
-                <button class="back-btn" id="back-to-watch-options">← 返回</button>
-                <h2>当前开播列表</h2>
-              </div>
-
-              <div class="live-rooms-list">
-                <div class="live-loading">正在获取直播间列表...</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      // 解析直播间列表数据
+      // 解析直播间列表数据（无论是否在等待，都先解析现有数据）
       const liveRooms = this.parseLiveRoomList();
 
       const roomsHtml = liveRooms
@@ -1102,6 +1101,28 @@ if (typeof window.WatchLiveApp === 'undefined') {
         )
         .join('');
 
+      // 构建列表内容
+      let listContent = '';
+
+      // 如果有现有直播间，显示它们
+      if (roomsHtml) {
+        listContent = roomsHtml;
+      }
+
+      // 如果正在等待新的直播间列表，添加加载提示
+      if (this.isWaitingForLiveList) {
+        const loadingHtml = `
+          <div class="live-loading-update">
+            <div class="loading-spinner"></div>
+            <span>正在获取更多直播间...</span>
+          </div>
+        `;
+        listContent = listContent ? listContent + loadingHtml : '<div class="live-loading">正在获取直播间列表...</div>';
+      } else if (!roomsHtml) {
+        // 如果没有现有数据且不在等待，显示无数据提示
+        listContent = '<div class="no-rooms">暂无直播间数据，请稍后再试</div>';
+      }
+
       return `
         <div class="live-app">
           <div class="live-list-container">
@@ -1111,7 +1132,7 @@ if (typeof window.WatchLiveApp === 'undefined') {
             </div>
 
             <div class="live-rooms-list">
-              ${roomsHtml || '<div class="no-rooms">暂无直播间数据，请稍后再试</div>'}
+              ${listContent}
             </div>
           </div>
         </div>
@@ -1780,20 +1801,35 @@ if (typeof window.WatchLiveApp === 'undefined') {
       try {
         console.log('[Watch Live App] 请求当前开播列表...');
 
+        // 先切换到列表视图
+        this.currentView = 'list';
+        this.isWaitingForLiveList = false; // 先设为false，立即解析现有内容
+
+        // 立即解析并渲染现有的直播间列表
+        console.log('[Watch Live App] 立即解析现有直播间列表...');
+        this.updateAppContent();
+
+        // 检查是否已有直播间数据
+        const existingRooms = this.parseLiveRoomList();
+        if (existingRooms.length > 0) {
+          console.log(`[Watch Live App] 找到 ${existingRooms.length} 个现有直播间，已立即渲染`);
+        } else {
+          console.log('[Watch Live App] 没有找到现有直播间数据');
+        }
+
+        // 然后发送请求获取新的直播间列表
         const message =
           '用户希望观看直播，请按照正确格式生成5-10个当前可能正在开播的直播间，每个直播间的格式为[直播|直播间名称|主播用户名|直播类别|观看人数]。主播可能是角色，NPC或者是无关路人。每个直播间格式之间需要正确换行';
 
-        // 先切换到列表视图并显示加载状态
-        this.currentView = 'list';
+        // 设置等待状态，准备接收新回复
         this.isWaitingForLiveList = true;
-        this.updateAppContent();
 
         // 开始监听AI回复
         this.eventListener.startListening();
 
         await this.sendToSillyTavern(message);
 
-        console.log('[Watch Live App] 已发送开播列表请求，等待AI回复...');
+        console.log('[Watch Live App] 已发送开播列表请求，等待AI回复以更新列表...');
       } catch (error) {
         console.error('[Watch Live App] 请求开播列表失败:', error);
         this.showToast('请求开播列表失败: ' + error.message, 'error');
@@ -2367,19 +2403,21 @@ if (typeof window.WatchLiveApp === 'undefined') {
      */
     async convertLiveToHistory() {
       try {
-        console.log('[Live App] 开始转换直播格式为直播历史格式');
+        console.log('[Watch Live App] 开始转换直播格式为直播历史格式');
 
         // 获取当前聊天数据
         const contextData = this.getChatData();
         if (!contextData || contextData.length === 0) {
-          console.log('[Live App] 没有找到聊天数据');
+          console.log('[Watch Live App] 没有找到聊天数据');
           return;
         }
 
         // 查找包含直播内容的消息
         let hasLiveContent = false;
         let updatedCount = 0;
+        const messagesToUpdate = []; // 收集需要更新的消息
 
+        // 第一遍：收集所有需要转换的消息
         for (let i = 0; i < contextData.length; i++) {
           const message = contextData[i];
           const content = message.mes || message.content || '';
@@ -2390,31 +2428,65 @@ if (typeof window.WatchLiveApp === 'undefined') {
             const convertedContent = this.convertLiveFormats(content);
 
             if (convertedContent !== content) {
-              // 尝试通过编辑器功能更新消息
-              const success = await this.updateMessageContent(i, convertedContent);
-              if (success) {
-                updatedCount++;
-                console.log(
-                  `[Live App] 已转换消息 ${i}，原始长度: ${content.length}，转换后长度: ${convertedContent.length}`,
-                );
-              }
+              messagesToUpdate.push({
+                index: i,
+                originalContent: content,
+                convertedContent: convertedContent
+              });
             }
           }
         }
 
         if (!hasLiveContent) {
-          console.log('[Live App] 没有找到需要转换的直播内容');
-        } else {
-          console.log(`[Live App] 直播格式转换完成，共更新了 ${updatedCount} 条消息`);
+          console.log('[Watch Live App] 没有找到需要转换的直播内容');
+          return;
+        }
 
-          // 保存聊天数据
-          if (updatedCount > 0) {
-            await this.saveChatData();
-            console.log('[Live App] 转换完成并已保存聊天数据');
+        // 第二遍：批量更新消息，减少频繁的DOM操作和保存
+        console.log(`[Watch Live App] 开始批量更新 ${messagesToUpdate.length} 条消息`);
+
+        // 临时禁用自动保存机制，避免每次更新都触发保存
+        const originalSaveChatDebounced = window.saveChatDebounced;
+        const originalSaveChatConditional = window.saveChatConditional;
+
+        // 临时替换为空函数
+        if (window.saveChatDebounced) {
+          window.saveChatDebounced = () => {};
+        }
+        if (window.saveChatConditional) {
+          window.saveChatConditional = () => Promise.resolve();
+        }
+
+        try {
+          for (const messageUpdate of messagesToUpdate) {
+            // 批量处理时跳过自动保存，避免频繁保存
+            const success = await this.updateMessageContent(messageUpdate.index, messageUpdate.convertedContent, true);
+            if (success) {
+              updatedCount++;
+              console.log(
+                `[Watch Live App] 已转换消息 ${messageUpdate.index}，原始长度: ${messageUpdate.originalContent.length}，转换后长度: ${messageUpdate.convertedContent.length}`,
+              );
+            }
+          }
+        } finally {
+          // 恢复原始的保存函数
+          if (originalSaveChatDebounced) {
+            window.saveChatDebounced = originalSaveChatDebounced;
+          }
+          if (originalSaveChatConditional) {
+            window.saveChatConditional = originalSaveChatConditional;
           }
         }
+
+        console.log(`[Watch Live App] 直播格式转换完成，共更新了 ${updatedCount} 条消息`);
+
+        // 只在最后保存一次聊天数据，避免频繁保存导致卡顿
+        if (updatedCount > 0) {
+          await this.saveChatData();
+          console.log('[Watch Live App] 转换完成并已保存聊天数据');
+        }
       } catch (error) {
-        console.error('[Live App] 转换直播格式失败:', error);
+        console.error('[Watch Live App] 转换直播格式失败:', error);
         this.showToast('转换直播格式失败: ' + error.message, 'error');
       }
     }
@@ -2494,24 +2566,58 @@ if (typeof window.WatchLiveApp === 'undefined') {
         }
       }
 
-      if (conversionCount > 0) {
-        console.log(`[Live App] 转换了 ${conversionCount} 个直播格式`);
-      }
+      // 移除单个消息转换的日志，避免批量处理时重复输出
+      // if (conversionCount > 0) {
+      //   console.log(`[Watch Live App] 转换了 ${conversionCount} 个直播格式`);
+      // }
 
       return convertedContent;
     }
 
     /**
      * 更新消息内容
+     * @param {number} messageIndex - 消息索引
+     * @param {string} newContent - 新内容
+     * @param {boolean} skipAutoSave - 是否跳过自动保存（用于批量处理）
      */
-    async updateMessageContent(messageIndex, newContent) {
+    async updateMessageContent(messageIndex, newContent, skipAutoSave = false) {
       try {
-        console.log(`[Live App] 正在更新消息 ${messageIndex}:`, newContent.substring(0, 100) + '...');
+        // 简化日志输出，避免批量处理时过多日志
+        console.log(`[Watch Live App] 正在更新消息 ${messageIndex}`);
 
-        // 方法1: 使用全局chat数组直接更新
-        const chat = window['chat'];
-        if (chat && Array.isArray(chat) && chat[messageIndex]) {
-          const originalContent = chat[messageIndex].mes;
+        // 方法1: 使用与getChatData相同的方法获取chat数组（推荐，不会触发自动保存）
+        let chat = null;
+
+        // 优先使用SillyTavern.getContext().chat
+        if (
+          typeof window !== 'undefined' &&
+          window.SillyTavern &&
+          typeof window.SillyTavern.getContext === 'function'
+        ) {
+          const context = window.SillyTavern.getContext();
+          if (context && context.chat && Array.isArray(context.chat)) {
+            chat = context.chat;
+          }
+        }
+
+        // 如果上面的方法失败，尝试从全局变量获取
+        if (!chat) {
+          chat = window['chat'];
+        }
+
+        if (chat && Array.isArray(chat)) {
+          // 添加边界检查
+          if (messageIndex < 0 || messageIndex >= chat.length) {
+            console.warn(`[Watch Live App] 消息索引 ${messageIndex} 超出范围，chat数组长度: ${chat.length}`);
+            return false;
+          }
+
+          if (!chat[messageIndex]) {
+            console.warn(`[Watch Live App] 消息索引 ${messageIndex} 处的消息不存在`);
+            return false;
+          }
+
+          const originalContent = chat[messageIndex].mes || '';
           chat[messageIndex].mes = newContent;
 
           // 如果消息有swipes，也需要更新
@@ -2525,29 +2631,44 @@ if (typeof window.WatchLiveApp === 'undefined') {
           }
 
           console.log(
-            `[Live App] 已更新消息 ${messageIndex}，原内容长度:${originalContent.length}，新内容长度:${newContent.length}`,
+            `[Watch Live App] 已更新消息 ${messageIndex}，原内容长度:${originalContent.length}，新内容长度:${newContent.length}`,
           );
           return true;
         }
 
-        // 方法2: 尝试通过编辑器功能更新
+        // 添加调试信息
+        console.warn(`[Watch Live App] 无法访问chat数组，chat类型: ${typeof chat}, 是否为数组: ${Array.isArray(chat)}`);
+        if (chat && Array.isArray(chat)) {
+          console.warn(`[Watch Live App] chat数组长度: ${chat.length}, 请求的消息索引: ${messageIndex}`);
+        }
+
+        // 如果直接方法失败，尝试备用方法（即使在批量处理时也要尝试）
+        // 方法2: 尝试通过编辑器功能更新（可能会触发自动保存）
         if (window.mobileContextEditor && window.mobileContextEditor.modifyMessage) {
-          await window.mobileContextEditor.modifyMessage(messageIndex, newContent);
-          console.log(`[Live App] 已通过mobileContextEditor更新消息 ${messageIndex}`);
-          return true;
+          try {
+            await window.mobileContextEditor.modifyMessage(messageIndex, newContent);
+            console.log(`[Watch Live App] 已通过mobileContextEditor更新消息 ${messageIndex}`);
+            return true;
+          } catch (error) {
+            console.warn(`[Watch Live App] mobileContextEditor更新失败:`, error);
+          }
         }
 
-        // 方法3: 尝试通过context-editor更新
+        // 方法3: 尝试通过context-editor更新（可能会触发自动保存）
         if (window.contextEditor && window.contextEditor.modifyMessage) {
-          await window.contextEditor.modifyMessage(messageIndex, newContent);
-          console.log(`[Live App] 已通过contextEditor更新消息 ${messageIndex}`);
-          return true;
+          try {
+            await window.contextEditor.modifyMessage(messageIndex, newContent);
+            console.log(`[Watch Live App] 已通过contextEditor更新消息 ${messageIndex}`);
+            return true;
+          } catch (error) {
+            console.warn(`[Watch Live App] contextEditor更新失败:`, error);
+          }
         }
 
-        console.warn('[Live App] 没有找到有效的消息更新方法');
+        console.warn('[Watch Live App] 没有找到有效的消息更新方法');
         return false;
       } catch (error) {
-        console.error('[Live App] 更新消息内容失败:', error);
+        console.error('[Watch Live App] 更新消息内容失败:', error);
         return false;
       }
     }
@@ -2656,8 +2777,8 @@ if (typeof window.WatchLiveApp === 'undefined') {
     updateHeader() {
       if (window.mobilePhone && window.mobilePhone.updateAppHeader) {
         const state = {
-          app: 'live',
-          title: this.currentView === 'live' ? '直播中' : '直播',
+          app: 'watch-live', // 修复：使用正确的应用名称
+          title: this.currentView === 'live' ? '观看直播中' : '观看直播',
           view: this.currentView,
           viewerCount: this.stateManager.currentViewerCount,
         };
@@ -2879,7 +3000,7 @@ if (typeof window.WatchLiveApp === 'undefined') {
     sequentialReveal(nodes) {
       if (!nodes || nodes.length === 0) return;
 
-      // 初始状态（先隐藏，避免“跳一下”），随后统一交由 CSS 过渡
+      // 初始状态（先隐藏，避免"跳一下"），随后统一交由 CSS 过渡
       nodes.forEach(el => {
         el.classList.remove('need-appear', 'appear-show');
         el.classList.add('appear-init');
@@ -2905,6 +3026,17 @@ if (typeof window.WatchLiveApp === 'undefined') {
           }
         }, baseDelay + idx * stepDelay);
       });
+    }
+
+    async debouncedSave() {
+      if (this.saveTimeout) {
+        clearTimeout(this.saveTimeout);
+      }
+
+      this.saveTimeout = setTimeout(async () => {
+        await this.saveChatData();
+        this.saveTimeout = null;
+      }, this.saveDebounceMs);
     }
   }
 

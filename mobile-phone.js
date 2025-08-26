@@ -12,6 +12,19 @@ class MobilePhone {
     this.currentAppState = null; // 当前应用状态
     this.dragHelper = null; // 拖拽辅助器（按钮）
     this.frameDragHelper = null; // 框架拖拽辅助器
+
+    // 防抖相关标记
+    this._openingApp = null;
+    this._goingHome = false;
+    this._returningToApp = null;
+    this._lastAppIconClick = 0;
+    this._lastBackButtonClick = 0;
+
+    // 应用加载状态管理
+    this._loadingApps = new Set(); // 正在加载的应用
+    this._userNavigationIntent = null; // 用户导航意图
+    this._loadingStartTime = {}; // 应用加载开始时间
+
     this.init();
   }
 
@@ -237,7 +250,7 @@ class MobilePhone {
                                             <span class="app-label">论坛</span>
                                         </div>
                                         <div class="app-icon" data-app="weibo">
-                                            <div class="app-icon-bg orange"></div>
+                                            <div class="app-icon-bg orange" style="font-size: 22px;color:rgba(0,0,0,0.4)">微</div>
                                             <span class="app-label">微博</span>
                                         </div>
                                         <div class="app-icon" data-app="live">
@@ -252,7 +265,7 @@ class MobilePhone {
                                             <span class="app-label">背包</span>
                                         </div>
                                         <div class="app-icon" data-app="api">
-                                            <div class="app-icon-bg orange"></div>
+                                            <div class="app-icon-bg orange" style="font-size: 22px;color:rgba(0,0,0,0.4)">AI</div>
                                             <span class="app-label">API</span>
                                         </div>
                                         <div class="app-icon" data-app="settings">
@@ -336,6 +349,13 @@ class MobilePhone {
 
     // 返回按钮
     document.getElementById('back-button').addEventListener('click', () => {
+      // 防抖：避免快速连续点击返回按钮
+      if (this._lastBackButtonClick && Date.now() - this._lastBackButtonClick < 300) {
+        console.log('[Mobile Phone] 防抖：返回按钮点击过快，跳过');
+        return;
+      }
+      this._lastBackButtonClick = Date.now();
+
       this.handleBackButton();
     });
 
@@ -343,6 +363,14 @@ class MobilePhone {
     document.querySelectorAll('.app-icon').forEach(icon => {
       icon.addEventListener('click', e => {
         const appName = e.currentTarget.getAttribute('data-app');
+
+        // 防抖：避免快速连续点击
+        if (this._lastAppIconClick && Date.now() - this._lastAppIconClick < 300) {
+          console.log('[Mobile Phone] 防抖：应用图标点击过快，跳过:', appName);
+          return;
+        }
+        this._lastAppIconClick = Date.now();
+
         this.openApp(appName);
       });
     });
@@ -351,6 +379,11 @@ class MobilePhone {
   // 处理返回按钮
   handleBackButton() {
     console.log('=== [Mobile Phone] 返回按钮处理开始 ===');
+
+    // 清除用户导航意图（用户主动返回）
+    this._userNavigationIntent = null;
+    console.log('[Mobile Phone] 已清除用户导航意图');
+
     console.log('[Mobile Phone] 当前应用栈长度:', this.appStack.length);
     console.log('[Mobile Phone] 当前应用栈:', JSON.stringify(this.appStack, null, 2));
     console.log('[Mobile Phone] 当前应用状态:', JSON.stringify(this.currentAppState, null, 2));
@@ -1068,16 +1101,69 @@ class MobilePhone {
         }
       });
       headerRight.appendChild(endBtn);
+    } else if (state.app === 'watch-live') {
+      // 观看直播应用：右侧显示 观看人数、退出直播间
+      // 观看人数徽标
+      const viewerBadge = document.createElement('div');
+      viewerBadge.className = 'viewer-count';
+      viewerBadge.title = '本场人数';
+      viewerBadge.innerHTML = `<i class="fas fa-user-friends"></i><span class="viewer-count-num">${
+        state.viewerCount || '-'
+      }</span>`;
+      headerRight.appendChild(viewerBadge);
+
+      // 退出直播间按钮
+      const exitBtn = document.createElement('button');
+      exitBtn.className = 'app-header-btn end-stream-btn';
+      exitBtn.title = '退出直播间';
+      exitBtn.innerHTML = '⏻';
+      exitBtn.addEventListener('click', () => {
+        if (window.watchLiveAppEndLive) {
+          window.watchLiveAppEndLive();
+        }
+      });
+      headerRight.appendChild(exitBtn);
     }
   }
 
   // 添加应用状态到栈
   pushAppState(state) {
+    if (!state || !state.app) {
+      console.warn('[Mobile Phone] 推送状态无效，跳过:', state);
+      return;
+    }
+
+    // 检查是否与当前状态相同，避免重复推送
+    const currentState = this.currentAppState;
+    if (currentState && this.isSameAppState(currentState, state)) {
+      console.log('[Mobile Phone] 状态相同，跳过重复推送:', JSON.stringify(state, null, 2));
+      return;
+    }
+
+    // 检查是否与栈顶状态相同
+    const topState = this.appStack[this.appStack.length - 1];
+    if (topState && this.isSameAppState(topState, state)) {
+      console.log('[Mobile Phone] 与栈顶状态相同，跳过重复推送:', JSON.stringify(state, null, 2));
+      return;
+    }
+
     console.log('[Mobile Phone] 推送应用状态:', JSON.stringify(state, null, 2));
     this.appStack.push(state);
     this.currentAppState = state;
+    this.currentApp = state.app; // 确保同步
     this.updateAppHeader(state);
     console.log('[Mobile Phone] 推送后应用栈长度:', this.appStack.length);
+  }
+
+  // 比较两个应用状态是否相同
+  isSameAppState(state1, state2) {
+    if (!state1 || !state2) return false;
+
+    return state1.app === state2.app &&
+           state1.view === state2.view &&
+           state1.friendId === state2.friendId &&
+           state1.threadId === state2.threadId &&
+           state1.title === state2.title;
   }
 
   // 刷新消息列表
@@ -1444,39 +1530,196 @@ class MobilePhone {
 
   // 打开应用
   openApp(appName) {
-    const app = this.apps[appName];
-    if (!app) return;
-
-    this.currentApp = appName;
-
-    // 创建应用状态
-    const appState = {
-      app: appName,
-      title: app.name,
-      view: appName === 'messages' ? 'messageList' : 'main', // 消息应用直接设为messageList
-    };
-
-    // 清空应用栈并添加新状态
-    this.appStack = [appState];
-    this.currentAppState = appState;
-    this.updateAppHeader(appState);
-
-    // 处理自定义应用
-    if (app.isCustomApp && app.customHandler) {
-      app.customHandler();
-    } else {
-      document.getElementById('app-content').innerHTML = app.content;
+    // 防抖检查：如果正在处理相同应用的打开操作，直接返回
+    if (this._openingApp === appName) {
+      console.log('[Mobile Phone] 防抖：正在打开相同应用，跳过重复操作:', appName);
+      return;
     }
 
-    // 显示应用界面，隐藏主界面
-    document.getElementById('home-screen').style.display = 'none';
-    document.getElementById('app-screen').style.display = 'block';
+    const app = this.apps[appName];
+    if (!app) {
+      console.warn('[Mobile Phone] 应用不存在:', appName);
+      return;
+    }
 
-    // 添加动画效果
-    document.getElementById('app-screen').classList.add('slide-in');
+    // 检查是否已经在目标应用的主界面
+    if (this.currentApp === appName &&
+        this.currentAppState &&
+        this.currentAppState.app === appName &&
+        this.isAppRootPage(this.currentAppState)) {
+      console.log('[Mobile Phone] 已在目标应用主界面，跳过重复打开:', appName);
+      return;
+    }
+
+    // 记录用户导航意图
+    this._userNavigationIntent = {
+      targetApp: appName,
+      timestamp: Date.now(),
+      fromApp: this.currentApp
+    };
+
+    // 设置防抖标记
+    this._openingApp = appName;
+
+    try {
+      console.log('[Mobile Phone] 打开应用:', appName);
+
+      // 检查是否是需要异步加载的应用
+      const needsAsyncLoading = ['forum', 'weibo', 'api'].includes(appName);
+
+      if (needsAsyncLoading) {
+        // 显示加载状态
+        this.showAppLoadingState(appName, app.name);
+        // 标记应用正在加载
+        this._loadingApps.add(appName);
+        this._loadingStartTime[appName] = Date.now();
+      }
+
+      this.currentApp = appName;
+
+      // 创建应用状态
+      const appState = {
+        app: appName,
+        title: app.name,
+        view: appName === 'messages' ? 'messageList' : 'main', // 消息应用直接设为messageList
+      };
+
+      // 清空应用栈并添加新状态
+      this.appStack = [appState];
+      this.currentAppState = appState;
+      this.updateAppHeader(appState);
+
+      // 处理自定义应用
+      if (app.isCustomApp && app.customHandler) {
+        app.customHandler();
+      } else {
+        document.getElementById('app-content').innerHTML = app.content;
+      }
+
+      // 显示应用界面，隐藏主界面
+      document.getElementById('home-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+
+      // 添加动画效果
+      document.getElementById('app-screen').classList.add('slide-in');
+      setTimeout(() => {
+        document.getElementById('app-screen').classList.remove('slide-in');
+      }, 300);
+
+    } finally {
+      // 清除防抖标记
+      setTimeout(() => {
+        this._openingApp = null;
+      }, 500); // 500ms后清除防抖标记
+    }
+  }
+
+  // 显示应用加载状态
+  showAppLoadingState(appName, appTitle) {
+    console.log('[Mobile Phone] 显示应用加载状态:', appName);
+
+    const loadingContent = `
+      <div class="app-loading-container">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-text">正在加载 ${appTitle}...</div>
+        <div class="loading-tip">首次加载可能需要几秒钟</div>
+        <div class="loading-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="loading-progress-${appName}"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('app-content').innerHTML = loadingContent;
+
+    // 模拟加载进度
+    this.simulateLoadingProgress(appName);
+  }
+
+  // 模拟加载进度
+  simulateLoadingProgress(appName) {
+    const progressBar = document.getElementById(`loading-progress-${appName}`);
+    if (!progressBar) return;
+
+    let progress = 0;
+    const interval = setInterval(() => {
+      // 如果应用已经加载完成或用户已经切换到其他应用，停止进度条
+      if (!this._loadingApps.has(appName) || this._userNavigationIntent?.targetApp !== appName) {
+        clearInterval(interval);
+        return;
+      }
+
+      progress += Math.random() * 15 + 5; // 随机增加5-20%
+      if (progress > 90) progress = 90; // 最多到90%，等待实际加载完成
+
+      progressBar.style.width = `${progress}%`;
+    }, 200);
+
+    // 10秒后强制停止进度条（防止卡住）
     setTimeout(() => {
-      document.getElementById('app-screen').classList.remove('slide-in');
-    }, 300);
+      clearInterval(interval);
+    }, 10000);
+  }
+
+  // 检查用户导航意图是否仍然有效
+  isUserNavigationIntentValid(appName) {
+    if (!this._userNavigationIntent) return false;
+
+    const intent = this._userNavigationIntent;
+    const now = Date.now();
+
+    // 检查意图是否过期（超过30秒）
+    if (now - intent.timestamp > 30000) {
+      console.log('[Mobile Phone] 用户导航意图已过期:', intent);
+      return false;
+    }
+
+    // 检查目标应用是否匹配
+    if (intent.targetApp !== appName) {
+      console.log('[Mobile Phone] 用户导航意图已改变:', intent.targetApp, '->', appName);
+      return false;
+    }
+
+    // 检查用户是否已经切换到其他应用
+    if (this.currentApp !== appName) {
+      console.log('[Mobile Phone] 用户已切换到其他应用:', this.currentApp, '!==', appName);
+      return false;
+    }
+
+    return true;
+  }
+
+  // 完成应用加载
+  completeAppLoading(appName) {
+    console.log('[Mobile Phone] 完成应用加载:', appName);
+
+    // 移除加载状态
+    this._loadingApps.delete(appName);
+
+    // 记录加载时间
+    if (this._loadingStartTime[appName]) {
+      const loadTime = Date.now() - this._loadingStartTime[appName];
+      console.log(`[Mobile Phone] ${appName} 加载耗时: ${loadTime}ms`);
+      delete this._loadingStartTime[appName];
+    }
+
+    // 检查用户导航意图是否仍然有效
+    if (!this.isUserNavigationIntentValid(appName)) {
+      console.log('[Mobile Phone] 用户导航意图无效，取消强制跳转:', appName);
+      return false; // 不执行跳转
+    }
+
+    // 完成进度条
+    const progressBar = document.getElementById(`loading-progress-${appName}`);
+    if (progressBar) {
+      progressBar.style.width = '100%';
+    }
+
+    console.log('[Mobile Phone] 应用加载完成，用户导航意图有效:', appName);
+    return true; // 可以执行跳转
   }
 
   // 处理论坛应用
@@ -1509,6 +1752,12 @@ class MobilePhone {
         // 清理失败的加载状态
         window._forumAppLoading = null;
         await loadWithTimeout(this.loadForumApp());
+      }
+
+      // 检查用户导航意图是否仍然有效
+      if (!this.completeAppLoading('forum')) {
+        console.log('[Mobile Phone] 论坛应用加载完成，但用户已切换到其他应用，取消渲染');
+        return;
       }
 
       // 获取当前应用状态，如果已经在论坛应用中，不重复推送状态
@@ -1581,6 +1830,10 @@ class MobilePhone {
       console.log('[Mobile Phone] ✅ 论坛应用加载完成');
     } catch (error) {
       console.error('[Mobile Phone] 处理论坛应用失败:', error);
+
+      // 移除加载状态
+      this._loadingApps.delete('forum');
+
       document.getElementById('app-content').innerHTML = `
                 <div class="error-placeholder">
                     <div class="error-icon">❌</div>
@@ -1622,6 +1875,12 @@ class MobilePhone {
         // 清理失败的加载状态
         window._weiboAppLoading = null;
         await loadWithTimeout(this.loadWeiboApp());
+      }
+
+      // 检查用户导航意图是否仍然有效
+      if (!this.completeAppLoading('weibo')) {
+        console.log('[Mobile Phone] 微博应用加载完成，但用户已切换到其他应用，取消渲染');
+        return;
       }
 
       // 获取当前应用状态
@@ -1673,6 +1932,10 @@ class MobilePhone {
       console.log('[Mobile Phone] ✅ 微博应用加载完成');
     } catch (error) {
       console.error('[Mobile Phone] 处理微博应用失败:', error);
+
+      // 移除加载状态
+      this._loadingApps.delete('weibo');
+
       document.getElementById('app-content').innerHTML = `
                 <div class="error-placeholder">
                     <div class="error-icon">❌</div>
@@ -2157,6 +2420,12 @@ class MobilePhone {
         ),
       ]);
 
+      // 检查用户导航意图是否仍然有效
+      if (!this.completeAppLoading('api')) {
+        console.log('[Mobile Phone] API设置应用加载完成，但用户已切换到其他应用，取消渲染');
+        return;
+      }
+
       // 生成统一的API设置面板HTML
       const content = this.getUnifiedApiSettingsHTML();
 
@@ -2178,6 +2447,10 @@ class MobilePhone {
       console.log('[Mobile Phone] ✅ 统一API设置应用加载完成');
     } catch (error) {
       console.error('[Mobile Phone] 处理统一API设置应用失败:', error);
+
+      // 移除加载状态
+      this._loadingApps.delete('api');
+
       document.getElementById('app-content').innerHTML = `
                 <div class="error-placeholder">
                     <div class="error-icon">❌</div>
@@ -4482,7 +4755,7 @@ class MobilePhone {
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+        fontAwesomeLink.href = '';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成（论坛应用）');
           checkComplete();
@@ -4660,7 +4933,7 @@ class MobilePhone {
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+        fontAwesomeLink.href = '';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成');
           checkComplete();
@@ -5376,15 +5649,41 @@ class MobilePhone {
 
   // 返回主界面
   goHome() {
-    console.log('[Mobile Phone] 返回主界面');
-    this.currentApp = null;
-    this.currentAppState = null;
-    this.appStack = []; // 清空应用栈
-    document.getElementById('home-screen').style.display = 'block';
-    document.getElementById('app-screen').style.display = 'none';
+    // 防抖检查：如果正在返回主界面，直接返回
+    if (this._goingHome) {
+      console.log('[Mobile Phone] 防抖：正在返回主界面，跳过重复操作');
+      return;
+    }
 
-    // 停止状态同步，避免无谓轮询
-    this.stopStateSyncLoop();
+    // 如果已经在主界面，直接返回
+    if (!this.currentApp && !this.currentAppState && this.appStack.length === 0) {
+      console.log('[Mobile Phone] 已在主界面，跳过重复操作');
+      return;
+    }
+
+    // 设置防抖标记
+    this._goingHome = true;
+
+    try {
+      console.log('[Mobile Phone] 返回主界面');
+
+      // 清除用户导航意图
+      this._userNavigationIntent = null;
+
+      this.currentApp = null;
+      this.currentAppState = null;
+      this.appStack = []; // 清空应用栈
+      document.getElementById('home-screen').style.display = 'block';
+      document.getElementById('app-screen').style.display = 'none';
+
+      // 停止状态同步，避免无谓轮询
+      this.stopStateSyncLoop();
+    } finally {
+      // 清除防抖标记
+      setTimeout(() => {
+        this._goingHome = false;
+      }, 300);
+    }
   }
 
   // 开始时钟
@@ -5431,11 +5730,29 @@ class MobilePhone {
 
   // 返回到指定应用主界面（通用）
   returnToAppMain(appName) {
+    // 防抖检查：如果正在返回相同应用主界面，直接返回
+    if (this._returningToApp === appName) {
+      console.log('[Mobile Phone] 防抖：正在返回相同应用主界面，跳过重复操作:', appName);
+      return;
+    }
+
+    // 检查是否已经在目标应用的主界面
+    if (this.currentApp === appName &&
+        this.currentAppState &&
+        this.currentAppState.app === appName &&
+        this.isAppRootPage(this.currentAppState)) {
+      console.log('[Mobile Phone] 已在目标应用主界面，跳过重复操作:', appName);
+      return;
+    }
+
     console.log('=== [Mobile Phone] returnToAppMain 开始 ===');
     console.log('[Mobile Phone] 目标应用:', appName);
     console.log('[Mobile Phone] 调用前状态:');
     console.log('  - currentApp:', this.currentApp);
     console.log('  - currentAppState:', JSON.stringify(this.currentAppState, null, 2));
+
+    // 设置防抖标记
+    this._returningToApp = appName;
 
     try {
       // 优先使用已有的专用方法以确保内部状态被完全重置
@@ -5499,6 +5816,11 @@ class MobilePhone {
     } catch (error) {
       console.error('[Mobile Phone] 返回应用主界面失败:', error);
       this.goHome();
+    } finally {
+      // 清除防抖标记
+      setTimeout(() => {
+        this._returningToApp = null;
+      }, 500);
     }
   }
 
@@ -5539,10 +5861,20 @@ class MobilePhone {
   // 启动应用状态同步轮询（将各模块的实际视图同步到 currentAppState）
   startStateSyncLoop() {
     if (this._stateSyncTimer) return; // 已在运行
+
     let lastSignature = '';
+    let syncCount = 0;
+    const maxSyncCount = 10; // 最多同步10次后降低频率
+
     const syncOnce = () => {
       try {
         if (!this.currentAppState || !this.isVisible) return;
+
+        // 如果正在进行应用切换操作，跳过同步避免冲突
+        if (this._openingApp || this._goingHome) {
+          return;
+        }
+
         const app = this.currentAppState.app;
         let nextView = this.currentAppState.view || 'main';
         let extra = {};
@@ -5572,14 +5904,21 @@ class MobilePhone {
         const signature = `${app}|${nextView}|${extra.friendId || ''}|${extra.threadId || ''}`;
         if (signature !== lastSignature) {
           lastSignature = signature;
-          this.currentAppState = {
+
+          // 创建新的状态对象
+          const newState = {
             ...this.currentAppState,
             view: nextView,
             ...extra,
           };
-          this.updateAppHeader(this.currentAppState);
-          // 不修改 appStack，避免历史污染
-          // console.log('[Mobile Phone] 同步模块视图到状态:', this.currentAppState);
+
+          // 只有状态真正发生变化时才更新
+          if (!this.isSameAppState(this.currentAppState, newState)) {
+            this.currentAppState = newState;
+            this.updateAppHeader(this.currentAppState);
+            syncCount++;
+            console.log('[Mobile Phone] 同步模块视图到状态:', this.currentAppState);
+          }
         }
       } catch (e) {
         console.warn('[Mobile Phone] 同步模块视图失败:', e);
@@ -5588,8 +5927,21 @@ class MobilePhone {
 
     // 立即执行一次，然后进入轮询
     syncOnce();
-    this._stateSyncTimer = setInterval(syncOnce, 500);
-    console.log('[Mobile Phone] 已启动状态同步轮询');
+
+    // 动态调整轮询频率：前10次同步使用500ms间隔，之后使用1000ms间隔
+    const getInterval = () => syncCount < maxSyncCount ? 500 : 1000;
+
+    this._stateSyncTimer = setInterval(() => {
+      syncOnce();
+      // 如果同步次数达到阈值，重新设置定时器以降低频率
+      if (syncCount === maxSyncCount) {
+        clearInterval(this._stateSyncTimer);
+        this._stateSyncTimer = setInterval(syncOnce, getInterval());
+        console.log('[Mobile Phone] 状态同步频率已降低到1000ms');
+      }
+    }, getInterval());
+
+    console.log('[Mobile Phone] 已启动状态同步轮询，初始间隔:', getInterval(), 'ms');
   }
 
   stopStateSyncLoop() {

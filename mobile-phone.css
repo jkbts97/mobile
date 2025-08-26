@@ -1,7 +1,7 @@
 /* 手机前端框架 - 可爱的iOS风格样式 */
 
 /* 引入Font Awesome */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+@import url('');
 
 /* 触发按钮 */
 .mobile-phone-trigger {
@@ -1687,6 +1687,68 @@
   opacity: 0.8;
 }
 
+/* 新的应用加载状态样式 */
+.app-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--bg-color, #f8f9fa);
+}
+
+.loading-spinner {
+  margin-bottom: 24px;
+}
+
+.spinner-ring {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007AFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.app-loading-container .loading-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-color, #333);
+  margin-bottom: 8px;
+  opacity: 1;
+}
+
+.loading-tip {
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+  margin-bottom: 24px;
+  opacity: 0.8;
+}
+
+.loading-progress {
+  width: 200px;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007AFF, #34C759);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -2155,6 +2217,7 @@
   transform: translate(-50%, -50%);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+  content:''
 }
 
 /* 9. "API"图标 */
@@ -2170,6 +2233,7 @@
   transform: translate(-50%, -50%);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+  content:''
 }
 
 .config-section {

@@ -43,6 +43,14 @@ if (typeof window.WeiboManager !== 'undefined') {
       this.statusUpdateTimer = null;
       this.maxWaitTime = 300000; // 最大等待时间: 5分钟
 
+      // 重试机制配置
+      this.retryConfig = {
+        maxRetries: 3, // 最大重试次数
+        retryDelay: 60000, // 重试延迟: 1分钟
+        currentRetryCount: 0, // 当前重试次数
+        lastFailTime: null, // 上次失败时间
+      };
+
       // 绑定方法
       this.initialize = this.initialize.bind(this);
       this.generateWeiboContent = this.generateWeiboContent.bind(this);
@@ -50,6 +58,7 @@ if (typeof window.WeiboManager !== 'undefined') {
       this.checkGenerationStatus = this.checkGenerationStatus.bind(this);
       this.waitForGenerationComplete = this.waitForGenerationComplete.bind(this);
       this.processInsertionQueue = this.processInsertionQueue.bind(this);
+      this.scheduleRetry = this.scheduleRetry.bind(this);
     }
 
     /**
@@ -440,14 +449,29 @@ if (typeof window.WeiboManager !== 'undefined') {
         }
       } catch (error) {
         console.error('[Weibo Manager] 生成微博内容失败:', error);
-        this.updateStatus(`生成失败: ${error.message}`, 'error');
 
-        // 显示错误提示
-        if (window.showMobileToast) {
-          window.showMobileToast(`❌ 微博生成失败: ${error.message}`, 'error');
+        // 检查是否需要重试
+        const shouldRetry = this.shouldRetry(error);
+        if (shouldRetry) {
+          console.log(`[Weibo Manager] 🔄 将在 ${this.retryConfig.retryDelay / 1000} 秒后重试 (${this.retryConfig.currentRetryCount + 1}/${this.retryConfig.maxRetries})`);
+          this.updateStatus(`生成失败，将在1分钟后重试 (${this.retryConfig.currentRetryCount + 1}/${this.retryConfig.maxRetries})`, 'warning');
+
+          // 安排延迟重试
+          this.scheduleRetry(force);
+          return false;
+        } else {
+          // 重试次数已用完或不需要重试
+          this.updateStatus(`生成失败: ${error.message}`, 'error');
+
+          // 显示错误提示
+          if (window.showMobileToast) {
+            window.showMobileToast(`❌ 微博生成失败: ${error.message}`, 'error');
+          }
+
+          // 重置重试计数器
+          this.resetRetryConfig();
+          return false;
         }
-
-        return false;
       } finally {
         // 确保状态被重置
         this.isProcessing = false;
@@ -1721,6 +1745,79 @@ if (typeof window.WeiboManager !== 'undefined') {
         console.error('[Weibo Manager] 检查自动生成失败:', error);
         return false;
       }
+    }
+
+    /**
+     * 检查是否需要重试
+     */
+    shouldRetry(error) {
+      // 如果已达到最大重试次数，不再重试
+      if (this.retryConfig.currentRetryCount >= this.retryConfig.maxRetries) {
+        console.log(`[Weibo Manager] 已达到最大重试次数 (${this.retryConfig.maxRetries})，停止重试`);
+        return false;
+      }
+
+      // 检查错误类型，某些错误不需要重试
+      const errorMessage = error.message.toLowerCase();
+      const nonRetryableErrors = [
+        '请先配置api',
+        '上下文编辑器未就绪',
+        '无聊天数据',
+        '无数据可更新'
+      ];
+
+      for (const nonRetryableError of nonRetryableErrors) {
+        if (errorMessage.includes(nonRetryableError)) {
+          console.log(`[Weibo Manager] 检测到不可重试的错误: ${error.message}`);
+          return false;
+        }
+      }
+
+      // 检查距离上次失败的时间间隔
+      const now = Date.now();
+      if (this.retryConfig.lastFailTime && (now - this.retryConfig.lastFailTime) < this.retryConfig.retryDelay) {
+        const remainingTime = Math.ceil((this.retryConfig.retryDelay - (now - this.retryConfig.lastFailTime)) / 1000);
+        console.log(`[Weibo Manager] 距离上次失败时间不足，还需等待 ${remainingTime} 秒`);
+        return false;
+      }
+
+      return true;
+    }
+
+    /**
+     * 安排延迟重试
+     */
+    scheduleRetry(force = false) {
+      // 更新重试配置
+      this.retryConfig.currentRetryCount++;
+      this.retryConfig.lastFailTime = Date.now();
+
+      console.log(`[Weibo Manager] 🔄 安排第 ${this.retryConfig.currentRetryCount} 次重试，将在 ${this.retryConfig.retryDelay / 1000} 秒后执行`);
+
+      // 设置延迟重试
+      setTimeout(async () => {
+        try {
+          console.log(`[Weibo Manager] 🔄 开始第 ${this.retryConfig.currentRetryCount} 次重试`);
+          this.updateStatus(`正在重试生成微博内容... (${this.retryConfig.currentRetryCount}/${this.retryConfig.maxRetries})`, 'info');
+
+          const success = await this.generateWeiboContent(force);
+          if (success) {
+            console.log(`[Weibo Manager] ✅ 第 ${this.retryConfig.currentRetryCount} 次重试成功`);
+            this.resetRetryConfig();
+          }
+        } catch (error) {
+          console.error(`[Weibo Manager] ❌ 第 ${this.retryConfig.currentRetryCount} 次重试失败:`, error);
+        }
+      }, this.retryConfig.retryDelay);
+    }
+
+    /**
+     * 重置重试配置
+     */
+    resetRetryConfig() {
+      this.retryConfig.currentRetryCount = 0;
+      this.retryConfig.lastFailTime = null;
+      console.log('[Weibo Manager] 🔄 重试配置已重置');
     }
   }
 
