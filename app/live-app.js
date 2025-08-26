@@ -1585,7 +1585,9 @@ if (typeof window.LiveApp === 'undefined') {
         // 查找包含直播内容的消息
         let hasLiveContent = false;
         let updatedCount = 0;
+        const messagesToUpdate = []; // 收集需要更新的消息
 
+        // 第一遍：收集所有需要转换的消息
         for (let i = 0; i < contextData.length; i++) {
           const message = contextData[i];
           const content = message.mes || message.content || '';
@@ -1596,28 +1598,62 @@ if (typeof window.LiveApp === 'undefined') {
             const convertedContent = this.convertLiveFormats(content);
 
             if (convertedContent !== content) {
-              // 尝试通过编辑器功能更新消息
-              const success = await this.updateMessageContent(i, convertedContent);
-              if (success) {
-                updatedCount++;
-                console.log(
-                  `[Live App] 已转换消息 ${i}，原始长度: ${content.length}，转换后长度: ${convertedContent.length}`,
-                );
-              }
+              messagesToUpdate.push({
+                index: i,
+                originalContent: content,
+                convertedContent: convertedContent
+              });
             }
           }
         }
 
         if (!hasLiveContent) {
           console.log('[Live App] 没有找到需要转换的直播内容');
-        } else {
-          console.log(`[Live App] 直播格式转换完成，共更新了 ${updatedCount} 条消息`);
+          return;
+        }
 
-          // 保存聊天数据
-          if (updatedCount > 0) {
-            await this.saveChatData();
-            console.log('[Live App] 转换完成并已保存聊天数据');
+        // 第二遍：批量更新消息，减少频繁的DOM操作和保存
+        console.log(`[Live App] 开始批量更新 ${messagesToUpdate.length} 条消息`);
+
+        // 临时禁用自动保存机制，避免每次更新都触发保存
+        const originalSaveChatDebounced = window.saveChatDebounced;
+        const originalSaveChatConditional = window.saveChatConditional;
+
+        // 临时替换为空函数
+        if (window.saveChatDebounced) {
+          window.saveChatDebounced = () => {};
+        }
+        if (window.saveChatConditional) {
+          window.saveChatConditional = () => Promise.resolve();
+        }
+
+        try {
+          for (const messageUpdate of messagesToUpdate) {
+            // 批量处理时跳过自动保存，避免频繁保存
+            const success = await this.updateMessageContent(messageUpdate.index, messageUpdate.convertedContent, true);
+            if (success) {
+              updatedCount++;
+              console.log(
+                `[Live App] 已转换消息 ${messageUpdate.index}，原始长度: ${messageUpdate.originalContent.length}，转换后长度: ${messageUpdate.convertedContent.length}`,
+              );
+            }
           }
+        } finally {
+          // 恢复原始的保存函数
+          if (originalSaveChatDebounced) {
+            window.saveChatDebounced = originalSaveChatDebounced;
+          }
+          if (originalSaveChatConditional) {
+            window.saveChatConditional = originalSaveChatConditional;
+          }
+        }
+
+        console.log(`[Live App] 直播格式转换完成，共更新了 ${updatedCount} 条消息`);
+
+        // 只在最后保存一次聊天数据，避免频繁保存导致卡顿
+        if (updatedCount > 0) {
+          await this.saveChatData();
+          console.log('[Live App] 转换完成并已保存聊天数据');
         }
       } catch (error) {
         console.error('[Live App] 转换直播格式失败:', error);
@@ -1709,15 +1745,47 @@ if (typeof window.LiveApp === 'undefined') {
 
     /**
      * 更新消息内容
+     * @param {number} messageIndex - 消息索引
+     * @param {string} newContent - 新内容
+     * @param {boolean} skipAutoSave - 是否跳过自动保存（用于批量处理）
      */
-    async updateMessageContent(messageIndex, newContent) {
+    async updateMessageContent(messageIndex, newContent, skipAutoSave = false) {
       try {
-        console.log(`[Live App] 正在更新消息 ${messageIndex}:`, newContent.substring(0, 100) + '...');
+        console.log(`[Live App] 正在更新消息 ${messageIndex}`);
 
-        // 方法1: 使用全局chat数组直接更新
-        const chat = window['chat'];
-        if (chat && Array.isArray(chat) && chat[messageIndex]) {
-          const originalContent = chat[messageIndex].mes;
+        // 方法1: 使用与getChatData相同的方法获取chat数组（推荐，不会触发自动保存）
+        let chat = null;
+
+        // 优先使用SillyTavern.getContext().chat
+        if (
+          typeof window !== 'undefined' &&
+          window.SillyTavern &&
+          typeof window.SillyTavern.getContext === 'function'
+        ) {
+          const context = window.SillyTavern.getContext();
+          if (context && context.chat && Array.isArray(context.chat)) {
+            chat = context.chat;
+          }
+        }
+
+        // 如果上面的方法失败，尝试从全局变量获取
+        if (!chat) {
+          chat = window['chat'];
+        }
+
+        if (chat && Array.isArray(chat)) {
+          // 添加边界检查
+          if (messageIndex < 0 || messageIndex >= chat.length) {
+            console.warn(`[Live App] 消息索引 ${messageIndex} 超出范围，chat数组长度: ${chat.length}`);
+            return false;
+          }
+
+          if (!chat[messageIndex]) {
+            console.warn(`[Live App] 消息索引 ${messageIndex} 处的消息不存在`);
+            return false;
+          }
+
+          const originalContent = chat[messageIndex].mes || '';
           chat[messageIndex].mes = newContent;
 
           // 如果消息有swipes，也需要更新
@@ -1736,18 +1804,33 @@ if (typeof window.LiveApp === 'undefined') {
           return true;
         }
 
-        // 方法2: 尝试通过编辑器功能更新
-        if (window.mobileContextEditor && window.mobileContextEditor.modifyMessage) {
-          await window.mobileContextEditor.modifyMessage(messageIndex, newContent);
-          console.log(`[Live App] 已通过mobileContextEditor更新消息 ${messageIndex}`);
-          return true;
+        // 添加调试信息
+        console.warn(`[Live App] 无法访问chat数组，chat类型: ${typeof chat}, 是否为数组: ${Array.isArray(chat)}`);
+        if (chat && Array.isArray(chat)) {
+          console.warn(`[Live App] chat数组长度: ${chat.length}, 请求的消息索引: ${messageIndex}`);
         }
 
-        // 方法3: 尝试通过context-editor更新
+        // 如果直接方法失败，尝试备用方法（即使在批量处理时也要尝试）
+        // 方法2: 尝试通过编辑器功能更新（可能会触发自动保存）
+        if (window.mobileContextEditor && window.mobileContextEditor.modifyMessage) {
+          try {
+            await window.mobileContextEditor.modifyMessage(messageIndex, newContent);
+            console.log(`[Live App] 已通过mobileContextEditor更新消息 ${messageIndex}`);
+            return true;
+          } catch (error) {
+            console.warn(`[Live App] mobileContextEditor更新失败:`, error);
+          }
+        }
+
+        // 方法3: 尝试通过context-editor更新（可能会触发自动保存）
         if (window.contextEditor && window.contextEditor.modifyMessage) {
-          await window.contextEditor.modifyMessage(messageIndex, newContent);
-          console.log(`[Live App] 已通过contextEditor更新消息 ${messageIndex}`);
-          return true;
+          try {
+            await window.contextEditor.modifyMessage(messageIndex, newContent);
+            console.log(`[Live App] 已通过contextEditor更新消息 ${messageIndex}`);
+            return true;
+          } catch (error) {
+            console.warn(`[Live App] contextEditor更新失败:`, error);
+          }
         }
 
         console.warn('[Live App] 没有找到有效的消息更新方法');

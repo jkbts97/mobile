@@ -1579,6 +1579,29 @@ button:disabled:hover,
   margin-right: 10px;
 }
 
+/* 更新加载提示样式 */
+.live-loading-update {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  margin-top: 10px;
+  background: rgba(255, 105, 180, 0.1);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--live-text-secondary);
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e0e0e0;
+  border-top: 2px solid var(--live-primary-pink);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

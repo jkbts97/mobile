@@ -237,7 +237,7 @@ class MobilePhone {
                                             <span class="app-label">论坛</span>
                                         </div>
                                         <div class="app-icon" data-app="weibo">
-                                            <div class="app-icon-bg orange"></div>
+                                            <div class="app-icon-bg orange" style="font-size: 22px;color:rgba(0,0,0,0.4)">微</div>
                                             <span class="app-label">微博</span>
                                         </div>
                                         <div class="app-icon" data-app="live">
@@ -252,7 +252,7 @@ class MobilePhone {
                                             <span class="app-label">背包</span>
                                         </div>
                                         <div class="app-icon" data-app="api">
-                                            <div class="app-icon-bg orange"></div>
+                                            <div class="app-icon-bg orange" style="font-size: 22px;color:rgba(0,0,0,0.4)">AI</div>
                                             <span class="app-label">API</span>
                                         </div>
                                         <div class="app-icon" data-app="settings">
@@ -1068,6 +1068,28 @@ class MobilePhone {
         }
       });
       headerRight.appendChild(endBtn);
+    } else if (state.app === 'watch-live') {
+      // 观看直播应用：右侧显示 观看人数、退出直播间
+      // 观看人数徽标
+      const viewerBadge = document.createElement('div');
+      viewerBadge.className = 'viewer-count';
+      viewerBadge.title = '本场人数';
+      viewerBadge.innerHTML = `<i class="fas fa-user-friends"></i><span class="viewer-count-num">${
+        state.viewerCount || '-'
+      }</span>`;
+      headerRight.appendChild(viewerBadge);
+
+      // 退出直播间按钮
+      const exitBtn = document.createElement('button');
+      exitBtn.className = 'app-header-btn end-stream-btn';
+      exitBtn.title = '退出直播间';
+      exitBtn.innerHTML = '⏻';
+      exitBtn.addEventListener('click', () => {
+        if (window.watchLiveAppEndLive) {
+          window.watchLiveAppEndLive();
+        }
+      });
+      headerRight.appendChild(exitBtn);
     }
   }
 
@@ -4482,7 +4504,7 @@ class MobilePhone {
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+        fontAwesomeLink.href = '';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成（论坛应用）');
           checkComplete();
@@ -4660,7 +4682,7 @@ class MobilePhone {
       if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+        fontAwesomeLink.href = '';
         fontAwesomeLink.onload = () => {
           console.log('[Mobile Phone] Font Awesome 加载完成');
           checkComplete();

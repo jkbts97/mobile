@@ -880,17 +880,7 @@ function createSettingsUI() {
                     <hr style="margin: 15px 0;">
                     <h4>移动端界面样式设置</h4>
 
-                    <div id="mobile_style_config_container" style="margin: 10px 0;">
-                        <div class="flex-container" style="gap: 10px; align-items: center; margin-bottom: 10px;">
-                            <button id="mobile_style_config_btn" class="menu_button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
-                                🎨 打开样式配置器
-                            </button>
-                            <small style="color: #666; font-size: 12px;">自定义移动端界面背景和样式</small>
-                        </div>
-                        <div id="mobile_style_config_app_container" style="display: none; margin-top: 15px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;" data-app="settings">
-                            <!-- 样式配置器内容将在这里动态加载 -->
-                        </div>
-                    </div>
+
 
                     <hr style="margin: 15px 0;">
                     <h4>手机交互设置</h4>
