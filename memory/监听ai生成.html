@@ -1,0 +1,71 @@
+/**
+ * 直播事件监听器
+ * 负责监听SillyTavern的消息事件并触发数据解析
+ */
+class LiveEventListener {
+  constructor(liveApp) {
+    this.liveApp = liveApp;
+    this.isListening = false;
+    this.lastMessageCount = 0;
+    this.pollingInterval = null;
+    this.messageReceivedHandler = this.onMessageReceived.bind(this);
+  }
+
+  /**
+   * 开始监听SillyTavern事件
+   */
+  startListening() {
+    if (this.isListening) {
+      console.log('[Live App] 监听器已经在运行中');
+      return;
+    }
+
+    try {
+      // 检查SillyTavern接口可用性
+      console.log('[Live App] 检查SillyTavern接口可用性:', {
+        'window.SillyTavern': !!window?.SillyTavern,
+        'window.SillyTavern.getContext': typeof window?.SillyTavern?.getContext,
+        eventOn: typeof eventOn,
+        tavern_events: typeof tavern_events,
+        mobileContextEditor: !!window?.mobileContextEditor,
+      });
+
+      // 方法1: 优先使用SillyTavern.getContext().eventSource（iframe环境推荐）
+      if (typeof window !== 'undefined' && window.SillyTavern && typeof window.SillyTavern.getContext === 'function') {
+        const context = window.SillyTavern.getContext();
+        if (context && context.eventSource && typeof context.eventSource.on === 'function' && context.event_types) {
+          console.log('[Live App] 使用SillyTavern.getContext().eventSource监听MESSAGE_RECEIVED事件');
+          context.eventSource.on(context.event_types.MESSAGE_RECEIVED, this.messageReceivedHandler);
+          this.isListening = true;
+          console.log('[Live App] ✅ 成功开始监听SillyTavern消息事件 (context.eventSource)');
+          this.updateMessageCount();
+          return;
+        }
+      }
+
+      // 方法2: 尝试使用全局eventOn函数（如果可用）
+      if (typeof eventOn === 'function' && typeof tavern_events !== 'undefined' && tavern_events.MESSAGE_RECEIVED) {
+        console.log('[Live App] 使用全局eventOn监听MESSAGE_RECEIVED事件');
+        eventOn(tavern_events.MESSAGE_RECEIVED, this.messageReceivedHandler);
+        this.isListening = true;
+        console.log('[Live App] ✅ 成功开始监听SillyTavern消息事件 (eventOn)');
+        this.updateMessageCount();
+        return;
+      }
+
+      // 方法2: 尝试从父窗口使用eventSource
+      if (
+        typeof window !== 'undefined' &&
+        window.parent &&
+        window.parent.eventSource &&
+        typeof window.parent.eventSource.on === 'function'
+      ) {
+        console.log('[Live App] 使用父窗口eventSource监听MESSAGE_RECEIVED事件');
+        if (window.parent.event_types && window.parent.event_types.MESSAGE_RECEIVED) {
+          window.parent.eventSource.on(window.parent.event_types.MESSAGE_RECEIVED, this.messageReceivedHandler);
+          this.isListening = true;
+          console.log('[Live App] ✅ 成功开始监听SillyTavern消息事件 (parent eventSource)');
+          this.updateMessageCount();
+          return;
+        }
+      }
