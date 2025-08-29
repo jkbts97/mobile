@@ -187,7 +187,7 @@ class MobileContextEditor {
 
       // 使用SillyTavern上下文API保存和刷新
       await context.saveChat();
-      await context.reloadCurrentChat(); // 重新加载当前聊天
+    //   await context.reloadCurrentChat(); // 重新加载当前聊天
 
       this.isModified = true;
       console.log(
@@ -218,7 +218,9 @@ class MobileContextEditor {
       // 构建消息对象（符合SillyTavern的消息格式）
       const message = {
         name: name || (isUser ? context.name1 || 'User' : context.name2 || 'Assistant'),
-        is_user: isUser,
+        is_user: true,
+        is_system: false,
+        force_avatar: true,
         mes: content,
         send_date: Date.now(),
         extra: extra,
