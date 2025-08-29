@@ -2033,7 +2033,10 @@
   max-width: 100%;
   overflow: hidden;
 }
-
+.sticker-item img {
+    width:100% !important;
+    height: auto !important;
+  }
 /* 响应式设计 */
 @media (max-width: 480px) {
   #sticker-input-panel .special-panel-content {
@@ -2043,10 +2046,7 @@
     width: auto !important;
   }
 
-  .sticker-item img {
-    width: 20px !important;
-    height: 20px !important;
-  }
+
 
   .message-detail[title='表情包'] .qq-sticker-image {
     max-width: 120px !important;

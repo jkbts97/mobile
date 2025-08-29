@@ -2798,20 +2798,488 @@ if (typeof window.MessageApp === 'undefined') {
         `;
 
       document.body.appendChild(panel);
+
+      // 🔥 新增：记录表情包面板显示事件，用于调试
+      console.log(`[Message App] 表情包面板已显示，包含 ${stickerImages.length} 个表情包`);
+      if (stickerImages.length > 0 && stickerImages[0].fullPath) {
+        console.log('[Message App] 使用世界书配置的表情包路径');
+      } else {
+        console.log('[Message App] 使用默认表情包配置');
+      }
     }
 
-    // 显示表情包面板
-    showStickerPanel() {
-      console.log('[Message App] 显示表情包面板');
+    /**
+     * 🔥 新增：从世界书读取表情包详情
+     * 查找名为"表情包详情"的世界书条目，解析前缀和后缀，生成完整的图片路径
+     */
+    async getStickerImagesFromWorldInfo() {
+      console.log('[Message App] 开始从世界书读取表情包详情');
 
-      // 检查是否已存在表情包面板
-      const existingPanel = document.getElementById('sticker-input-panel');
-      if (existingPanel) {
-        existingPanel.remove();
+      try {
+        // 获取所有世界书条目（包括角色绑定的和全局的）
+        const allEntries = await this.getAllWorldInfoEntries();
+
+        // 🔥 修复：查找所有包含"表情包详情"的条目
+        const stickerDetailEntries = [];
+
+        // 🔥 优先级1：查找注释包含"表情包详情"的条目
+        const commentEntries = allEntries.filter(entry => {
+          return entry.comment && entry.comment.includes('表情包详情');
+        });
+        stickerDetailEntries.push(...commentEntries);
+
+        // 🔥 优先级2：查找关键词包含"表情包详情"的条目（排除已添加的）
+        const keywordEntries = allEntries.filter(entry => {
+          if (stickerDetailEntries.includes(entry)) return false; // 避免重复
+          if (entry.key && Array.isArray(entry.key)) {
+            return entry.key.some(k => k.includes('表情包详情'));
+          }
+          return false;
+        });
+        stickerDetailEntries.push(...keywordEntries);
+
+        // 🔥 优先级3：查找内容以"表情包详情"开头的条目（排除已添加的）
+        const contentEntries = allEntries.filter(entry => {
+          if (stickerDetailEntries.includes(entry)) return false; // 避免重复
+          return entry.content && entry.content.trim().startsWith('表情包详情');
+        });
+        stickerDetailEntries.push(...contentEntries);
+
+        console.log(`[Message App] 找到 ${stickerDetailEntries.length} 个表情包详情条目:`);
+        stickerDetailEntries.forEach((entry, index) => {
+          console.log(`${index + 1}. "${entry.comment}" (来源: ${entry.world})`);
+        });
+
+        if (stickerDetailEntries.length === 0) {
+          console.warn('[Message App] 未找到"表情包详情"世界书条目，使用默认表情包列表');
+          console.log('[Message App] 搜索的条目总数:', allEntries.length);
+          console.log('[Message App] 条目示例:', allEntries.slice(0, 3).map(e => ({
+            comment: e.comment,
+            key: e.key,
+            content: e.content ? e.content.substring(0, 50) + '...' : ''
+          })));
+          return this.getDefaultStickerImages();
+        }
+
+        // 🔥 修改：解析所有表情包详情条目
+        const allStickerImages = [];
+
+        for (let i = 0; i < stickerDetailEntries.length; i++) {
+          const entry = stickerDetailEntries[i];
+          console.log(`[Message App] 解析第 ${i + 1} 个表情包详情条目: "${entry.comment}" (来源: ${entry.world})`);
+
+          try {
+            const stickerImages = this.parseStickerDetails(entry.content);
+            if (stickerImages.length > 0) {
+              // 为每个表情包添加来源信息
+              const imagesWithSource = stickerImages.map(img => ({
+                ...img,
+                source: entry.comment,
+                world: entry.world
+              }));
+              allStickerImages.push(...imagesWithSource);
+              console.log(`[Message App] 从"${entry.comment}"解析到 ${stickerImages.length} 个表情包`);
+            } else {
+              console.warn(`[Message App] 条目"${entry.comment}"解析失败，内容可能格式不正确`);
+            }
+          } catch (error) {
+            console.error(`[Message App] 解析条目"${entry.comment}"时出错:`, error);
+          }
+        }
+
+        if (allStickerImages.length === 0) {
+          console.warn('[Message App] 所有表情包详情条目解析失败，使用默认表情包列表');
+          return this.getDefaultStickerImages();
+        }
+
+        console.log(`[Message App] 成功从 ${stickerDetailEntries.length} 个条目解析到总共 ${allStickerImages.length} 个表情包`);
+        return allStickerImages;
+
+      } catch (error) {
+        console.error('[Message App] 读取世界书表情包详情时出错:', error);
+        return this.getDefaultStickerImages();
+      }
+    }
+
+    /**
+     * 🔥 新增：获取所有世界书条目
+     */
+    async getAllWorldInfoEntries() {
+      const allEntries = [];
+
+      try {
+        // 🔥 修复：使用正确的SillyTavern世界书API
+        // 1. 尝试使用SillyTavern的getSortedEntries函数（最佳方法）
+        if (typeof window.getSortedEntries === 'function') {
+          try {
+            const entries = await window.getSortedEntries();
+            allEntries.push(...entries);
+            console.log(`[Message App] 通过getSortedEntries获取到 ${entries.length} 个世界书条目`);
+            return allEntries; // 如果成功，直接返回
+          } catch (error) {
+            console.warn('[Message App] getSortedEntries调用失败:', error);
+          }
+        }
+
+        // 2. 备用方法：手动获取全局和角色世界书
+        console.log('[Message App] 使用备用方法获取世界书条目');
+
+        // 🔥 修复：获取全局世界书 - 从DOM元素读取
+        console.log('[Message App] 尝试获取全局世界书...');
+        console.log('[Message App] window.selected_world_info:', window.selected_world_info);
+        console.log('[Message App] window.world_names:', window.world_names);
+
+        // 🔥 新增：方法1 - 从DOM元素获取选中的世界书
+        const worldInfoSelect = document.getElementById('world_info');
+        if (worldInfoSelect) {
+          console.log('[Message App] 找到世界书选择器元素');
+
+          // 获取所有选中的选项
+          const selectedOptions = Array.from(worldInfoSelect.selectedOptions);
+          console.log(`[Message App] 找到 ${selectedOptions.length} 个选中的世界书选项:`, selectedOptions.map(opt => opt.text));
+
+          for (const option of selectedOptions) {
+            const worldName = option.text;
+            const worldIndex = option.value;
+
+            try {
+              console.log(`[Message App] 正在加载全局世界书: ${worldName} (索引: ${worldIndex})`);
+              const worldData = await this.loadWorldInfoByName(worldName);
+              if (worldData && worldData.entries) {
+                const entries = Object.values(worldData.entries).map(entry => ({
+                  ...entry,
+                  world: worldName
+                }));
+                allEntries.push(...entries);
+                console.log(`[Message App] 从全局世界书"${worldName}"获取到 ${entries.length} 个条目`);
+              } else {
+                console.warn(`[Message App] 全局世界书"${worldName}"没有条目或加载失败`);
+              }
+            } catch (error) {
+              console.warn(`[Message App] 加载全局世界书"${worldName}"失败:`, error);
+            }
+          }
+        } else {
+          console.log('[Message App] 未找到世界书选择器元素 #world_info');
+        }
+
+        // 方法2：从 selected_world_info 变量获取（备用）
+        if (allEntries.length === 0 && typeof window.selected_world_info !== 'undefined' && Array.isArray(window.selected_world_info) && window.selected_world_info.length > 0) {
+          console.log(`[Message App] 备用方法：从变量获取 ${window.selected_world_info.length} 个全局世界书:`, window.selected_world_info);
+
+          for (const worldName of window.selected_world_info) {
+            try {
+              console.log(`[Message App] 正在加载全局世界书: ${worldName}`);
+              const worldData = await this.loadWorldInfoByName(worldName);
+              if (worldData && worldData.entries) {
+                const entries = Object.values(worldData.entries).map(entry => ({
+                  ...entry,
+                  world: worldName
+                }));
+                allEntries.push(...entries);
+                console.log(`[Message App] 从全局世界书"${worldName}"获取到 ${entries.length} 个条目`);
+              }
+            } catch (error) {
+              console.warn(`[Message App] 加载全局世界书"${worldName}"失败:`, error);
+            }
+          }
+        }
+
+        // 方法3：从 world_info.globalSelect 获取（备用）
+        if (allEntries.length === 0 && typeof window.world_info !== 'undefined' && window.world_info.globalSelect) {
+          console.log('[Message App] 备用方法：从 world_info.globalSelect 获取:', window.world_info.globalSelect);
+
+          for (const worldName of window.world_info.globalSelect) {
+            try {
+              const worldData = await this.loadWorldInfoByName(worldName);
+              if (worldData && worldData.entries) {
+                const entries = Object.values(worldData.entries).map(entry => ({
+                  ...entry,
+                  world: worldName
+                }));
+                allEntries.push(...entries);
+                console.log(`[Message App] 从world_info.globalSelect世界书"${worldName}"获取到 ${entries.length} 个条目`);
+              }
+            } catch (error) {
+              console.warn(`[Message App] 从world_info.globalSelect加载世界书"${worldName}"失败:`, error);
+            }
+          }
+        }
+
+        // 获取角色绑定的世界书
+        try {
+          const characterEntries = await this.getCharacterWorldInfoEntries();
+          allEntries.push(...characterEntries);
+        } catch (error) {
+          console.warn('[Message App] 获取角色世界书失败:', error);
+        }
+
+      } catch (error) {
+        console.error('[Message App] 获取世界书条目时出错:', error);
       }
 
-      // 表情包图片列表（从实际图片目录获取）
-      const stickerImages = [
+      console.log(`[Message App] 总共获取到 ${allEntries.length} 个世界书条目`);
+
+      // 🔥 新增：为调试提供详细信息
+      if (allEntries.length > 0) {
+        console.log('[Message App] 世界书条目预览:', allEntries.slice(0, 3).map(entry => ({
+          comment: entry.comment,
+          key: Array.isArray(entry.key) ? entry.key.join(', ') : entry.key,
+          contentPreview: entry.content ? entry.content.substring(0, 50) + '...' : '无内容',
+          world: entry.world || '未知来源'
+        })));
+      }
+
+      return allEntries;
+    }
+
+    /**
+     * 🔥 新增：通过名称加载世界书数据
+     */
+    async loadWorldInfoByName(worldName) {
+      try {
+        // 🔥 修复：优先使用SillyTavern的loadWorldInfo函数
+        if (typeof window.loadWorldInfo === 'function') {
+          console.log(`[Message App] 使用loadWorldInfo函数加载世界书: ${worldName}`);
+          return await window.loadWorldInfo(worldName);
+        }
+
+        // 备用方法：直接调用API（需要正确的请求头）
+        console.log(`[Message App] 使用API加载世界书: ${worldName}`);
+
+        // 获取正确的请求头
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+
+        // 如果有getRequestHeaders函数，使用它
+        if (typeof window.getRequestHeaders === 'function') {
+          Object.assign(headers, window.getRequestHeaders());
+        }
+
+        const response = await fetch('/api/worldinfo/get', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ name: worldName }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`[Message App] 成功加载世界书 "${worldName}":`, data);
+          return data;
+        } else {
+          console.error(`[Message App] 加载世界书 "${worldName}" 失败: ${response.status} ${response.statusText}`);
+        }
+
+      } catch (error) {
+        console.error(`[Message App] 加载世界书 "${worldName}" 时出错:`, error);
+      }
+
+      return null;
+    }
+
+    /**
+     * 🔥 新增：获取角色绑定的世界书条目
+     */
+    async getCharacterWorldInfoEntries() {
+      const entries = [];
+
+      try {
+        // 🔥 修复：使用正确的SillyTavern全局变量获取角色信息
+        let character = null;
+        let characterId = null;
+
+        // 方法1：通过SillyTavern.getContext()获取
+        if (window.SillyTavern && typeof window.SillyTavern.getContext === 'function') {
+          const context = window.SillyTavern.getContext();
+          if (context && context.characters && context.characterId !== undefined) {
+            character = context.characters[context.characterId];
+            characterId = context.characterId;
+          }
+        }
+
+        // 方法2：通过全局变量获取
+        if (!character && typeof window.characters !== 'undefined' && typeof window.this_chid !== 'undefined') {
+          character = window.characters[window.this_chid];
+          characterId = window.this_chid;
+        }
+
+        if (!character) {
+          console.log('[Message App] 无法获取当前角色信息');
+          return entries;
+        }
+
+        console.log(`[Message App] 找到当前角色: ${character.name} (ID: ${characterId})`);
+
+        // 获取角色绑定的主要世界书
+        const worldName = character.data?.extensions?.world;
+        if (worldName) {
+          console.log(`[Message App] 角色绑定的主要世界书: ${worldName}`);
+          const worldData = await this.loadWorldInfoByName(worldName);
+          if (worldData && worldData.entries) {
+            const worldEntries = Object.values(worldData.entries).map(entry => ({
+              ...entry,
+              world: worldName
+            }));
+            entries.push(...worldEntries);
+            console.log(`[Message App] 从角色主要世界书获取到 ${worldEntries.length} 个条目`);
+          }
+        }
+
+        // 🔥 新增：获取角色的额外世界书
+        if (typeof window.world_info !== 'undefined' && window.world_info.charLore) {
+          // 获取角色文件名
+          const fileName = character.avatar || `${character.name}.png`;
+          const extraCharLore = window.world_info.charLore.find(e => e.name === fileName);
+
+          if (extraCharLore && Array.isArray(extraCharLore.extraBooks)) {
+            console.log(`[Message App] 角色额外世界书: ${extraCharLore.extraBooks.join(', ')}`);
+
+            for (const extraWorldName of extraCharLore.extraBooks) {
+              try {
+                const worldData = await this.loadWorldInfoByName(extraWorldName);
+                if (worldData && worldData.entries) {
+                  const worldEntries = Object.values(worldData.entries).map(entry => ({
+                    ...entry,
+                    world: extraWorldName
+                  }));
+                  entries.push(...worldEntries);
+                  console.log(`[Message App] 从角色额外世界书"${extraWorldName}"获取到 ${worldEntries.length} 个条目`);
+                }
+              } catch (error) {
+                console.warn(`[Message App] 加载角色额外世界书"${extraWorldName}"失败:`, error);
+              }
+            }
+          }
+        }
+
+      } catch (error) {
+        console.error('[Message App] 获取角色世界书条目时出错:', error);
+      }
+
+      return entries;
+    }
+
+    /**
+     * 🔥 新增：解析表情包详情内容
+     * 支持多种格式：
+     * 1. 前缀|后缀|文件名1,文件名2,文件名3
+     * 2. JSON格式：{"prefix": "前缀", "suffix": "后缀", "files": ["文件名1", "文件名2"]}
+     * 3. 简单列表：文件名1,文件名2,文件名3（使用默认前缀后缀）
+     */
+    parseStickerDetails(content) {
+      const stickerImages = [];
+
+      try {
+        console.log('[Message App] 解析表情包详情内容:', content);
+
+        // 尝试JSON格式解析
+        if (content.trim().startsWith('{')) {
+          const jsonData = JSON.parse(content);
+          const prefix = jsonData.prefix || '';
+          const suffix = jsonData.suffix || '';
+          const files = jsonData.files || [];
+
+          for (const filename of files) {
+            const fullPath = prefix + filename + suffix;
+            // 🔥 修复：生成正确的备用路径
+            const fallbackPath = `/scripts/extensions/third-party/mobile/images/${filename}`;
+
+            stickerImages.push({
+              filename: filename,
+              fullPath: fullPath,
+              displayName: filename,
+              fallbackPath: fallbackPath,
+              prefix: prefix,
+              suffix: suffix
+            });
+          }
+
+          console.log(`[Message App] JSON格式解析成功，获取到 ${stickerImages.length} 个表情包`);
+          return stickerImages;
+        }
+
+        // 尝试管道分隔格式：前缀|后缀|文件名1,文件名2,文件名3
+        if (content.includes('|')) {
+          const parts = content.split('|');
+          if (parts.length >= 3) {
+            const prefix = parts[0].trim();
+            const suffix = parts[1].trim();
+            const filesStr = parts[2].trim();
+
+            const files = filesStr.split(',').map(f => f.trim()).filter(f => f);
+
+            for (const filename of files) {
+              const fullPath = prefix + filename + suffix;
+              // 🔥 修复：生成正确的备用路径
+              const fallbackPath = `/scripts/extensions/third-party/mobile/images/${filename}`;
+
+              stickerImages.push({
+                filename: filename,
+                fullPath: fullPath,
+                displayName: filename,
+                fallbackPath: fallbackPath,
+                prefix: prefix,
+                suffix: suffix
+              });
+            }
+
+            console.log(`[Message App] 管道格式解析成功，前缀: "${prefix}", 后缀: "${suffix}", 获取到 ${stickerImages.length} 个表情包`);
+            return stickerImages;
+          }
+        }
+
+        // 尝试简单逗号分隔格式
+        if (content.includes(',')) {
+          const files = content.split(',').map(f => f.trim()).filter(f => f);
+          const defaultPrefix = '/scripts/extensions/third-party/mobile/images/';
+          const defaultSuffix = '';
+
+          for (const filename of files) {
+            const fullPath = defaultPrefix + filename + defaultSuffix;
+            stickerImages.push({
+              filename: filename,
+              fullPath: fullPath,
+              displayName: filename
+            });
+          }
+
+          console.log(`[Message App] 简单格式解析成功，使用默认前缀，获取到 ${stickerImages.length} 个表情包`);
+          return stickerImages;
+        }
+
+        // 尝试单行格式（每行一个文件名）
+        const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+        if (lines.length > 0) {
+          const defaultPrefix = '/scripts/extensions/third-party/mobile/images/';
+          const defaultSuffix = '';
+
+          for (const filename of lines) {
+            const fullPath = defaultPrefix + filename + defaultSuffix;
+            stickerImages.push({
+              filename: filename,
+              fullPath: fullPath,
+              displayName: filename
+            });
+          }
+
+          console.log(`[Message App] 行分隔格式解析成功，获取到 ${stickerImages.length} 个表情包`);
+          return stickerImages;
+        }
+
+      } catch (error) {
+        console.error('[Message App] 解析表情包详情时出错:', error);
+      }
+
+      console.warn('[Message App] 无法解析表情包详情内容，返回空列表');
+      return stickerImages;
+    }
+
+    /**
+     * 🔥 新增：获取默认表情包列表
+     */
+    getDefaultStickerImages() {
+      const defaultFiles = [
         'zjlr8e.jpg',
         'emzckz.jpg',
         'ivtswg.jpg',
@@ -2832,41 +3300,120 @@ if (typeof window.MessageApp === 'undefined') {
         '6eyt6n.jpg',
       ];
 
+      const defaultPrefix = '/scripts/extensions/third-party/mobile/images/';
+      const defaultSuffix = '';
+
+      return defaultFiles.map(filename => ({
+        filename: filename,
+        fullPath: defaultPrefix + filename + defaultSuffix,
+        displayName: filename
+      }));
+    }
+
+    /**
+     * 🔥 新增：测试表情包配置功能
+     * 可以在浏览器控制台调用 window.messageApp.testStickerConfig() 来测试
+     */
+    async testStickerConfig() {
+      console.log('=== Message App 表情包配置测试开始 ===');
+
+      try {
+        // 测试获取世界书条目
+        const allEntries = await this.getAllWorldInfoEntries();
+        console.log(`✓ 成功获取 ${allEntries.length} 个世界书条目`);
+
+        // 测试查找表情包详情条目
+        const stickerDetailEntry = allEntries.find(entry => {
+          if (entry.comment && entry.comment.includes('表情包详情')) return true;
+          if (entry.key && Array.isArray(entry.key)) {
+            if (entry.key.some(k => k.includes('表情包详情'))) return true;
+          }
+          if (entry.content && entry.content.trim().startsWith('表情包详情')) return true;
+          return false;
+        });
+
+        if (stickerDetailEntry) {
+          console.log('✓ 找到表情包详情条目:', {
+            comment: stickerDetailEntry.comment,
+            key: stickerDetailEntry.key,
+            world: stickerDetailEntry.world
+          });
+
+          // 测试解析表情包详情
+          const stickerImages = this.parseStickerDetails(stickerDetailEntry.content);
+          console.log(`✓ 成功解析 ${stickerImages.length} 个表情包:`);
+          stickerImages.forEach((sticker, index) => {
+            console.log(`  ${index + 1}. ${sticker.displayName} -> ${sticker.fullPath}`);
+          });
+
+          if (stickerImages.length > 0) {
+            console.log('✅ Message App 表情包配置测试通过！');
+            return { success: true, count: stickerImages.length, stickers: stickerImages };
+          } else {
+            console.log('❌ 表情包解析失败，内容格式可能不正确');
+            return { success: false, error: '解析失败' };
+          }
+        } else {
+          console.log('❌ 未找到表情包详情条目');
+          console.log('💡 请确保世界书中有一个条目的注释包含"表情包详情"或关键词包含"sticker"');
+          return { success: false, error: '未找到配置条目' };
+        }
+
+      } catch (error) {
+        console.error('❌ Message App 表情包配置测试失败:', error);
+        return { success: false, error: error.message };
+      } finally {
+        console.log('=== Message App 表情包配置测试结束 ===');
+      }
+    }
+
+    // 显示表情包面板
+    async showStickerPanel() {
+      console.log('[Message App] 显示表情包面板');
+
+      // 检查是否已存在表情包面板
+      const existingPanel = document.getElementById('sticker-input-panel');
+      if (existingPanel) {
+        existingPanel.remove();
+      }
+
+      // 🔥 修改：优先从缓存读取，不立即读取世界书
+      const stickerImages = this.getCachedStickerImages();
+
       // 创建表情包输入面板
       const panel = document.createElement('div');
       panel.id = 'sticker-input-panel';
       panel.className = 'special-panel';
 
-      const stickerGrid = stickerImages
-        .map(
-          filename => `
-            <div class="sticker-item" onclick="window.messageApp.insertStickerMessage('${filename}')"
-                 style="cursor: pointer; padding: 4px; border: 2px solid transparent; border-radius: 8px; transition: all 0.3s ease;"
-                 onmouseover="this.style.borderColor='#667eea'; this.style.transform='scale(1.1)'"
-                 onmouseout="this.style.borderColor='transparent'; this.style.transform='scale(1)'">
-                <img src="/scripts/extensions/third-party/mobile/images/${filename}"
-                     alt="${filename}"
-                     style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; display: block;"
-                     title="${filename}">
-            </div>
-        `,
-        )
-        .join('');
+      // 🔥 修改：使用缓存的表情包数据生成网格
+      const stickerGrid = this.generateStickerGrid(stickerImages);
 
       panel.innerHTML = `
             <div class="special-panel-content" style="max-width: 500px; width: 90%;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
                     <h3 style="margin: 0; color: #333; font-size: 18px;">😄 选择表情包</h3>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()"
-                            style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 5px;">✕</button>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="refresh-sticker-btn" onclick="window.messageApp.refreshStickerConfig()"
+                                style="background: #667eea; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px;"
+                                title="从世界书重新加载表情包配置">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()"
+                                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 5px;">✕</button>
+                    </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; max-height: 300px; overflow-y: auto; padding: 10px; background: #f8f9fa; border-radius: 12px;">
+                <div class="sticker-grid-container" style="display: flex; flex-wrap: wrap;  gap: 0; max-height: 300px; overflow-y: auto; padding: 10px; background: #f8f9fa; border-radius: 12px;">
                     ${stickerGrid}
                 </div>
 
                 <div style="margin-top: 15px; text-align: center; font-size: 12px; color: #666;">
                     点击表情包插入到消息中
+                    <br><span class="sticker-status">
+                        ${stickerImages.length > 0 && stickerImages[0].fullPath && stickerImages[0].fullPath !== stickerImages[0].filename ?
+                          '<small style="color: #999;">✓ 使用世界书配置</small>' :
+                          '<small style="color: #999;">使用默认配置</small>'}
+                    </span>
                 </div>
             </div>
         `;
@@ -3074,12 +3621,37 @@ if (typeof window.MessageApp === 'undefined') {
     }
 
     /**
-     * 插入表情包消息到输入框
+     * 🔥 修改：插入表情包消息到输入框 - 直接使用完整路径
      */
-    insertStickerMessage(filename) {
+    insertStickerMessage(filename, fullPath = null) {
       if (!filename) {
         console.error('表情包文件名不能为空');
         return;
+      }
+
+      // 🔥 修改：优先使用传入的完整路径，避免重复查找
+      if (!fullPath) {
+        // 如果没有传入完整路径，尝试从缓存查找
+        try {
+          const stickerImages = this.getCachedStickerImages();
+          const stickerData = stickerImages.find(sticker =>
+            (sticker.filename === filename) ||
+            (typeof sticker === 'string' && sticker === filename)
+          );
+
+          if (stickerData && stickerData.fullPath) {
+            fullPath = stickerData.fullPath;
+            console.log(`[Message App] 从缓存获取表情包路径: ${filename} -> ${fullPath}`);
+          } else {
+            fullPath = filename;
+            console.log(`[Message App] 未找到表情包配置，使用原文件名: ${filename}`);
+          }
+        } catch (error) {
+          console.warn('[Message App] 获取表情包完整路径失败，使用原文件名:', error);
+          fullPath = filename;
+        }
+      } else {
+        console.log(`[Message App] 使用传入的完整路径: ${filename} -> ${fullPath}`);
       }
 
       // 获取当前的输入框
@@ -3120,13 +3692,15 @@ if (typeof window.MessageApp === 'undefined') {
         console.warn('[Message App] 未能获取当前好友ID，使用默认值:', targetId);
       }
 
-      // 生成表情包消息格式 - 区分群聊和私聊
+      // 🔥 修改：生成表情包消息格式 - 使用完整路径
       let stickerMessage;
       if (isGroup) {
-        stickerMessage = `[群聊消息|${targetId}|我|表情包|${filename}]`;
+        stickerMessage = `[群聊消息|${targetId}|我|表情包|${fullPath}]`;
       } else {
-        stickerMessage = `[我方消息|我|${targetId}|表情包|${filename}]`;
+        stickerMessage = `[我方消息|我|${targetId}|表情包|${fullPath}]`;
       }
+
+      console.log(`[Message App] 生成表情包消息: ${filename} -> ${fullPath}`);
 
       // 插入到输入框
       const currentValue = targetInput.value || '';
@@ -3150,6 +3724,159 @@ if (typeof window.MessageApp === 'undefined') {
       this.showToast('表情包已插入到输入框', 'success');
 
       console.log('表情包消息已插入:', stickerMessage);
+    }
+
+    /**
+     * 🔥 新增：获取缓存的表情包配置
+     */
+    getCachedStickerImages() {
+      try {
+        // 从localStorage读取缓存
+        const cached = localStorage.getItem('stickerConfig_cache');
+        if (cached) {
+          const cacheData = JSON.parse(cached);
+          const now = Date.now();
+
+          // 检查缓存是否过期（默认30分钟）
+          if (cacheData.timestamp && (now - cacheData.timestamp) < 30 * 60 * 1000) {
+            console.log(`[Message App] 使用缓存的表情包配置，包含 ${cacheData.data.length} 个表情包`);
+            return cacheData.data;
+          } else {
+            console.log('[Message App] 表情包缓存已过期');
+            localStorage.removeItem('stickerConfig_cache');
+          }
+        }
+      } catch (error) {
+        console.warn('[Message App] 读取表情包缓存失败:', error);
+        localStorage.removeItem('stickerConfig_cache');
+      }
+
+      // 没有有效缓存，返回默认配置
+      console.log('[Message App] 没有缓存，使用默认表情包配置');
+      return this.getDefaultStickerImages();
+    }
+
+    /**
+     * 🔥 新增：缓存表情包配置到localStorage
+     */
+    cacheStickerImages(stickerImages) {
+      try {
+        const cacheData = {
+          data: stickerImages,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('stickerConfig_cache', JSON.stringify(cacheData));
+        console.log(`[Message App] 表情包配置已缓存，包含 ${stickerImages.length} 个表情包`);
+      } catch (error) {
+        console.warn('[Message App] 缓存表情包配置失败:', error);
+      }
+    }
+
+    /**
+     * 🔥 新增：刷新表情包配置（从世界书重新读取）
+     */
+    async refreshStickerConfig() {
+      console.log('[Message App] 开始刷新表情包配置...');
+
+      // 显示加载状态
+      const refreshBtn = document.getElementById('refresh-sticker-btn');
+      const originalText = refreshBtn ? refreshBtn.innerHTML : '';
+      if (refreshBtn) {
+        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
+        refreshBtn.disabled = true;
+      }
+
+      try {
+        // 清除缓存
+        localStorage.removeItem('stickerConfig_cache');
+
+        // 从世界书重新读取
+        const stickerImages = await this.getStickerImagesFromWorldInfo();
+
+        // 缓存新配置
+        this.cacheStickerImages(stickerImages);
+
+        // 更新面板内容
+        this.updateStickerPanel(stickerImages);
+
+        // 显示成功提示
+        this.showToast('表情包配置已刷新', 'success');
+
+      } catch (error) {
+        console.error('[Message App] 刷新表情包配置失败:', error);
+        this.showToast('刷新失败，请检查世界书配置', 'error');
+      } finally {
+        // 恢复按钮状态
+        if (refreshBtn) {
+          refreshBtn.innerHTML = originalText;
+          refreshBtn.disabled = false;
+        }
+      }
+    }
+
+    /**
+     * 🔥 新增：更新表情包面板内容
+     */
+    updateStickerPanel(stickerImages) {
+      const panel = document.getElementById('sticker-input-panel');
+      if (!panel) return;
+
+      // 生成新的表情包网格
+      const stickerGrid = this.generateStickerGrid(stickerImages);
+
+      // 更新网格容器
+      const gridContainer = panel.querySelector('.sticker-grid-container');
+      if (gridContainer) {
+        gridContainer.innerHTML = stickerGrid;
+      }
+
+      // 更新状态提示
+      const statusElement = panel.querySelector('.sticker-status');
+      if (statusElement) {
+        const statusText = stickerImages.length > 0 && stickerImages[0].fullPath && stickerImages[0].fullPath !== stickerImages[0].filename ?
+          '✓ 使用世界书配置' : '使用默认配置';
+        statusElement.innerHTML = `<small style="color: #999;">${statusText}</small>`;
+      }
+
+      console.log(`[Message App] 表情包面板已更新，包含 ${stickerImages.length} 个表情包`);
+    }
+
+    /**
+     * 🔥 新增：生成表情包网格HTML
+     */
+    generateStickerGrid(stickerImages) {
+      return stickerImages
+        .map(
+          stickerData => {
+            // 🔥 修复：为备用路径使用世界书配置的前缀，而不是硬编码路径
+            let fallbackPath;
+            if (stickerData.fallbackPath) {
+              // 如果已经有备用路径，直接使用
+              fallbackPath = stickerData.fallbackPath;
+            } else if (stickerData.prefix && stickerData.suffix !== undefined) {
+              // 如果有世界书配置的前缀和后缀，使用它们构建备用路径
+              fallbackPath = stickerData.prefix + (stickerData.filename || stickerData) + stickerData.suffix;
+            } else {
+              // 最后才使用默认路径
+              fallbackPath = `/scripts/extensions/third-party/mobile/images/${stickerData.filename || stickerData}`;
+            }
+
+            return `
+            <div class="sticker-item" onclick="window.messageApp.insertStickerMessage('${stickerData.filename || stickerData}', '${stickerData.fullPath || stickerData}')"
+                 style="cursor: pointer; padding: 4px; border: 2px solid transparent; border-radius: 8px; transition: all 0.3s ease;width:calc(25%);box-sizing:border-box"
+                 onmouseover="this.style.borderColor='#667eea'; this.style.transform='scale(1.1)'"
+                 onmouseout="this.style.borderColor='transparent'; this.style.transform='scale(1)'"
+                 title="${stickerData.displayName || stickerData}">
+                <img src="${stickerData.fullPath || stickerData}"
+                     alt="${stickerData.displayName || stickerData}"
+                     style="object-fit: cover; border-radius: 4px; display: block;"
+                     loading="lazy"
+                     >
+            </div>
+        `;
+          }
+        )
+        .join('');
     }
 
     // 显示红包面板
