@@ -384,6 +384,8 @@ phoneScript.onload = () => {
       console.log('[Mobile Context] ✅ 手机按钮创建成功');
       // 添加上传按钮到手机界面
       addUploadButtonToMobilePhone();
+      // 应用手机可见性设置
+      updatePhoneVisibility();
     } else {
       console.error('[Mobile Context] ❌ 手机按钮创建失败');
     }
@@ -485,6 +487,7 @@ const defaultSettings = {
   forumStyle: '贴吧老哥',
   // 新增手机交互设置
   tavernCompatibilityMode: true,
+  hidePhone: false,
 };
 
 // 插件设置
@@ -596,6 +599,9 @@ async function initMobileContextPlugin() {
 
     // 初始化微博功能
     initWeiboFeatures();
+
+    // 应用手机可见性设置
+    updatePhoneVisibility();
 
     isInitialized = true;
     console.log(
@@ -889,6 +895,10 @@ function createSettingsUI() {
                         <input id="mobile_tavern_compatibility_mode" type="checkbox" />
                         <span>酒馆页面与手机控制兼容</span>
                     </label>
+                    <label class="checkbox_label" for="mobile_hide_phone">
+                        <input id="mobile_hide_phone" type="checkbox" />
+                        <span>隐藏手机按钮</span>
+                    </label>
                     <div class="flex m-t-1" style='flex-wrap: wrap;'>
                         <button id="mobile_context_status_btn" class="menu_button" style='width: auto;background:#777;color:#fff;display:none'>查看状态</button>
                         <button id="mobile_context_clear_btn" class="menu_button" style='width: auto;background:#777;color:#fff'>清除日志</button>
@@ -1108,6 +1118,17 @@ function bindSettingsControls() {
 
       // 应用pointer-events设置
       updatePointerEventsSettings();
+    });
+
+  // 隐藏手机按钮
+  $('#mobile_hide_phone')
+    .prop('checked', extension_settings.mobile_context.hidePhone)
+    .on('change', function () {
+      extension_settings.mobile_context.hidePhone = $(this).prop('checked');
+      saveSettings();
+
+      // 应用隐藏设置
+      updatePhoneVisibility();
     });
 
   // 按钮事件
@@ -2676,5 +2697,24 @@ function updatePointerEventsSettings() {
     // 非兼容模式：确保容器可以接收点击事件，允许点击外部关闭手机
     container.style.pointerEvents = 'auto';
     frame.style.pointerEvents = 'auto';
+  }
+}
+
+/**
+ * 更新手机按钮可见性
+ */
+function updatePhoneVisibility() {
+  const phoneTrigger = document.getElementById('mobile-phone-trigger');
+
+  if (!phoneTrigger) {
+    return;
+  }
+
+  if (extension_settings.mobile_context.hidePhone) {
+    // 隐藏手机按钮
+    phoneTrigger.style.display = 'none';
+  } else {
+    // 显示手机按钮
+    phoneTrigger.style.display = 'block';
   }
 }
