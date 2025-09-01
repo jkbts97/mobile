@@ -15,6 +15,9 @@ class MobileCustomAPIConfig {
         this.currentSettings = this.getDefaultSettings();
         this.supportedProviders = this.getSupportedProviders();
 
+        // 初始化Gemini的内置URL
+        this.geminiUrl = this.supportedProviders.gemini.defaultUrl;
+
         // 绑定到全局窗口对象
         window.mobileCustomAPIConfig = this;
 
@@ -27,7 +30,7 @@ class MobileCustomAPIConfig {
     getDefaultSettings() {
         return {
             enabled: false,
-            provider: 'custom', // 修改：默认使用自定义API
+            provider: 'openai', // 修改：默认使用OpenAI
             apiUrl: '',
             apiKey: '',
             model: '',
@@ -49,6 +52,26 @@ class MobileCustomAPIConfig {
      */
     getSupportedProviders() {
         return {
+            openai: {
+                name: 'OpenAI',
+                defaultUrl: 'https://api.openai.com',
+                urlSuffix: 'v1/chat/completions',
+                modelsEndpoint: 'v1/models',
+                defaultModels: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini'],
+                authType: 'Bearer',
+                requiresKey: true,
+                icon: '🤖'
+            },
+            gemini: {
+                name: 'Google Gemini',
+                defaultUrl: 'https://generativelanguage.googleapis.com',
+                urlSuffix: 'v1beta/models/{model}:generateContent',
+                modelsEndpoint: 'v1beta/models',
+                defaultModels: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro', 'gemini-1.5-pro-latest', 'gemini-1.5-flash-latest'],
+                authType: 'Key',
+                requiresKey: true,
+                icon: '💎'
+            },
             custom: {
                 name: '自定义API',
                 defaultUrl: '',
@@ -56,7 +79,7 @@ class MobileCustomAPIConfig {
                 modelsEndpoint: 'models',
                 defaultModels: [],
                 authType: 'Bearer',
-                requiresKey: true, // 修复：允许填写密钥
+                requiresKey: true,
                 icon: '⚙️'
             }
         };
@@ -97,9 +120,6 @@ class MobileCustomAPIConfig {
             if (savedSettings) {
                 this.currentSettings = { ...this.getDefaultSettings(), ...JSON.parse(savedSettings) };
             }
-
-            // 强制设置provider为custom
-            this.currentSettings.provider = 'custom';
 
             console.log('[Mobile API Config] 设置已加载:', this.currentSettings);
         } catch (error) {
@@ -249,7 +269,7 @@ class MobileCustomAPIConfig {
         return `
             <div class="mobile-api-config-header">
                 <h3 style="margin: 0 0 20px 0; color: #333; text-align: center;">
-                    ⚙️ 自定义API配置
+                    ⚙️ API配置
                 </h3>
                 <button id="close-api-config" style="
                     position: absolute;
@@ -272,11 +292,18 @@ class MobileCustomAPIConfig {
                     </label>
                 </div>
 
-                <!-- 隐藏的服务商设置，固定为custom -->
-                <input type="hidden" id="api-provider" value="custom">
+                <!-- 服务商选择 -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">API服务商:</label>
+                    <select id="api-provider" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff; color: #000;">
+                        ${Object.entries(providers).map(([key, provider]) =>
+                            `<option value="${key}" ${key === settings.provider ? 'selected' : ''}>${provider.icon} ${provider.name}</option>`
+                        ).join('')}
+                    </select>
+                </div>
 
                 <!-- API URL -->
-                <div style="margin-bottom: 15px;">
+                <div style="margin-bottom: 15px;" id="api-url-section">
                     <label style="display: block; margin-bottom: 5px; font-weight: 500;">API URL:</label>
                     <input type="text" id="api-url" placeholder="https://api.openai.com"
                            value="${settings.apiUrl}"
@@ -288,7 +315,7 @@ class MobileCustomAPIConfig {
                 <div style="margin-bottom: 15px;" id="api-key-section">
                     <label style="display: block; margin-bottom: 5px; font-weight: 500;">API密钥:</label>
                     <div style="position: relative;">
-                        <input type="password" id="api-key" placeholder="sk-..."
+                        <input type="password" id="api-key" placeholder="sk-... 或 AIza..."
                                value="${settings.apiKey}"
                                style="width: 100%; padding: 8px 35px 8px 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;background-color: #fff;color: #000;">
                         <button type="button" id="toggle-api-key" style="
@@ -451,7 +478,10 @@ class MobileCustomAPIConfig {
         if (panel) {
             panel.style.display = 'block';
             this.updateUIFromSettings();
-            this.onProviderChange(this.currentSettings.provider);
+
+            // 确保URL显示状态正确
+            const currentProvider = this.currentSettings.provider;
+            this.onProviderChange(currentProvider);
         }
     }
 
@@ -469,21 +499,74 @@ class MobileCustomAPIConfig {
      * 当服务商选择变化时
      */
     onProviderChange(providerKey) {
-        // 固定使用custom provider
-        const provider = this.supportedProviders['custom'];
+        const provider = this.supportedProviders[providerKey];
         if (!provider) return;
 
-        // 不更新URL默认值，保持用户输入
-        // 自定义API不设置默认URL，让用户自己填写
+        console.log('[Mobile API Config] 服务商切换:', providerKey, provider);
 
-        // 显示密钥输入框
+        // 处理URL输入框的显示/隐藏
+        const urlSection = document.getElementById('api-url-section');
+        const urlInput = document.getElementById('api-url');
+
+        if (providerKey === 'gemini') {
+            // Gemini: 隐藏URL输入框，使用内置URL
+            if (urlSection) {
+                urlSection.style.display = 'none';
+            }
+            // 内部设置Gemini的URL，但不显示给用户
+            this.geminiUrl = provider.defaultUrl;
+        } else {
+            // OpenAI和自定义API: 显示URL输入框让用户编辑
+            if (urlSection) {
+                urlSection.style.display = 'block';
+            }
+
+            // 恢复或设置非Gemini服务商的URL
+            if (urlInput) {
+                // 如果之前保存过这个服务商的URL，则恢复；否则使用默认值
+                const savedUrl = this.getNonGeminiUrl(providerKey);
+                urlInput.value = savedUrl || provider.defaultUrl;
+                urlInput.placeholder = provider.defaultUrl;
+            }
+        }
+
+        // 更新API密钥占位符
+        const keyInput = document.getElementById('api-key');
+        if (keyInput) {
+            if (providerKey === 'openai') {
+                keyInput.placeholder = 'sk-...';
+            } else if (providerKey === 'gemini') {
+                keyInput.placeholder = 'AIza...';
+            } else {
+                keyInput.placeholder = '输入API密钥...';
+            }
+        }
+
+        // 显示/隐藏密钥输入框
         const keySection = document.getElementById('api-key-section');
         if (keySection) {
-            keySection.style.display = 'block';
+            keySection.style.display = provider.requiresKey ? 'block' : 'none';
         }
 
         // 更新模型列表
         this.updateModelList(provider.defaultModels);
+    }
+
+    /**
+     * 获取非Gemini服务商的保存URL
+     */
+    getNonGeminiUrl(providerKey) {
+        const saved = localStorage.getItem(`mobile_api_url_${providerKey}`);
+        return saved || '';
+    }
+
+    /**
+     * 保存非Gemini服务商的URL
+     */
+    saveNonGeminiUrl(providerKey, url) {
+        if (providerKey !== 'gemini') {
+            localStorage.setItem(`mobile_api_url_${providerKey}`, url);
+        }
     }
 
     /**
@@ -547,11 +630,23 @@ class MobileCustomAPIConfig {
      */
     async saveConfigFromUI() {
         try {
+            const provider = document.getElementById('api-provider')?.value || 'openai';
+            let apiUrl;
+
+            if (provider === 'gemini') {
+                // Gemini使用内置的URL
+                apiUrl = this.geminiUrl || this.supportedProviders.gemini.defaultUrl;
+            } else {
+                // 其他服务商从输入框获取URL并保存
+                apiUrl = document.getElementById('api-url')?.value || '';
+                this.saveNonGeminiUrl(provider, apiUrl);
+            }
+
             // 收集UI数据
             const formData = {
                 enabled: document.getElementById('api-enabled')?.checked || false,
-                provider: 'custom', // 固定使用custom provider
-                apiUrl: document.getElementById('api-url')?.value || '',
+                provider: provider,
+                apiUrl: apiUrl,
                 apiKey: document.getElementById('api-key')?.value || '',
                 model: document.getElementById('api-model')?.value || '',
                 temperature: parseFloat(document.getElementById('api-temperature')?.value || 0.8),
@@ -560,8 +655,8 @@ class MobileCustomAPIConfig {
             };
 
             // 验证必填字段
-            const provider = this.supportedProviders[formData.provider];
-            if (provider?.requiresKey && !formData.apiKey) {
+            const providerConfig = this.supportedProviders[formData.provider];
+            if (providerConfig?.requiresKey && !formData.apiKey) {
                 this.showStatus('❌ 请填写API密钥', 'error');
                 return;
             }
@@ -591,12 +686,33 @@ class MobileCustomAPIConfig {
      * 刷新模型列表
      */
     async refreshModels() {
-        const provider = 'custom'; // 固定使用custom provider
-        const apiUrl = document.getElementById('api-url')?.value || '';
+        const provider = document.getElementById('api-provider')?.value || this.currentSettings.provider;
+        let apiUrl;
+
+        if (provider === 'gemini') {
+            // Gemini使用内置的URL，不从输入框获取
+            apiUrl = this.geminiUrl || this.supportedProviders.gemini.defaultUrl;
+        } else {
+            // 其他服务商从输入框获取URL
+            apiUrl = document.getElementById('api-url')?.value || '';
+        }
+
         const apiKey = document.getElementById('api-key')?.value || '';
+
+        console.log('[Mobile API Config] 开始刷新模型列表:', {
+            provider,
+            apiUrl: apiUrl ? '已设置' : '未设置',
+            apiKey: apiKey ? '已设置' : '未设置',
+            isGemini: provider === 'gemini'
+        });
 
         if (!apiUrl) {
             this.showStatus('❌ 请先填写API URL', 'error');
+            return;
+        }
+
+        if (!apiKey) {
+            this.showStatus('❌ 请先填写API密钥', 'error');
             return;
         }
 
@@ -604,11 +720,29 @@ class MobileCustomAPIConfig {
 
         try {
             const models = await this.fetchModels(provider, apiUrl, apiKey);
-            this.updateModelList(models);
-            this.showStatus(`✅ 已获取 ${models.length} 个模型`, 'success');
+
+            if (models && models.length > 0) {
+                this.updateModelList(models);
+                this.showStatus(`✅ 已获取 ${models.length} 个模型`, 'success');
+                console.log('[Mobile API Config] 成功获取模型列表:', models);
+            } else {
+                // 使用默认模型列表
+                const defaultModels = this.supportedProviders[provider]?.defaultModels || [];
+                this.updateModelList(defaultModels);
+                this.showStatus(`⚠️ 使用默认模型列表 (${defaultModels.length} 个)`, 'warning');
+                console.warn('[Mobile API Config] 使用默认模型列表:', defaultModels);
+            }
         } catch (error) {
             console.error('[Mobile API Config] 获取模型失败:', error);
-            this.showStatus('❌ 获取模型失败: ' + error.message, 'error');
+
+            // 使用默认模型列表作为备选
+            const defaultModels = this.supportedProviders[provider]?.defaultModels || [];
+            if (defaultModels.length > 0) {
+                this.updateModelList(defaultModels);
+                this.showStatus(`⚠️ 网络请求失败，使用默认模型列表 (${defaultModels.length} 个)`, 'warning');
+            } else {
+                this.showStatus('❌ 获取模型失败: ' + error.message, 'error');
+            }
         }
     }
 
@@ -621,64 +755,125 @@ class MobileCustomAPIConfig {
             throw new Error('不支持的服务商');
         }
 
-        // 构建模型列表URL (完全模拟real-time-status-bar逻辑)
+        // 构建模型列表URL
         let modelsUrl = apiUrl.trim();
         if (!modelsUrl.endsWith('/')) {
             modelsUrl += '/';
         }
 
-        // 自定义API使用标准OpenAI兼容的URL构建
-        if (modelsUrl.endsWith('/v1/')) {
-            modelsUrl += 'models';
-        } else if (!modelsUrl.includes('/models')) {
-            modelsUrl += 'v1/models';
+        // 根据不同服务商构建正确的URL
+        if (provider === 'gemini') {
+            // Gemini API使用特殊的URL结构
+            if (!modelsUrl.includes('/v1beta/models')) {
+                if (modelsUrl.endsWith('/v1/')) {
+                    modelsUrl = modelsUrl.replace('/v1/', '/v1beta/models');
+                } else {
+                    modelsUrl += 'v1beta/models';
+                }
+            }
+        } else {
+            // OpenAI和自定义API使用标准URL构建
+            if (modelsUrl.endsWith('/v1/')) {
+                modelsUrl += 'models';
+            } else if (!modelsUrl.includes('/models')) {
+                modelsUrl += 'models';
+            }
         }
 
         // 构建请求头
         const headers = { 'Content-Type': 'application/json' };
 
-        // 自定义API使用Bearer认证
+        // 根据服务商设置正确的认证方式
         if (providerConfig.requiresKey && apiKey) {
-            headers['Authorization'] = `Bearer ${apiKey}`;
+            if (provider === 'gemini') {
+                // Gemini API使用URL参数传递key
+                modelsUrl += `?key=${apiKey}`;
+            } else {
+                // OpenAI和自定义API使用Bearer认证
+                headers['Authorization'] = `Bearer ${apiKey}`;
+            }
         }
 
         console.log('[Mobile API Config] 请求模型列表:', {
-            url: modelsUrl,
-            headers: { ...headers, Authorization: apiKey ? 'Bearer [HIDDEN]' : undefined }
+            provider: provider,
+            url: modelsUrl.replace(apiKey || '', '[HIDDEN]'),
+            headers: { ...headers, Authorization: headers.Authorization ? 'Bearer [HIDDEN]' : undefined }
         });
 
-        const response = await fetch(modelsUrl, {
-            method: 'GET',
-            headers: headers,
-            timeout: 10000
-        });
+        try {
+            const response = await fetch(modelsUrl, {
+                method: 'GET',
+                headers: headers
+                // 移除timeout，因为某些浏览器不支持
+            });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorText}`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('[Mobile API Config] 模型列表请求失败:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: errorText
+                });
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log('[Mobile API Config] 模型列表原始响应:', data);
+
+            // 根据不同服务商解析响应
+            let models = [];
+            if (provider === 'gemini') {
+                // Gemini API响应格式：{ models: [{ name: "models/gemini-pro", ... }] }
+                if (data.models && Array.isArray(data.models)) {
+                    models = data.models
+                        .filter(model => model.supportedGenerationMethods?.includes('generateContent'))
+                        .map(model => model.name.replace('models/', ''));
+                } else {
+                    console.warn('[Mobile API Config] Gemini API响应格式异常:', data);
+                    // 如果没有返回期望的格式，使用默认模型
+                    models = providerConfig.defaultModels;
+                }
+            } else {
+                // OpenAI兼容格式
+                if (data.data && Array.isArray(data.data)) {
+                    // 标准OpenAI格式
+                    models = data.data.map(model => model.id);
+                } else if (Array.isArray(data)) {
+                    // 直接数组格式
+                    models = data.map(model => model.id || model.name || model);
+                } else {
+                    console.warn('[Mobile API Config] OpenAI兼容API响应格式异常:', data);
+                    models = providerConfig.defaultModels;
+                }
+            }
+
+            const filteredModels = models.filter(model => typeof model === 'string' && model.length > 0);
+            console.log('[Mobile API Config] 解析后的模型列表:', filteredModels);
+
+            return filteredModels.length > 0 ? filteredModels : providerConfig.defaultModels;
+
+        } catch (fetchError) {
+            console.error('[Mobile API Config] 网络请求失败:', fetchError);
+            // 如果网络请求失败，返回默认模型列表
+            return providerConfig.defaultModels;
         }
-
-        const data = await response.json();
-
-        // 解析OpenAI兼容格式的响应
-        let models = [];
-        if (data.data && Array.isArray(data.data)) {
-            // 标准OpenAI格式
-            models = data.data.map(model => model.id);
-        } else if (Array.isArray(data)) {
-            // 直接数组格式
-            models = data.map(model => model.id || model.name || model);
-        }
-
-        return models.filter(model => typeof model === 'string' && model.length > 0);
     }
 
     /**
      * 测试API连接
      */
     async testConnection() {
-        const provider = 'custom'; // 固定使用custom provider
-        const apiUrl = document.getElementById('api-url')?.value || '';
+        const provider = document.getElementById('api-provider')?.value || this.currentSettings.provider;
+        let apiUrl;
+
+        if (provider === 'gemini') {
+            // Gemini使用内置的URL，不从输入框获取
+            apiUrl = this.geminiUrl || this.supportedProviders.gemini.defaultUrl;
+        } else {
+            // 其他服务商从输入框获取URL
+            apiUrl = document.getElementById('api-url')?.value || '';
+        }
+
         const apiKey = document.getElementById('api-key')?.value || '';
         const model = document.getElementById('api-model')?.value || '';
 
@@ -724,13 +919,24 @@ class MobileCustomAPIConfig {
         if (!requestUrl.endsWith('/')) {
             requestUrl += '/';
         }
-        requestUrl += providerConfig.urlSuffix.replace('{model}', model);
+
+        // 根据不同服务商构建URL
+        if (provider === 'gemini') {
+            // Gemini API使用特殊的URL结构，并通过URL参数传递API key
+            requestUrl += providerConfig.urlSuffix.replace('{model}', model);
+            if (apiKey) {
+                requestUrl += `?key=${apiKey}`;
+            }
+        } else {
+            // OpenAI和自定义API使用标准URL构建
+            requestUrl += providerConfig.urlSuffix.replace('{model}', model);
+        }
 
         // 构建请求头
         const headers = { 'Content-Type': 'application/json' };
 
-        // 自定义API使用Bearer认证
-        if (providerConfig.requiresKey && apiKey) {
+        // 根据服务商设置正确的认证方式
+        if (providerConfig.requiresKey && apiKey && provider !== 'gemini') {
             headers['Authorization'] = `Bearer ${apiKey}`;
         }
 
@@ -738,8 +944,9 @@ class MobileCustomAPIConfig {
         const requestBody = this.buildTestRequestBody(provider, model);
 
         console.log('[Mobile API Config] 测试请求:', {
-            url: requestUrl,
-            headers: { ...headers, Authorization: apiKey ? 'Bearer [HIDDEN]' : undefined },
+            provider: provider,
+            url: requestUrl.replace(apiKey || '', '[HIDDEN]'),
+            headers: { ...headers, Authorization: headers.Authorization ? 'Bearer [HIDDEN]' : undefined },
             body: requestBody
         });
 
@@ -767,13 +974,26 @@ class MobileCustomAPIConfig {
     buildTestRequestBody(provider, model) {
         const testMessage = "Hello! This is a test message from Mobile API Config.";
 
-        // 自定义API使用标准OpenAI兼容格式
-        return {
-            model: model,
-            messages: [{ role: 'user', content: testMessage }],
-            max_tokens: 50,
-            temperature: 0.7
-        };
+        if (provider === 'gemini') {
+            // Gemini API格式
+            return {
+                contents: [{
+                    parts: [{ text: testMessage }]
+                }],
+                generationConfig: {
+                    maxOutputTokens: 50,
+                    temperature: 0.7
+                }
+            };
+        } else {
+            // OpenAI兼容格式（用于OpenAI和自定义API）
+            return {
+                model: model,
+                messages: [{ role: 'user', content: testMessage }],
+                max_tokens: 50,
+                temperature: 0.7
+            };
+        }
     }
 
     /**
@@ -818,7 +1038,16 @@ class MobileCustomAPIConfig {
         }
 
         const provider = this.currentSettings.provider;
-        const apiUrl = this.currentSettings.apiUrl || this.supportedProviders[provider]?.defaultUrl;
+        let apiUrl;
+
+        if (provider === 'gemini') {
+            // Gemini使用内置的URL
+            apiUrl = this.geminiUrl || this.supportedProviders.gemini.defaultUrl;
+        } else {
+            // 其他服务商使用配置中的URL
+            apiUrl = this.currentSettings.apiUrl || this.supportedProviders[provider]?.defaultUrl;
+        }
+
         const apiKey = this.currentSettings.apiKey;
         const model = this.currentSettings.model;
 
@@ -831,17 +1060,34 @@ class MobileCustomAPIConfig {
             throw new Error('缺少API密钥');
         }
 
+        // CORS警告检查
+        if (provider === 'gemini' && window.location.protocol === 'http:') {
+            console.warn('⚠️ [Mobile API Config] CORS警告: 从浏览器直接调用Gemini API可能被CORS策略阻止');
+            console.warn('建议通过后端代理或使用HTTPS来避免CORS问题');
+        }
+
         // 构建请求
         let requestUrl = apiUrl.trim();
         if (!requestUrl.endsWith('/')) {
             requestUrl += '/';
         }
-        requestUrl += providerConfig.urlSuffix.replace('{model}', model);
+
+        // 根据不同服务商构建URL
+        if (provider === 'gemini') {
+            // Gemini API使用特殊的URL结构，并通过URL参数传递API key
+            requestUrl += providerConfig.urlSuffix.replace('{model}', model);
+            if (apiKey) {
+                requestUrl += `?key=${apiKey}`;
+            }
+        } else {
+            // OpenAI和自定义API使用标准URL构建
+            requestUrl += providerConfig.urlSuffix.replace('{model}', model);
+        }
 
         const headers = { 'Content-Type': 'application/json' };
 
-        // 自定义API使用Bearer认证
-        if (providerConfig.requiresKey && apiKey) {
+        // 根据服务商设置正确的认证方式
+        if (providerConfig.requiresKey && apiKey && provider !== 'gemini') {
             headers['Authorization'] = `Bearer ${apiKey}`;
         }
 
@@ -869,35 +1115,91 @@ class MobileCustomAPIConfig {
     buildRequestBody(provider, model, messages, options) {
         const settings = this.currentSettings;
 
-        // 自定义API使用标准OpenAI兼容格式
-        const body = {
-            model: model,
-            messages: messages,
-            max_tokens: options.maxTokens || settings.maxTokens,
-            temperature: options.temperature || settings.temperature,
-            ...options.customParams
-        };
+        if (provider === 'gemini') {
+            // Gemini API格式
+            const contents = [];
 
-        // 添加系统提示词
-        if (settings.systemPrompt) {
-            body.messages = [
-                { role: 'system', content: settings.systemPrompt },
-                ...body.messages
-            ];
+            // 转换消息格式
+            messages.forEach(msg => {
+                if (msg.role === 'system') {
+                    // 系统消息作为第一个用户消息的前缀
+                    if (contents.length === 0) {
+                        contents.push({
+                            parts: [{ text: msg.content + '\n\n' }]
+                        });
+                    }
+                } else if (msg.role === 'user') {
+                    const existingText = contents.length > 0 ? contents[contents.length - 1].parts[0].text : '';
+                    if (contents.length > 0 && !contents[contents.length - 1].role) {
+                        // 合并到现有的系统消息中
+                        contents[contents.length - 1].parts[0].text = existingText + msg.content;
+                    } else {
+                        contents.push({
+                            parts: [{ text: msg.content }]
+                        });
+                    }
+                } else if (msg.role === 'assistant') {
+                    contents.push({
+                        role: 'model',
+                        parts: [{ text: msg.content }]
+                    });
+                }
+            });
+
+            // 添加系统提示词
+            if (settings.systemPrompt && contents.length === 0) {
+                contents.push({
+                    parts: [{ text: settings.systemPrompt }]
+                });
+            }
+
+            return {
+                contents: contents,
+                generationConfig: {
+                    maxOutputTokens: options.maxTokens || settings.maxTokens,
+                    temperature: options.temperature || settings.temperature,
+                    ...options.customParams
+                }
+            };
+        } else {
+            // OpenAI兼容格式（用于OpenAI和自定义API）
+            const body = {
+                model: model,
+                messages: messages,
+                max_tokens: options.maxTokens || settings.maxTokens,
+                temperature: options.temperature || settings.temperature,
+                ...options.customParams
+            };
+
+            // 添加系统提示词
+            if (settings.systemPrompt) {
+                body.messages = [
+                    { role: 'system', content: settings.systemPrompt },
+                    ...body.messages
+                ];
+            }
+
+            return body;
         }
-
-        return body;
     }
 
     /**
      * 解析API响应 (OpenAI兼容格式)
      */
     parseAPIResponse(provider, data) {
-        // 自定义API使用标准OpenAI兼容格式
-        return {
-            content: data.choices?.[0]?.message?.content || '',
-            usage: data.usage
-        };
+        if (provider === 'gemini') {
+            // Gemini API响应格式
+            return {
+                content: data.candidates?.[0]?.content?.parts?.[0]?.text || '',
+                usage: data.usageMetadata
+            };
+        } else {
+            // OpenAI兼容格式（用于OpenAI和自定义API）
+            return {
+                content: data.choices?.[0]?.message?.content || '',
+                usage: data.usage
+            };
+        }
     }
 
     /**
@@ -944,13 +1246,90 @@ class MobileCustomAPIConfig {
         console.log('🌐 支持的服务商:', Object.keys(this.supportedProviders));
         console.log('⚙️ 当前Provider配置:', this.supportedProviders[this.currentSettings.provider]);
         console.log('🔗 API可用性:', this.isAPIAvailable());
+
+        // 获取当前UI中的值
+        const currentProvider = document.getElementById('api-provider')?.value;
+        const currentUrl = document.getElementById('api-url')?.value;
+        const currentKey = document.getElementById('api-key')?.value;
+
         console.log('🔧 UI元素状态:', {
-            'api-provider': document.getElementById('api-provider')?.value || '(未找到)',
-            'api-url': document.getElementById('api-url')?.value || '(未找到)',
-            'api-key': document.getElementById('api-key') ? '(存在)' : '(未找到)',
+            'api-provider': currentProvider || '(未找到)',
+            'api-url': currentUrl || '(未找到)',
+            'api-key': document.getElementById('api-key') ? (currentKey ? '已填写' : '未填写') : '(未找到)',
             'api-model': document.getElementById('api-model')?.value || '(未找到)'
         });
+
+        // 测试URL构建
+        const provider = currentProvider || this.currentSettings.provider || 'gemini';
+        const apiUrl = currentUrl || this.currentSettings.apiUrl || this.supportedProviders[provider]?.defaultUrl;
+        if (apiUrl) {
+            const modelsUrl = this.buildModelsUrl(provider, apiUrl);
+            console.log('🔗 当前Provider:', provider);
+            console.log('🔗 基础URL:', apiUrl);
+            console.log('🔗 预期的模型URL:', modelsUrl);
+
+            // 检查URL是否正确
+            if (provider === 'gemini' && !modelsUrl.includes('v1beta')) {
+                console.warn('⚠️ 警告: Gemini URL应该包含v1beta，当前URL可能不正确');
+            }
+        }
+
         console.groupEnd();
+    }
+
+    /**
+     * 构建模型列表URL（用于调试）
+     */
+    buildModelsUrl(provider, apiUrl) {
+        let modelsUrl = apiUrl.trim();
+        if (!modelsUrl.endsWith('/')) {
+            modelsUrl += '/';
+        }
+
+        if (provider === 'gemini') {
+            if (!modelsUrl.includes('/v1beta/models')) {
+                if (modelsUrl.endsWith('/v1/')) {
+                    modelsUrl = modelsUrl.replace('/v1/', '/v1beta/models');
+                } else {
+                    modelsUrl += 'v1beta/models';
+                }
+            }
+        } else {
+            if (modelsUrl.endsWith('/v1/')) {
+                modelsUrl += 'models';
+            } else if (!modelsUrl.includes('/models')) {
+                modelsUrl += 'models';
+            }
+        }
+
+        return modelsUrl;
+    }
+
+    /**
+     * 手动测试模型获取（调试用）
+     */
+    async testModelFetch() {
+        console.log('[Mobile API Config] 🧪 开始手动测试模型获取...');
+
+        const provider = document.getElementById('api-provider')?.value || this.currentSettings.provider;
+        const apiUrl = document.getElementById('api-url')?.value || this.currentSettings.apiUrl;
+        const apiKey = document.getElementById('api-key')?.value || this.currentSettings.apiKey;
+
+        console.log('测试参数:', { provider, apiUrl: apiUrl ? '已设置' : '未设置', apiKey: apiKey ? '已设置' : '未设置' });
+
+        if (!apiUrl || !apiKey) {
+            console.error('缺少必要参数');
+            return;
+        }
+
+        try {
+            const models = await this.fetchModels(provider, apiUrl, apiKey);
+            console.log('✅ 测试成功，获取到模型:', models);
+            return models;
+        } catch (error) {
+            console.error('❌ 测试失败:', error);
+            return null;
+        }
     }
 }
 
@@ -975,3 +1354,42 @@ jQuery(document).ready(() => {
 
 // 导出类和实例到全局作用域
 window.MobileCustomAPIConfig = MobileCustomAPIConfig;
+
+// 全局辅助函数
+window.fixGeminiConfig = function() {
+    console.log('🔧 正在修复Gemini配置...');
+
+    const config = window.mobileCustomAPIConfig;
+    if (!config) {
+        console.error('❌ API配置管理器未初始化');
+        return;
+    }
+
+    // 强制设置正确的Gemini配置
+    const providerSelect = document.getElementById('api-provider');
+
+    if (providerSelect) {
+        providerSelect.value = 'gemini';
+    }
+
+    // 触发provider change事件（这会自动隐藏URL输入框并设置内置URL）
+    config.onProviderChange('gemini');
+
+    console.log('✅ 配置已修复，请确保：');
+    console.log('1. 已选择💎 Google Gemini服务商');
+    console.log('2. URL输入框已隐藏（使用内置URL）');
+    console.log('3. API密钥: 以AIza开头的Google AI API密钥');
+    console.log('4. 点击📥按钮获取模型列表');
+
+    // 显示调试信息
+    config.debugConfig();
+};
+
+// 添加控制台提示
+console.log(`
+🚀 [Mobile API Config] 可用的调试命令:
+
+   查看配置状态: window.mobileCustomAPIConfig.debugConfig()
+   手动测试获取: await window.mobileCustomAPIConfig.testModelFetch()
+   修复Gemini配置: window.fixGeminiConfig()
+`);
