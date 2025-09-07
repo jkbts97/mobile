@@ -593,7 +593,7 @@
   order: 1; /* 确保显示顺序 */
 }
 
-.add-friend-app > .tab-content {
+.add-friend-app > .m-tab-content {
   flex: 1;
   order: 2; /* 确保显示顺序 */
   overflow-y: auto;

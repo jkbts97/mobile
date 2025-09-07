@@ -2492,7 +2492,7 @@ class MobilePhone {
                         <button class="tab-btn" data-tab="api">API</button>
                     </div>
 
-                    <div class="tab-content" id="forum-tab" style="display: block;">
+                    <div class="m-tab-content" id="forum-tab" style="display: block;">
                         <div class="setting-group">
                             <label>论坛风格:</label>
                             <select id="forum-style-select">
@@ -2558,7 +2558,7 @@ class MobilePhone {
                         </div>
                     </div>
 
-                    <div class="tab-content" id="forum-styles-tab" style="display: none;">
+                    <div class="m-tab-content" id="forum-styles-tab" style="display: none;">
                         <div class="forum-styles-container">
                             <div class="styles-header">
                                 <h3>🎨 论坛风格管理</h3>
@@ -2603,7 +2603,7 @@ class MobilePhone {
                         </div>
                     </div>
 
-                    <div class="tab-content" id="weibo-tab" style="display: none;">
+                    <div class="m-tab-content" id="weibo-tab" style="display: none;">
 
 
                         <div class="setting-group">
@@ -2635,7 +2635,7 @@ class MobilePhone {
                         </div>
                     </div>
 
-                    <div class="tab-content" id="api-tab" style="display: none;">
+                    <div class="m-tab-content" id="api-tab" style="display: none;">
                         <div class="setting-group">
                             <label>API配置:</label>
                             <button id="open-api-config" class="btn-secondary">🔧 打开API配置面板</button>
@@ -2712,7 +2712,7 @@ class MobilePhone {
                         color: #007AFF;
                     }
 
-                    .tab-content {
+                    .m-tab-content {
                         padding: 25px;
                     }
 
@@ -2923,7 +2923,7 @@ class MobilePhone {
     document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
     // 切换内容显示
-    document.querySelectorAll('.tab-content').forEach(content => {
+    document.querySelectorAll('.m-tab-content').forEach(content => {
       content.style.display = 'none';
     });
     document.getElementById(`${tabName}-tab`).style.display = 'block';

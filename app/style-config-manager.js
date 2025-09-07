@@ -1116,7 +1116,7 @@ ${
                         </button>
                     </div>
 
-                    <div class="tab-content">
+                    <div class="m-tab-content">
                         <div class="tab-panel active" data-tab="editor">
                 <div class="style-config-settings">
                     <div class="image-upload-settings">
@@ -1280,7 +1280,7 @@ ${
                     border-bottom: 2px solid transparent !important;
                 }
 
-                [data-app="settings"] .tab-content {
+                [data-app="settings"] .m-tab-content {
                     min-height: auto !important;
                     padding: 0 !important;
                 }
@@ -1321,7 +1321,7 @@ ${
                     border-bottom-color: #3182ce;
                 }
 
-                .tab-content {
+                .m-tab-content {
                     min-height: 500px;
                 }
 

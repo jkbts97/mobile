@@ -1835,7 +1835,7 @@ if (typeof window.MessageApp === 'undefined') {
                 </div>
 
                 <!-- Tab内容 -->
-                <div class="tab-content">
+                <div class="m-tab-content">
                     ${this.renderCurrentTabContent()}
                 </div>
             </div>
