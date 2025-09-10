@@ -116,3 +116,6 @@ inputP {
 .style-config-settings .tab-content {
   display: block !important;
 }
+[force_avatar="false"][is_user="true"] .mes_text{padding:10px;border-radius: 10px;border:1px solid rgba(255,255,255,0.6)}
+.mobile-phone-screen input,.mobile-phone-screen textarea,.mobile-phone-screen select{background:#eee !important;color:#333 !important}
+.unified-api-settings .toggle-label{background-color: unset;}

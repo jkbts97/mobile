@@ -221,7 +221,7 @@ class MobilePhone {
                                         <span class="current-date" id="home-date">08/21</span>
                                     </div>
                                     <div class="weather-info">
-                                        <span class="weather-desc">多云转小雨 · 上海</span>
+                                        <span class="weather-desc">多云转小雨</span>
                                     </div>
                                 </div>
 
@@ -1386,6 +1386,12 @@ class MobilePhone {
         isCustomApp: true,
         customHandler: this.handleWatchLiveApp.bind(this),
       },
+      'parallel-events': {
+        name: '平行事件',
+        content: null, // 将由parallel-events-app动态生成
+        isCustomApp: true,
+        customHandler: this.handleParallelEventsApp.bind(this),
+      },
     };
   }
 
@@ -1405,6 +1411,7 @@ class MobilePhone {
       container.classList.add('active');
     }, 10);
     this.isVisible = true;
+    this.isPhoneActive = true;
 
     // 初始化样式配置管理器（如果还没有初始化）
     this.initStyleConfigManager();
@@ -1436,6 +1443,7 @@ class MobilePhone {
       container.style.display = 'none';
     }, 300);
     this.isVisible = false;
+    this.isPhoneActive = false;
 
     // 停止应用状态同步轮询
     this.stopStateSyncLoop();
@@ -2388,6 +2396,83 @@ class MobilePhone {
     }
   }
 
+  // 处理平行事件应用
+  async handleParallelEventsApp() {
+    try {
+      console.log('[Mobile Phone] 开始处理平行事件应用...');
+
+      // 显示加载状态
+      document.getElementById('app-content').innerHTML = `
+                <div class="loading-placeholder">
+                    <div class="loading-icon">⏳</div>
+                    <div class="loading-text">正在加载平行事件应用...</div>
+                </div>
+            `;
+
+      // 确保parallel-events-app已加载
+      console.log('[Mobile Phone] 加载平行事件应用模块...');
+
+      // 如果全局变量不存在，尝试简单加载
+      if (!window.ParallelEventsApp || !window.getParallelEventsAppContent ||
+          !window.bindParallelEventsAppEvents || !window.parallelEventsStyles) {
+        console.log('[Mobile Phone] 平行事件应用模块未加载，尝试简单加载...');
+        await this.simpleLoadParallelEventsApp();
+      } else {
+        console.log('[Mobile Phone] 平行事件应用模块已存在');
+      }
+
+      // 检查必要的全局变量
+      console.log('[Mobile Phone] 检查全局变量状态:');
+      console.log('  - ParallelEventsApp:', typeof window.ParallelEventsApp);
+      console.log('  - getParallelEventsAppContent:', typeof window.getParallelEventsAppContent);
+      console.log('  - bindParallelEventsAppEvents:', typeof window.bindParallelEventsAppEvents);
+      console.log('  - parallelEventsStyles:', typeof window.parallelEventsStyles);
+      console.log('  - parallelEventsManager:', typeof window.parallelEventsManager);
+
+      if (!window.getParallelEventsAppContent) {
+        throw new Error('getParallelEventsAppContent 函数未找到');
+      }
+
+      if (!window.bindParallelEventsAppEvents) {
+        throw new Error('bindParallelEventsAppEvents 函数未找到');
+      }
+
+      // 获取平行事件应用内容
+      console.log('[Mobile Phone] 获取平行事件应用内容...');
+      const content = window.getParallelEventsAppContent();
+
+      if (!content || content.trim() === '') {
+        throw new Error('平行事件应用内容为空');
+      }
+
+      document.getElementById('app-content').innerHTML = content;
+
+      // 绑定平行事件应用事件
+      console.log('[Mobile Phone] 绑定平行事件应用事件...');
+      if (window.bindParallelEventsAppEvents) {
+        await window.bindParallelEventsAppEvents();
+      }
+
+      console.log('[Mobile Phone] 平行事件管理器状态:', {
+        manager: !!window.parallelEventsManager,
+        isListening: window.parallelEventsManager?.isListening,
+        settings: window.parallelEventsManager?.currentSettings
+      });
+
+      console.log('[Mobile Phone] ✅ 平行事件应用加载完成');
+    } catch (error) {
+      console.error('[Mobile Phone] 处理平行事件应用失败:', error);
+      document.getElementById('app-content').innerHTML = `
+                <div class="error-placeholder">
+                    <div class="error-icon">❌</div>
+                    <div class="error-text">平行事件应用加载失败</div>
+                    <div class="error-detail">${error.message}</div>
+                    <button onclick="window.mobilePhone.handleParallelEventsApp()" class="retry-button">重试</button>
+                </div>
+            `;
+    }
+  }
+
   // 处理统一API设置应用
   async handleApiApp() {
     try {
@@ -2402,7 +2487,7 @@ class MobilePhone {
             `;
 
       // 确保必要的模块已加载，添加超时控制
-      console.log('[Mobile Phone] 确保论坛和微博模块已加载...');
+      console.log('[Mobile Phone] 确保论坛、微博和平行事件模块已加载...');
 
       const loadWithTimeout = (promise, timeout = 10000, name = '') => {
         return Promise.race([
@@ -2417,6 +2502,9 @@ class MobilePhone {
         ),
         loadWithTimeout(this.loadWeiboApp(), 10000, '微博模块').catch(e =>
           console.warn('[Mobile Phone] 微博模块加载失败:', e),
+        ),
+        loadWithTimeout(this.simpleLoadParallelEventsApp(), 10000, '平行事件模块').catch(e =>
+          console.warn('[Mobile Phone] 平行事件模块加载失败:', e),
         ),
       ]);
 
@@ -2442,7 +2530,23 @@ class MobilePhone {
           this.initializeForumStyleSelector(forumStyleSelect);
           console.log('[Mobile Phone] API设置页面风格选择器初始化完成');
         }
+
+        // 同时初始化平行事件设置显示
+        console.log('[Mobile Phone] 准备同步平行事件UI...');
+        if (this.syncParallelEventsUIFromStorage) {
+          this.syncParallelEventsUIFromStorage();
+        } else {
+          console.warn('[Mobile Phone] syncParallelEventsUIFromStorage方法不存在');
+        }
       }, 500);
+
+      // 额外的延迟调用，确保UI元素完全加载
+      setTimeout(() => {
+        console.log('[Mobile Phone] 延迟1秒后再次尝试同步平行事件UI...');
+        if (this.syncParallelEventsUIFromStorage) {
+          this.syncParallelEventsUIFromStorage();
+        }
+      }, 1000);
 
       console.log('[Mobile Phone] ✅ 统一API设置应用加载完成');
     } catch (error) {
@@ -2488,6 +2592,7 @@ class MobilePhone {
                     <div class="tab-buttons">
                         <button class="tab-btn active" data-tab="forum">论坛</button>
                         <button class="tab-btn" data-tab="forum-styles">论坛风格</button>
+                        <button class="tab-btn" data-tab="parallel-events">平行事件</button>
                         <button class="tab-btn" data-tab="weibo">微博</button>
                         <button class="tab-btn" data-tab="api">API</button>
                     </div>
@@ -2581,7 +2686,7 @@ class MobilePhone {
                             </div>
 
                             <div class="custom-styles-list">
-                                <h4>自定义风格列表</h4>
+                                <h4>自定义风格列表111</h4>
                                 <div id="custom-styles-container">
                                     <div class="no-styles-placeholder">
                                         <div class="placeholder-icon">🎭</div>
@@ -2598,6 +2703,65 @@ class MobilePhone {
                                     <li>可以导出风格文件在其他设备上使用</li>
                                     <li>编辑风格时请保持格式的完整性</li>
                                     <li>风格内容支持所有论坛功能和格式</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="m-tab-content" id="parallel-events-tab" style="display: none;">
+                        <div class="parallel-events-container">
+                            <div class="settings-header">
+                                <h3>🌀 平行事件设置</h3>
+                                <p>配置平行事件的生成风格和自定义前缀</p>
+                            </div>
+
+                            <div class="setting-group">
+                                <label>事件风格:</label>
+                                <select id="parallel-events-style-select">
+                                    <option value="科幻未来">科幻未来</option>
+                                    <option value="奇幻魔法">奇幻魔法</option>
+                                    <option value="现代都市">现代都市</option>
+                                    <option value="历史古代">历史古代</option>
+                                    <option value="恐怖悬疑">恐怖悬疑</option>
+                                    <option value="浪漫温馨">浪漫温馨</option>
+                                    <option value="冒险探索">冒险探索</option>
+                                    <option value="自定义">自定义</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-group">
+                                <label>自定义前缀:</label>
+                                <textarea id="parallel-events-custom-prefix" placeholder="当选择'自定义'风格时，请在此输入具体的风格要求和生成指导..."></textarea>
+                                <small>提示：选择"自定义"风格时，此前缀将作为主要的风格指导</small>
+                            </div>
+
+                            <div class="setting-group">
+                                <label>监听阈值:</label>
+                                <input type="number" id="parallel-events-threshold" value="5" min="2" max="50">
+                                <small>楼层变化达到此数量时触发平行事件生成</small>
+                            </div>
+
+                            <div class="setting-group">
+                                <label>启用监听:</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="parallel-events-enabled" checked>
+                                    <label for="parallel-events-enabled" class="toggle-label">
+                                    </label>
+                                </div>
+                                <small>开启后将持续监听楼层变化，无论手机界面是否打开</small>
+                            </div>
+
+                            <div class="setting-group">
+                                <button id="test-parallel-events" class="btn-primary">🧪 测试生成</button>
+                            </div>
+
+                            <div class="parallel-events-info">
+                                <h4>使用说明</h4>
+                                <ul>
+                                    <li>平行事件会根据最近5层楼的对话内容生成相关的背景事件</li>
+                                    <li>生成的内容会自动插入到最新楼层</li>
+                                    <li>选择"自定义"风格可以完全自定义生成要求</li>
+                                    <li>自定义前缀可以进一步细化任何风格的生成方向</li>
                                 </ul>
                             </div>
                         </div>
@@ -2652,6 +2816,10 @@ class MobilePhone {
                                 <div class="status-item">
                                     <span class="status-label">微博管理器:</span>
                                     <span id="weibo-status" class="status-value">检查中...</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-label">平行事件管理器:</span>
+                                    <span id="parallel-events-status" class="status-value">检查中...</span>
                                 </div>
                                 <div class="status-item">
                                     <span class="status-label">API配置:</span>
@@ -2898,6 +3066,9 @@ class MobilePhone {
 
     // 论坛风格设置事件
     this.bindForumStylesEvents();
+
+    // 平行事件设置事件
+    this.bindParallelEventsEvents();
 
     // 微博设置事件
     this.bindWeiboSettingsEvents();
@@ -3177,8 +3348,148 @@ class MobilePhone {
     }
   }
 
+  // 绑定平行事件设置事件
+  bindParallelEventsEvents() {
+    // 初始化平行事件风格选择器
+    this.initializeParallelEventsStyleSelector();
+
+    // 平行事件风格选择
+    const parallelEventsStyleSelect = document.getElementById('parallel-events-style-select');
+    if (parallelEventsStyleSelect) {
+      parallelEventsStyleSelect.addEventListener('change', e => {
+        if (window.parallelEventsManager) {
+          window.parallelEventsManager.currentSettings.selectedStyle = e.target.value;
+          window.parallelEventsManager.saveSettings();
+          console.log('[Mobile Phone] 平行事件风格已更新:', e.target.value);
+        }
+      });
+    }
+
+    // 平行事件自定义前缀
+    const parallelEventsCustomPrefix = document.getElementById('parallel-events-custom-prefix');
+    if (parallelEventsCustomPrefix) {
+      parallelEventsCustomPrefix.addEventListener('input', e => {
+        if (window.parallelEventsManager) {
+          window.parallelEventsManager.currentSettings.customPrefix = e.target.value;
+          window.parallelEventsManager.saveSettings();
+          console.log('[Mobile Phone] 平行事件自定义前缀已更新');
+        }
+      });
+    }
+
+    // 平行事件监听阈值
+    const parallelEventsThreshold = document.getElementById('parallel-events-threshold');
+    if (parallelEventsThreshold) {
+      parallelEventsThreshold.addEventListener('change', e => {
+        if (window.parallelEventsManager) {
+          window.parallelEventsManager.currentSettings.threshold = parseInt(e.target.value);
+          window.parallelEventsManager.saveSettings();
+          console.log('[Mobile Phone] 平行事件监听阈值已更新:', e.target.value);
+        }
+      });
+    }
+
+    // 平行事件启用开关
+    const parallelEventsEnabled = document.getElementById('parallel-events-enabled');
+    if (parallelEventsEnabled) {
+      parallelEventsEnabled.addEventListener('change', e => {
+        if (window.parallelEventsManager) {
+          window.parallelEventsManager.currentSettings.enabled = e.target.checked;
+          window.parallelEventsManager.saveSettings();
+
+          if (e.target.checked) {
+            console.log('[Mobile Phone] 平行事件监听已启用，立即开始监听');
+            window.parallelEventsManager.startListening();
+          } else {
+            console.log('[Mobile Phone] 平行事件监听已禁用，停止监听');
+            window.parallelEventsManager.stopListening();
+          }
+
+          // 立即更新状态显示
+          setTimeout(() => {
+            this.updateApiStatus();
+            console.log('[Mobile Phone] 平行事件状态已更新');
+          }, 100);
+        }
+      });
+    }
+
+    // 平行事件自定义前缀
+    const parallelEventsPrefixTextarea = document.getElementById('parallel-events-custom-prefix');
+    if (parallelEventsPrefixTextarea) {
+      parallelEventsPrefixTextarea.addEventListener('blur', e => {
+        if (window.parallelEventsManager) {
+          window.parallelEventsManager.currentSettings.customPrefix = e.target.value;
+          window.parallelEventsManager.saveSettings();
+          console.log('[Mobile Phone] 平行事件自定义前缀已更新');
+        }
+      });
+    }
+
+
+
+    // 平行事件启用开关
+    const parallelEventsEnabledCheckbox = document.getElementById('parallel-events-enabled');
+    if (parallelEventsEnabledCheckbox) {
+      parallelEventsEnabledCheckbox.addEventListener('change', e => {
+        if (window.parallelEventsManager) {
+          window.parallelEventsManager.currentSettings.enabled = e.target.checked;
+          window.parallelEventsManager.saveSettings();
+          console.log('[Mobile Phone] 平行事件启用状态已更新:', e.target.checked);
+
+          // 根据启用状态控制监听
+          if (e.target.checked) {
+            window.parallelEventsManager.startListening();
+          } else {
+            window.parallelEventsManager.stopListening();
+          }
+        }
+      });
+    }
+
+    // 测试生成按钮
+    const testParallelEventsBtn = document.getElementById('test-parallel-events');
+    if (testParallelEventsBtn) {
+      testParallelEventsBtn.addEventListener('click', async () => {
+        if (window.parallelEventsManager) {
+          console.log('[Mobile Phone] 触发测试生成平行事件');
+          MobilePhone.showToast('🔄 开始生成平行事件内容...', 'processing');
+
+          try {
+            await window.parallelEventsManager.generateParallelEvent();
+            MobilePhone.showToast('✅ 平行事件生成完成', 'success');
+            // 刷新状态显示
+            setTimeout(() => this.updateApiStatus(), 500);
+          } catch (error) {
+            console.error('[Mobile Phone] 生成平行事件出错:', error);
+            MobilePhone.showToast(`❌ 生成平行事件出错: ${error.message}`, 'error');
+          }
+        } else {
+          MobilePhone.showToast('❌ 平行事件管理器未初始化', 'error');
+        }
+      });
+    }
+
+    // 清空队列按钮
+    const clearParallelEventsQueueBtn = document.getElementById('clear-parallel-events-queue');
+    if (clearParallelEventsQueueBtn) {
+      clearParallelEventsQueueBtn.addEventListener('click', () => {
+        if (window.parallelEventsManager) {
+          console.log('[Mobile Phone] 清空平行事件队列');
+          window.parallelEventsManager.clearQueue();
+          MobilePhone.showToast('✅ 平行事件队列已清空', 'success');
+        } else {
+          MobilePhone.showToast('❌ 平行事件管理器未初始化', 'error');
+        }
+      });
+    }
+  }
+
   // 绑定API配置事件
   bindApiConfigEvents() {
+    // 初始化平行事件管理器（如果还没有）
+    this.initializeParallelEventsManager();
+
     // 打开API配置面板
     const openApiConfigBtn = document.getElementById('open-api-config');
     if (openApiConfigBtn) {
@@ -3210,10 +3521,54 @@ class MobilePhone {
     }
   }
 
+  // 初始化平行事件管理器
+  async initializeParallelEventsManager() {
+    try {
+      // 检查是否已经初始化
+      if (window.parallelEventsManager && window.parallelEventsManager.isInitialized) {
+        console.log('[Mobile Phone] 平行事件管理器已初始化');
+        return;
+      }
+
+      // 检查必要的全局变量是否存在
+      if (!window.ParallelEventsApp || !window.bindParallelEventsAppEvents) {
+        console.log('[Mobile Phone] 平行事件应用模块未加载，跳过初始化');
+        return;
+      }
+
+      console.log('[Mobile Phone] 开始初始化平行事件管理器...');
+
+      // 创建管理器（如果不存在）
+      if (!window.parallelEventsManager) {
+        console.log('[Mobile Phone] 创建平行事件管理器实例...');
+        window.parallelEventsManager = new window.ParallelEventsApp();
+      }
+
+      // 初始化管理器
+      if (!window.parallelEventsManager.isInitialized) {
+        console.log('[Mobile Phone] 初始化平行事件管理器...');
+        await window.parallelEventsManager.initialize();
+      }
+
+      // 检查是否应该自动开始监听
+      if (window.parallelEventsManager.currentSettings.enabled) {
+        console.log('[Mobile Phone] 平行事件监听已启用，自动开始监听');
+        window.parallelEventsManager.startListening();
+      } else {
+        console.log('[Mobile Phone] 平行事件监听未启用');
+      }
+
+      console.log('[Mobile Phone] ✅ 平行事件管理器初始化完成');
+    } catch (error) {
+      console.error('[Mobile Phone] 平行事件管理器初始化失败:', error);
+    }
+  }
+
   // 更新API状态显示
   updateApiStatus() {
     const forumStatusEl = document.getElementById('forum-status');
     const weiboStatusEl = document.getElementById('weibo-status');
+    const parallelEventsStatusEl = document.getElementById('parallel-events-status');
     const apiConfigStatusEl = document.getElementById('api-config-status');
 
     // 详细的状态检查和调试信息
@@ -3225,6 +3580,11 @@ class MobilePhone {
     console.log('[Mobile Phone] 微博管理器:', {
       exists: !!window.weiboManager,
       isInitialized: window.weiboManager ? window.weiboManager.isInitialized : false,
+    });
+    console.log('[Mobile Phone] 平行事件管理器:', {
+      exists: !!window.parallelEventsManager,
+      isInitialized: window.parallelEventsManager ? window.parallelEventsManager.isInitialized : false,
+      isListening: window.parallelEventsManager ? window.parallelEventsManager.isListening : false,
     });
 
     if (forumStatusEl) {
@@ -3262,6 +3622,28 @@ class MobilePhone {
       } else {
         weiboStatusEl.textContent = '❌ 未加载';
         weiboStatusEl.style.color = '#dc3545';
+      }
+    }
+
+    if (parallelEventsStatusEl) {
+      if (window.parallelEventsManager && window.parallelEventsManager.isInitialized) {
+        // 检查是否正在处理
+        if (window.parallelEventsManager.isProcessing) {
+          parallelEventsStatusEl.textContent = '🔄 正在生成平行事件...';
+          parallelEventsStatusEl.style.color = '#007bff';
+        } else if (window.parallelEventsManager.isListening) {
+          parallelEventsStatusEl.textContent = '👂 监听中';
+          parallelEventsStatusEl.style.color = '#17a2b8';
+        } else {
+          parallelEventsStatusEl.textContent = '✅ 已就绪';
+          parallelEventsStatusEl.style.color = '#28a745';
+        }
+      } else if (window.parallelEventsManager) {
+        parallelEventsStatusEl.textContent = '⚠️ 初始化中...';
+        parallelEventsStatusEl.style.color = '#ffc107';
+      } else {
+        parallelEventsStatusEl.textContent = '❌ 未加载';
+        parallelEventsStatusEl.style.color = '#dc3545';
       }
     }
 
@@ -4364,6 +4746,200 @@ class MobilePhone {
     };
 
     initializeSelector();
+  }
+
+  // 初始化平行事件风格选择器
+  initializeParallelEventsStyleSelector() {
+    const selectElement = document.getElementById('parallel-events-style-select');
+    if (!selectElement) {
+      console.warn('[Mobile Phone] 平行事件风格选择器元素不存在');
+      return;
+    }
+
+    console.log('[Mobile Phone] 开始初始化平行事件风格选择器...');
+
+    // 等待平行事件样式管理器初始化完成
+    const initializeSelector = () => {
+      if (!window.parallelEventsStyles) {
+        console.log('[Mobile Phone] 等待平行事件样式管理器初始化...');
+        setTimeout(initializeSelector, 100);
+        return;
+      }
+
+      console.log('[Mobile Phone] 平行事件样式管理器已初始化，开始更新选择器');
+
+      // 获取当前选中的风格
+      let currentStyle = '科幻未来'; // 默认风格
+      if (window.parallelEventsManager && window.parallelEventsManager.currentSettings) {
+        currentStyle = window.parallelEventsManager.currentSettings.selectedStyle || '科幻未来';
+        console.log('[Mobile Phone] 从平行事件管理器获取当前风格:', currentStyle);
+      }
+
+      // 清空现有选项
+      selectElement.innerHTML = '';
+
+      // 获取平行事件的可用风格
+      const availableStyles = window.parallelEventsStyles.getAvailableStyles();
+      console.log('[Mobile Phone] 平行事件可用风格:', availableStyles);
+
+      // 添加预设风格
+      const presetGroup = document.createElement('optgroup');
+      presetGroup.label = '预设风格';
+
+      availableStyles.forEach(styleName => {
+        const option = document.createElement('option');
+        option.value = styleName;
+        option.textContent = styleName;
+        presetGroup.appendChild(option);
+      });
+
+      selectElement.appendChild(presetGroup);
+
+      // 设置当前选中的风格
+      if (selectElement.querySelector(`option[value="${currentStyle}"]`)) {
+        selectElement.value = currentStyle;
+        console.log('[Mobile Phone] 成功设置平行事件当前风格:', currentStyle);
+      } else {
+        // 如果当前风格不存在，回退到默认风格
+        console.warn('[Mobile Phone] 平行事件当前风格不存在，回退到默认风格:', currentStyle);
+        selectElement.value = '科幻未来';
+        if (window.parallelEventsManager) {
+          window.parallelEventsManager.currentSettings.selectedStyle = '科幻未来';
+          window.parallelEventsManager.saveSettings();
+        }
+      }
+
+      console.log('[Mobile Phone] 平行事件风格选择器初始化完成，当前风格:', selectElement.value);
+      console.log('[Mobile Phone] 选择器选项数量:', selectElement.options.length);
+
+      // 同时初始化其他平行事件设置
+      this.initializeParallelEventsSettings();
+    };
+
+    initializeSelector();
+  }
+
+  // 初始化平行事件设置
+  initializeParallelEventsSettings() {
+    if (!window.parallelEventsManager) {
+      return;
+    }
+
+    console.log('[Mobile Phone] 开始同步平行事件设置...');
+
+    // 从界面元素读取当前值，并同步到管理器
+    const thresholdInput = document.getElementById('parallel-events-threshold');
+    const customPrefixInput = document.getElementById('parallel-events-custom-prefix');
+    const enabledCheckbox = document.getElementById('parallel-events-enabled');
+
+    let needsSave = false;
+
+    // 同步阈值：优先使用界面值
+    if (thresholdInput) {
+      const htmlValue = parseInt(thresholdInput.value);
+      const managerValue = window.parallelEventsManager.currentSettings.threshold;
+
+      if (htmlValue !== managerValue) {
+        console.log(`[Mobile Phone] 阈值不同步 - HTML: ${htmlValue}, 管理器: ${managerValue}, 使用HTML值`);
+        window.parallelEventsManager.currentSettings.threshold = htmlValue;
+        needsSave = true;
+      }
+    }
+
+    // 同步自定义前缀
+    if (customPrefixInput) {
+      const htmlValue = customPrefixInput.value;
+      const managerValue = window.parallelEventsManager.currentSettings.customPrefix;
+
+      if (htmlValue !== managerValue && htmlValue) {
+        console.log('[Mobile Phone] 自定义前缀不同步，使用HTML值');
+        window.parallelEventsManager.currentSettings.customPrefix = htmlValue;
+        needsSave = true;
+      } else if (!htmlValue && managerValue) {
+        // 如果HTML为空但管理器有值，更新HTML
+        customPrefixInput.value = managerValue;
+      }
+    }
+
+    // 同步启用状态
+    if (enabledCheckbox) {
+      const htmlValue = enabledCheckbox.checked;
+      const managerValue = window.parallelEventsManager.currentSettings.enabled;
+
+      if (htmlValue !== managerValue) {
+        console.log(`[Mobile Phone] 启用状态不同步 - HTML: ${htmlValue}, 管理器: ${managerValue}, 使用HTML值`);
+        window.parallelEventsManager.currentSettings.enabled = htmlValue;
+        needsSave = true;
+      }
+    }
+
+    // 如果有变化，保存设置
+    if (needsSave) {
+      window.parallelEventsManager.saveSettings();
+      console.log('[Mobile Phone] 平行事件设置已同步并保存:', window.parallelEventsManager.currentSettings);
+    } else {
+      console.log('[Mobile Phone] 平行事件设置已同步，无需保存');
+    }
+  }
+
+  // 从localStorage同步平行事件UI显示
+  syncParallelEventsUIFromStorage() {
+    try {
+      const saved = localStorage.getItem('parallelEventsSettings');
+      if (!saved) {
+        console.log('[Mobile Phone] 没有保存的平行事件设置，跳过UI同步');
+        return;
+      }
+
+      const settings = JSON.parse(saved);
+      console.log('[Mobile Phone] 开始同步平行事件UI显示:', settings);
+
+      // 同步阈值
+      const thresholdInput = document.getElementById('parallel-events-threshold');
+      if (thresholdInput && settings.threshold !== undefined) {
+        thresholdInput.value = settings.threshold;
+        console.log('[Mobile Phone] UI阈值已同步:', settings.threshold);
+      }
+
+      // 同步自定义前缀
+      const customPrefixInput = document.getElementById('parallel-events-custom-prefix');
+      if (customPrefixInput && settings.customPrefix !== undefined) {
+        customPrefixInput.value = settings.customPrefix;
+        console.log('[Mobile Phone] UI自定义前缀已同步');
+      }
+
+      // 同步启用状态
+      const enabledCheckbox = document.getElementById('parallel-events-enabled');
+      if (enabledCheckbox && settings.enabled !== undefined) {
+        enabledCheckbox.checked = settings.enabled;
+        console.log('[Mobile Phone] UI启用状态已同步:', settings.enabled);
+      }
+
+      // 同步风格选择
+      const styleSelect = document.getElementById('parallel-events-style-select');
+      if (styleSelect && settings.selectedStyle) {
+        // 先检查选项是否存在
+        let optionExists = false;
+        for (let i = 0; i < styleSelect.options.length; i++) {
+          if (styleSelect.options[i].value === settings.selectedStyle) {
+            optionExists = true;
+            break;
+          }
+        }
+
+        if (optionExists) {
+          styleSelect.value = settings.selectedStyle;
+          console.log('[Mobile Phone] UI风格选择已同步:', settings.selectedStyle);
+        } else {
+          console.warn('[Mobile Phone] 风格选项不存在:', settings.selectedStyle);
+          console.log('[Mobile Phone] 可用选项:', Array.from(styleSelect.options).map(opt => opt.value));
+        }
+      }
+
+      console.log('[Mobile Phone] ✅ 平行事件UI同步完成');
+    } catch (error) {
+      console.error('[Mobile Phone] 平行事件UI同步失败:', error);
+    }
   }
 
   // 更新单个风格选择器
@@ -5645,6 +6221,169 @@ class MobilePhone {
     });
 
     return window._watchLiveAppLoading;
+  }
+
+  // 加载平行事件应用
+  async loadParallelEventsApp() {
+    console.log('[Mobile Phone] 开始加载平行事件应用模块...');
+
+    // 检查是否已加载 - 只检查必要的全局变量
+    if (window.ParallelEventsApp && window.getParallelEventsAppContent &&
+        window.bindParallelEventsAppEvents && window.parallelEventsStyles) {
+      console.log('[Mobile Phone] Parallel Events App 模块已存在，跳过加载');
+      return Promise.resolve();
+    }
+
+    // 检查是否正在加载
+    if (window._parallelEventsAppLoading) {
+      console.log('[Mobile Phone] Parallel Events App 正在加载中，等待完成');
+      return window._parallelEventsAppLoading;
+    }
+
+    // 标记正在加载
+    window._parallelEventsAppLoading = new Promise((resolve, reject) => {
+      let loadedCount = 0;
+      const totalFiles = 3; // parallel-events-app.css + parallel-events-styles.js + parallel-events-app.js
+
+      const checkComplete = () => {
+        loadedCount++;
+        console.log(`[Mobile Phone] 已加载 ${loadedCount}/${totalFiles} 个平行事件应用文件`);
+        if (loadedCount === totalFiles) {
+          console.log('[Mobile Phone] 所有平行事件应用文件加载完成，等待模块初始化...');
+
+          // 等待模块完全初始化
+          const checkInitialization = (attempt = 1, maxAttempts = 10) => {
+            setTimeout(() => {
+              const hasClass = !!window.ParallelEventsApp;
+              const hasContent = !!window.getParallelEventsAppContent;
+              const hasEvents = !!window.bindParallelEventsAppEvents;
+              const hasStyles = !!window.parallelEventsStyles;
+              const hasManager = !!window.parallelEventsManager;
+
+              console.log(`[Mobile Phone] 初始化检查 ${attempt}/${maxAttempts}:`, {
+                ParallelEventsApp: hasClass,
+                getParallelEventsAppContent: hasContent,
+                bindParallelEventsAppEvents: hasEvents,
+                parallelEventsStyles: hasStyles,
+                parallelEventsManager: hasManager,
+              });
+
+              // 只检查必要的模块，管理器会在后续异步创建
+              if (hasClass && hasContent && hasEvents && hasStyles) {
+                console.log('[Mobile Phone] ✅ Parallel Events App 模块加载并初始化完成');
+                window._parallelEventsAppLoading = null;
+                resolve();
+              } else if (attempt < maxAttempts) {
+                console.log(`[Mobile Phone] 等待初始化完成... (${attempt}/${maxAttempts})`);
+                checkInitialization(attempt + 1, maxAttempts);
+              } else {
+                console.error('[Mobile Phone] ❌ 平行事件应用模块初始化超时');
+                window._parallelEventsAppLoading = null;
+                reject(new Error('平行事件应用模块初始化超时'));
+              }
+            }, 500); // 每0.5秒检查一次
+          };
+
+          checkInitialization();
+        }
+      };
+
+      const handleError = name => {
+        console.error(`[Mobile Phone] ${name} 加载失败`);
+        window._parallelEventsAppLoading = null;
+        reject(new Error(`${name} 加载失败`));
+      };
+
+      // 加载CSS文件
+      const cssLink = document.createElement('link');
+      cssLink.rel = 'stylesheet';
+      cssLink.href = './scripts/extensions/third-party/mobile/app/parallel-events-app/parallel-events-app.css';
+      cssLink.onload = () => {
+        console.log('[Mobile Phone] parallel-events-app.css 加载完成');
+        checkComplete();
+      };
+      cssLink.onerror = () => handleError('parallel-events-app.css');
+      document.head.appendChild(cssLink);
+
+      // 加载风格管理器JS文件
+      const stylesScript = document.createElement('script');
+      stylesScript.src = './scripts/extensions/third-party/mobile/app/parallel-events-app/parallel-events-styles.js';
+      stylesScript.onload = () => {
+        console.log('[Mobile Phone] parallel-events-styles.js 加载完成');
+        console.log('[Mobile Phone] parallelEventsStyles 状态:', typeof window.parallelEventsStyles);
+        checkComplete();
+      };
+      stylesScript.onerror = () => handleError('parallel-events-styles.js');
+      document.head.appendChild(stylesScript);
+
+      // 加载主JS文件
+      const jsScript = document.createElement('script');
+      jsScript.src = './scripts/extensions/third-party/mobile/app/parallel-events-app/parallel-events-app.js';
+      jsScript.onload = () => {
+        console.log('[Mobile Phone] parallel-events-app.js 加载完成');
+        console.log('[Mobile Phone] 全局变量状态:', {
+          ParallelEventsApp: typeof window.ParallelEventsApp,
+          getParallelEventsAppContent: typeof window.getParallelEventsAppContent,
+          bindParallelEventsAppEvents: typeof window.bindParallelEventsAppEvents,
+          debugParallelEventsApp: typeof window.debugParallelEventsApp
+        });
+        checkComplete();
+      };
+      jsScript.onerror = () => handleError('parallel-events-app.js');
+      document.head.appendChild(jsScript);
+    });
+
+    return window._parallelEventsAppLoading;
+  }
+
+  // 简化的平行事件应用加载方法
+  async simpleLoadParallelEventsApp() {
+    console.log('[Mobile Phone] 使用简化方法加载平行事件应用...');
+
+    return new Promise((resolve, reject) => {
+      let loadedCount = 0;
+      const totalFiles = 3;
+
+      const checkComplete = () => {
+        loadedCount++;
+        console.log(`[Mobile Phone] 简化加载: ${loadedCount}/${totalFiles} 完成`);
+        if (loadedCount === totalFiles) {
+          // 等待一下让模块初始化
+          setTimeout(() => {
+            if (window.ParallelEventsApp && window.getParallelEventsAppContent &&
+                window.bindParallelEventsAppEvents && window.parallelEventsStyles) {
+              console.log('[Mobile Phone] ✅ 简化加载成功');
+              resolve();
+            } else {
+              console.error('[Mobile Phone] ❌ 简化加载失败，全局变量未设置');
+              reject(new Error('简化加载失败'));
+            }
+          }, 1000);
+        }
+      };
+
+      // 加载CSS
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = './scripts/extensions/third-party/mobile/app/parallel-events-app/parallel-events-app.css';
+      css.onload = checkComplete;
+      css.onerror = () => reject(new Error('CSS加载失败'));
+      document.head.appendChild(css);
+
+      // 加载样式JS
+      const stylesJs = document.createElement('script');
+      stylesJs.src = './scripts/extensions/third-party/mobile/app/parallel-events-app/parallel-events-styles.js';
+      stylesJs.onload = checkComplete;
+      stylesJs.onerror = () => reject(new Error('样式JS加载失败'));
+      document.head.appendChild(stylesJs);
+
+      // 加载主JS
+      const mainJs = document.createElement('script');
+      mainJs.src = './scripts/extensions/third-party/mobile/app/parallel-events-app/parallel-events-app.js';
+      mainJs.onload = checkComplete;
+      mainJs.onerror = () => reject(new Error('主JS加载失败'));
+      document.head.appendChild(mainJs);
+    });
   }
 
   // 返回主界面

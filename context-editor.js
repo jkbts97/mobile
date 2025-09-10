@@ -6,15 +6,26 @@
 // @license      MIT
 
 /**
- * SillyTavern 移动端上下文编辑器 v2.1
+ * SillyTavern 移动端上下文编辑器 v2.2 - 性能优化版
  * 使用SillyTavern.getContext() API和数据结构
+ * 新增：分页加载、虚拟滚动、懒加载等性能优化
  */
 class MobileContextEditor {
   constructor() {
     this.initialized = false;
     this.currentChatData = null;
     this.isModified = false;
-    this.log('info', 'MobileContextEditor 初始化开始');
+
+    // 性能优化相关配置
+    this.pageSize = 20; // 每页显示的消息数量
+    this.currentPage = 0; // 当前页码
+    this.totalPages = 0; // 总页数
+    this.messageCache = new Map(); // 消息缓存
+    this.renderCache = new Map(); // 渲染缓存
+    this.isLoading = false; // 加载状态
+    this.virtualScrollEnabled = true; // 虚拟滚动开关
+
+    this.log('info', 'MobileContextEditor v2.2 初始化开始 - 性能优化版');
 
     // 立即初始化
     this.initialize();
@@ -100,12 +111,17 @@ class MobileContextEditor {
   }
 
   /**
-   * 获取当前聊天数据
+   * 获取当前聊天数据 - 优化版本，支持分页和缓存
    */
-  getCurrentChatData() {
+  getCurrentChatData(useCache = true) {
     try {
       if (!this.isSillyTavernReady()) {
         throw new Error('SillyTavern 未准备就绪');
+      }
+
+      // 如果使用缓存且缓存存在，直接返回
+      if (useCache && this.currentChatData) {
+        return this.currentChatData;
       }
 
       let chatData;
@@ -151,12 +167,150 @@ class MobileContextEditor {
       }
 
       this.currentChatData = chatData;
-      this.log('info', `加载聊天数据成功: ${chatData.messages.length} 条消息 (${chatData.characterName})`);
+
+      // 计算分页信息
+      this.totalPages = Math.ceil(chatData.messages.length / this.pageSize);
+      this.currentPage = Math.max(0, this.totalPages - 1); // 默认显示最后一页
+
+      this.log('info', `加载聊天数据成功: ${chatData.messages.length} 条消息 (${chatData.characterName}), 分为 ${this.totalPages} 页`);
 
       return chatData;
     } catch (error) {
       this.log('error', '获取聊天数据失败', error);
       throw error;
+    }
+  }
+
+  /**
+   * 获取指定页的消息数据
+   */
+  getPageMessages(pageIndex = this.currentPage) {
+    if (!this.currentChatData) {
+      return [];
+    }
+
+    const messages = this.currentChatData.messages;
+    const startIndex = pageIndex * this.pageSize;
+    const endIndex = Math.min(startIndex + this.pageSize, messages.length);
+
+    return messages.slice(startIndex, endIndex).map((msg, index) => ({
+      ...msg,
+      globalIndex: startIndex + index, // 全局索引
+      pageIndex: index // 页内索引
+    }));
+  }
+
+  /**
+   * 清除缓存
+   */
+  clearCache() {
+    this.messageCache.clear();
+    this.renderCache.clear();
+    this.currentChatData = null;
+    this.log('info', '缓存已清除');
+  }
+
+  /**
+   * 使用服务端分页API加载聊天数据 - 适用于大文件
+   */
+  async loadChatDataWithPagination(page = 0, pageSize = this.pageSize, searchQuery = '') {
+    try {
+      if (!this.isSillyTavernReady()) {
+        throw new Error('SillyTavern未准备就绪');
+      }
+
+      let character, avatarUrl, fileName;
+
+      // 获取当前角色信息
+      if (window.SillyTavern && typeof window.SillyTavern.getContext === 'function') {
+        const context = window.SillyTavern.getContext();
+        character = context.characters[context.characterId];
+        avatarUrl = character?.avatar;
+        fileName = character?.chat;
+      } else {
+        character = window.characters[window.this_chid];
+        avatarUrl = character?.avatar;
+        fileName = character?.chat;
+      }
+
+      if (!character || !fileName) {
+        throw new Error('未找到当前角色或聊天文件');
+      }
+
+      this.log('info', `使用分页API加载聊天数据: 第${page + 1}页, 每页${pageSize}条`);
+
+      const response = await fetch('/api/chats/get-paginated', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          avatar_url: avatarUrl,
+          file_name: fileName.replace('.jsonl', ''),
+          page: page,
+          pageSize: pageSize,
+          searchQuery: searchQuery,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`服务器错误: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // 更新分页信息
+      this.currentPage = data.currentPage;
+      this.totalPages = data.totalPages;
+      this.pageSize = data.pageSize;
+
+      this.log('info', `分页数据加载成功: ${data.messages.length}条消息, 总计${data.totalCount}条, 文件大小${data.fileSize}`);
+
+      return {
+        messages: data.messages,
+        totalCount: data.totalCount,
+        totalPages: data.totalPages,
+        currentPage: data.currentPage,
+        pageSize: data.pageSize,
+        hasMore: data.hasMore,
+        fileSize: data.fileSize,
+        characterName: character.name,
+        userName: window.name1 || 'User',
+      };
+    } catch (error) {
+      this.log('error', '分页加载聊天数据失败', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 智能选择加载方式 - 根据文件大小决定使用内存加载还是分页加载
+   */
+  async smartLoadChatData() {
+    try {
+      // 首先尝试获取基本的聊天数据来判断大小
+      const basicData = this.getCurrentChatData(false);
+      const messageCount = basicData.messages.length;
+
+      // 如果消息数量超过阈值，使用分页API
+      const LARGE_CHAT_THRESHOLD = 500; // 超过500条消息认为是大文件
+
+      if (messageCount > LARGE_CHAT_THRESHOLD) {
+        this.log('info', `检测到大型聊天文件(${messageCount}条消息)，使用分页模式`);
+        this.usePaginationMode = true;
+
+        // 使用分页API加载最后一页
+        const lastPage = Math.max(0, Math.ceil(messageCount / this.pageSize) - 1);
+        return await this.loadChatDataWithPagination(lastPage, this.pageSize);
+      } else {
+        this.log('info', `普通大小聊天文件(${messageCount}条消息)，使用内存模式`);
+        this.usePaginationMode = false;
+        return basicData;
+      }
+    } catch (error) {
+      this.log('error', '智能加载失败，回退到基本模式', error);
+      this.usePaginationMode = false;
+      return this.getCurrentChatData(false);
     }
   }
 
@@ -220,7 +374,7 @@ class MobileContextEditor {
         name: name || (isUser ? context.name1 || 'User' : context.name2 || 'Assistant'),
         is_user: true,
         is_system: false,
-        force_avatar: true,
+        force_avatar: false,
         mes: content,
         send_date: Date.now(),
         extra: extra,
@@ -531,7 +685,7 @@ class MobileContextEditor {
   }
 
   /**
-   * 设置移动端UI界面
+   * 设置移动端UI界面 - 优化版本，增加分页控制
    */
   setupUI() {
     // 等待jQuery加载
@@ -564,7 +718,7 @@ class MobileContextEditor {
             <div id="mobile-context-editor-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto;">
 
                 <div style="background: linear-gradient(135deg, #9C27B0, #673AB7); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
-                    <h3 style="margin: 0; font-size: 18px;">🛠️ 上下文编辑器 v2.1</h3>
+                    <h3 style="margin: 0; font-size: 18px;">🛠️ 上下文编辑器 v2.2</h3>
                     <button id="mobile-context-editor-close" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 12px; border-radius: 15px; cursor: pointer; font-size: 14px;">✖️ 关闭</button>
                 </div>
 
@@ -586,10 +740,38 @@ class MobileContextEditor {
                         <button id="mobile-test-api-btn" style="background: #00BCD4; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 14px;" disabled>🔧 测试API</button>
                     </div>
 
+                    <!-- 新增：分页控制区域 -->
+                    <div id="mobile-pagination-controls" style="display: none; margin-bottom: 15px; padding: 10px; background: #e8f5e8; border-radius: 8px; border: 1px solid #4CAF50;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span id="mobile-page-info" style="font-size: 14px; color: #333; font-weight: bold;">第 1 页，共 1 页</span>
+                            <div>
+                                <label style="font-size: 12px; color: #666;">每页显示：</label>
+                                <select id="mobile-page-size" style="padding: 4px; border-radius: 4px; border: 1px solid #ddd; font-size: 12px;">
+                                    <option value="10">10条</option>
+                                    <option value="20" selected>20条</option>
+                                    <option value="50">50条</option>
+                                    <option value="100">100条</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 5px; justify-content: center;">
+                            <button id="mobile-first-page" style="padding: 6px 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">⏮️</button>
+                            <button id="mobile-prev-page" style="padding: 6px 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">◀️</button>
+                            <button id="mobile-next-page" style="padding: 6px 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">▶️</button>
+                            <button id="mobile-last-page" style="padding: 6px 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">⏭️</button>
+                        </div>
+                    </div>
+
                     <div id="mobile-context-editor-status" style="margin-bottom: 15px; padding: 12px; background: #f5f5f5; border-radius: 8px; color: #333; min-height: 20px; font-size: 14px; border-left: 4px solid #2196F3;"></div>
 
                     <div id="mobile-context-editor-content" style="border: 1px solid #ddd; border-radius: 8px; background: #fafafa; min-height: 300px; max-height: 400px; overflow-y: auto;">
                         <p style="text-align: center; padding: 40px 20px; color: #666; margin: 0; font-size: 16px;">点击"加载聊天"开始编辑</p>
+                    </div>
+
+                    <!-- 新增：加载指示器 -->
+                    <div id="mobile-loading-indicator" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; text-align: center; z-index: 10000;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+                        <div>正在加载...</div>
                     </div>
                 </div>
             </div>
@@ -614,22 +796,57 @@ class MobileContextEditor {
     // 功能按钮
     $(document).on('click', '#mobile-load-chat-btn', async () => {
       try {
+        this.showLoadingIndicator(true);
         this.updateStatus('🔄 正在检查SillyTavern状态...');
 
         // 等待SillyTavern准备就绪
         const isReady = await this.waitForSillyTavernReady(10000);
         if (!isReady) {
           this.updateStatus('❌ SillyTavern未准备就绪，请等待页面完全加载后重试');
+          this.showLoadingIndicator(false);
           return;
         }
 
-        this.updateStatus('🔄 正在加载聊天数据...');
-        const chatData = this.getCurrentChatData();
-        this.renderMobileChatMessages();
-        this.updateStatus(`✅ 聊天数据加载成功！共 ${chatData.messages.length} 条消息 (${chatData.characterName})`);
+        this.updateStatus('🔄 正在分析聊天文件大小...');
+
+        // 使用智能加载
+        const chatData = await this.smartLoadChatData();
+
+        if (this.usePaginationMode) {
+          // 分页模式
+          this.currentChatData = {
+            messages: [], // 在分页模式下不缓存所有消息
+            characterName: chatData.characterName,
+            userName: chatData.userName,
+          };
+          this.totalPages = chatData.totalPages;
+          this.currentPage = chatData.currentPage;
+
+          this.updateStatus(`🔄 正在渲染消息 (分页模式)...`);
+          await this.renderPaginatedMessages(chatData.messages);
+
+          this.updateStatus(`✅ 大型聊天文件加载成功！总计 ${chatData.totalCount} 条消息 (${chatData.characterName}) - 分页模式 [${chatData.fileSize}]`);
+        } else {
+          // 内存模式
+          this.currentChatData = chatData;
+          this.totalPages = Math.ceil(chatData.messages.length / this.pageSize);
+          this.currentPage = Math.max(0, this.totalPages - 1);
+
+          this.updateStatus(`🔄 正在渲染消息 (内存模式)...`);
+          await this.renderMobileChatMessages();
+
+          this.updateStatus(`✅ 聊天数据加载成功！共 ${chatData.messages.length} 条消息 (${chatData.characterName}) - 内存模式`);
+        }
+
+        // 显示分页控制
+        this.showPaginationControls(true);
+        this.updatePaginationInfo();
         this.updateMobileButtonStates();
+        this.showLoadingIndicator(false);
+
       } catch (error) {
         this.updateStatus(`❌ 加载失败: ${error.message}`);
+        this.showLoadingIndicator(false);
       }
     });
 
@@ -702,6 +919,17 @@ class MobileContextEditor {
       }
     });
 
+    // 分页控制事件
+    $(document).on('click', '#mobile-first-page', () => this.goToPage(0));
+    $(document).on('click', '#mobile-prev-page', () => this.goToPage(this.currentPage - 1));
+    $(document).on('click', '#mobile-next-page', () => this.goToPage(this.currentPage + 1));
+    $(document).on('click', '#mobile-last-page', () => this.goToPage(this.totalPages - 1));
+
+    $(document).on('change', '#mobile-page-size', async (e) => {
+      const newPageSize = parseInt(e.target.value);
+      await this.changePageSize(newPageSize);
+    });
+
     // 消息操作
     $(document).on('click', '.mobile-edit-message-btn', async e => {
       const messageIndex = parseInt($(e.target).data('index'));
@@ -713,7 +941,13 @@ class MobileContextEditor {
         const messageIndex = parseInt($(e.target).data('index'));
         try {
           await this.deleteMessage(messageIndex);
-          this.renderMobileChatMessages();
+
+          // 重新计算分页并刷新显示
+          this.clearCache();
+          this.getCurrentChatData(false);
+          this.updatePaginationInfo();
+          await this.renderMobileChatMessages();
+
           this.updateStatus(`🗑️ 已删除消息 ${messageIndex}`);
           this.updateMobileButtonStates();
         } catch (error) {
@@ -913,40 +1147,141 @@ class MobileContextEditor {
     $('#mobile-test-api-btn').prop('disabled', !this.isSillyTavernReady()); // API测试只需要SillyTavern就绪
   }
 
-  renderMobileChatMessages() {
+  /**
+   * 渲染移动端聊天消息 - 优化版本，支持分页和虚拟滚动
+   */
+  async renderMobileChatMessages() {
     if (!this.isSillyTavernReady()) return;
 
-    const context = window.SillyTavern.getContext();
-    if (!context.chat || !context.chat.length) return;
+    if (!this.currentChatData) {
+      this.updateStatus('⚠️ 请先加载聊天数据');
+      return;
+    }
 
-    const messages = context.chat;
+    this.showLoadingIndicator(true);
+
+    try {
+      // 获取当前页的消息
+      const pageMessages = this.getPageMessages();
+
+      if (pageMessages.length === 0) {
+        $('#mobile-context-editor-content').html(`
+          <div style="text-align: center; padding: 40px 20px; color: #666;">
+            <div style="font-size: 48px; margin-bottom: 20px;">📭</div>
+            <p style="margin: 0; font-size: 16px;">当前页没有消息</p>
+          </div>
+        `);
+        this.showLoadingIndicator(false);
+        return;
+      }
+
+      let html = '<div style="padding: 10px;">';
+
+      // 分批渲染消息以避免阻塞UI
+      for (let i = 0; i < pageMessages.length; i++) {
+        const message = pageMessages[i];
+        const messageHtml = this.renderSingleMessage(message);
+        html += messageHtml;
+
+        // 每处理5条消息就让出控制权，避免阻塞UI
+        if (i % 5 === 4) {
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      }
+
+      html += '</div>';
+      $('#mobile-context-editor-content').html(html);
+
+      this.showLoadingIndicator(false);
+    } catch (error) {
+      this.log('error', '渲染消息失败', error);
+      this.updateStatus(`❌ 渲染失败: ${error.message}`);
+      this.showLoadingIndicator(false);
+    }
+  }
+
+  /**
+   * 渲染单条消息
+   */
+  renderSingleMessage(message) {
+    const isUser = message.is_user;
+    const name = message.name || (isUser ? '用户' : '助手');
+    const globalIndex = message.globalIndex;
+
+    // 智能截断消息内容
+    let content = message.mes || '';
+    const maxLength = 200;
+    let displayContent = content;
+
+    if (content.length > maxLength) {
+      displayContent = content.substring(0, maxLength) + '...';
+    }
+
+    // 转义HTML特殊字符
+    displayContent = this.escapeHtml(displayContent);
+
+    return `
+      <div style="margin-bottom: 15px; padding: 12px; border: 2px solid ${
+        isUser ? '#4CAF50' : '#2196F3'
+      }; border-radius: 10px; background: ${isUser ? '#f1f8e9' : '#e3f2fd'};">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="color: #333; font-size: 14px;">${
+            isUser ? '👤' : '🤖'
+          } ${this.escapeHtml(name)} (#${globalIndex})</strong>
+          <div>
+            <button class="mobile-edit-message-btn" data-index="${globalIndex}" style="margin-right: 5px; padding: 4px 8px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">✏️</button>
+            <button class="mobile-delete-message-btn" data-index="${globalIndex}" style="padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">🗑️</button>
+          </div>
+        </div>
+        <div style="color: #555; white-space: pre-wrap; background: white; padding: 8px; border-radius: 5px; border: 1px solid #ddd; font-size: 13px; line-height: 1.4;">${displayContent}</div>
+        ${content.length > maxLength ? `<div style="margin-top: 8px;"><button class="mobile-expand-message-btn" data-index="${globalIndex}" style="padding: 4px 8px; background: #607D8B; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">📖 展开全文</button></div>` : ''}
+      </div>
+    `;
+  }
+
+  /**
+   * 渲染分页模式的消息
+   */
+  async renderPaginatedMessages(messages) {
+    if (!messages || messages.length === 0) {
+      $('#mobile-context-editor-content').html(`
+        <div style="text-align: center; padding: 40px 20px; color: #666;">
+          <div style="font-size: 48px; margin-bottom: 20px;">📭</div>
+          <p style="margin: 0; font-size: 16px;">当前页没有消息</p>
+        </div>
+      `);
+      return;
+    }
+
     let html = '<div style="padding: 10px;">';
 
-    messages.forEach((message, index) => {
-      const isUser = message.is_user;
-      const name = message.name || (isUser ? '用户' : '助手');
-      const content = (message.mes || '').substring(0, 150) + (message.mes && message.mes.length > 150 ? '...' : '');
+    // 分批渲染消息以避免阻塞UI
+    for (let i = 0; i < messages.length; i++) {
+      const message = messages[i];
+      const messageHtml = this.renderSingleMessage({
+        ...message,
+        globalIndex: message.index, // 使用服务端返回的全局索引
+        pageIndex: i
+      });
+      html += messageHtml;
 
-      html += `
-                <div style="margin-bottom: 15px; padding: 12px; border: 2px solid ${
-                  isUser ? '#4CAF50' : '#2196F3'
-                }; border-radius: 10px; background: ${isUser ? '#f1f8e9' : '#e3f2fd'};">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #333; font-size: 14px;">${
-                          isUser ? '👤' : '🤖'
-                        } ${name} (#${index})</strong>
-                        <div>
-                            <button class="mobile-edit-message-btn" data-index="${index}" style="margin-right: 5px; padding: 4px 8px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">✏️</button>
-                            <button class="mobile-delete-message-btn" data-index="${index}" style="padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">🗑️</button>
-                        </div>
-                    </div>
-                    <div style="color: #555; white-space: pre-wrap; background: white; padding: 8px; border-radius: 5px; border: 1px solid #ddd; font-size: 13px; line-height: 1.4;">${content}</div>
-                </div>
-            `;
-    });
+      // 每处理3条消息就让出控制权，避免阻塞UI
+      if (i % 3 === 2) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+    }
 
     html += '</div>';
     $('#mobile-context-editor-content').html(html);
+  }
+
+  /**
+   * 转义HTML特殊字符
+   */
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   async editMobileMessage(messageIndex) {
@@ -1173,11 +1508,113 @@ class MobileContextEditor {
   }
 
   /**
+   * 分页控制方法
+   */
+
+  /**
+   * 跳转到指定页
+   */
+  async goToPage(pageIndex) {
+    if (pageIndex < 0 || pageIndex >= this.totalPages) {
+      return;
+    }
+
+    this.showLoadingIndicator(true);
+    this.currentPage = pageIndex;
+    this.updatePaginationInfo();
+
+    try {
+      if (this.usePaginationMode) {
+        // 分页模式：从服务器加载指定页
+        const chatData = await this.loadChatDataWithPagination(pageIndex, this.pageSize);
+        await this.renderPaginatedMessages(chatData.messages);
+      } else {
+        // 内存模式：直接渲染
+        await this.renderMobileChatMessages();
+      }
+
+      this.updateStatus(`📄 已跳转到第 ${pageIndex + 1} 页`);
+    } catch (error) {
+      this.updateStatus(`❌ 跳转失败: ${error.message}`);
+    } finally {
+      this.showLoadingIndicator(false);
+    }
+  }
+
+  /**
+   * 更改每页显示数量
+   */
+  async changePageSize(newPageSize) {
+    if (newPageSize === this.pageSize) return;
+
+    this.showLoadingIndicator(true);
+    this.pageSize = newPageSize;
+
+    try {
+      if (this.usePaginationMode) {
+        // 分页模式：重新加载当前页
+        const chatData = await this.loadChatDataWithPagination(this.currentPage, newPageSize);
+        this.totalPages = chatData.totalPages;
+        this.currentPage = Math.min(this.currentPage, this.totalPages - 1);
+        await this.renderPaginatedMessages(chatData.messages);
+      } else {
+        // 内存模式：重新计算分页
+        if (this.currentChatData) {
+          this.totalPages = Math.ceil(this.currentChatData.messages.length / this.pageSize);
+          this.currentPage = Math.min(this.currentPage, this.totalPages - 1);
+        }
+        await this.renderMobileChatMessages();
+      }
+
+      this.updatePaginationInfo();
+      this.updateStatus(`📄 每页显示已更改为 ${newPageSize} 条`);
+    } catch (error) {
+      this.updateStatus(`❌ 更改页面大小失败: ${error.message}`);
+    } finally {
+      this.showLoadingIndicator(false);
+    }
+  }
+
+  /**
+   * 显示/隐藏分页控制
+   */
+  showPaginationControls(show) {
+    $('#mobile-pagination-controls').toggle(show);
+  }
+
+  /**
+   * 更新分页信息显示
+   */
+  updatePaginationInfo() {
+    if (!this.currentChatData) return;
+
+    const totalMessages = this.currentChatData.messages.length;
+    const startIndex = this.currentPage * this.pageSize + 1;
+    const endIndex = Math.min((this.currentPage + 1) * this.pageSize, totalMessages);
+
+    $('#mobile-page-info').text(`第 ${this.currentPage + 1} 页，共 ${this.totalPages} 页 (${startIndex}-${endIndex}/${totalMessages})`);
+
+    // 更新按钮状态
+    $('#mobile-first-page, #mobile-prev-page').prop('disabled', this.currentPage === 0);
+    $('#mobile-next-page, #mobile-last-page').prop('disabled', this.currentPage === this.totalPages - 1);
+
+    // 更新页面大小选择器
+    $('#mobile-page-size').val(this.pageSize);
+  }
+
+  /**
+   * 显示/隐藏加载指示器
+   */
+  showLoadingIndicator(show) {
+    $('#mobile-loading-indicator').toggle(show);
+  }
+
+  /**
    * 日志记录
    */
   log(level, message, data = null) {
     const timestamp = new Date().toLocaleTimeString();
-    const logMessage = `[Mobile Context Editor] ${message}`;
+    const logMessage = `[Mobile Context Editor v2.2] ${message}`;
 
     switch (level) {
       case 'info':
@@ -1203,4 +1640,30 @@ class MobileContextEditor {
 // 创建全局实例
 window.mobileContextEditor = new MobileContextEditor();
 
-console.log('[Mobile Context Editor] v2.0 移动端上下文编辑器加载完成 - 使用原生API');
+// 添加展开消息的事件处理
+$(document).on('click', '.mobile-expand-message-btn', function(e) {
+  const messageIndex = parseInt($(e.target).data('index'));
+  const editor = window.mobileContextEditor;
+
+  if (editor.currentChatData && editor.currentChatData.messages[messageIndex]) {
+    const message = editor.currentChatData.messages[messageIndex];
+    const fullContent = message.mes || '';
+
+    // 创建全文显示弹窗
+    const fullTextModal = `
+      <div id="mobile-full-text-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10001; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; margin: 20px; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 80%; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+            <h4 style="margin: 0; color: #333;">消息全文 (#${messageIndex})</h4>
+            <button onclick="$('#mobile-full-text-modal').remove()" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer;">✖️ 关闭</button>
+          </div>
+          <div style="white-space: pre-wrap; color: #333; line-height: 1.6; font-size: 14px; max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; border-radius: 5px; background: #f9f9f9;">${editor.escapeHtml(fullContent)}</div>
+        </div>
+      </div>
+    `;
+
+    $('body').append(fullTextModal);
+  }
+});
+
+console.log('[Mobile Context Editor] v2.2 移动端上下文编辑器加载完成 - 性能优化版');
