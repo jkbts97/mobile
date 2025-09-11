@@ -4952,24 +4952,7 @@ class MobilePhone {
       currentValue = window.forumManager.currentSettings.selectedStyle || currentValue;
     }
 
-    // 清空现有选项
-    selectElement.innerHTML = '';
-
-    // 添加预设风格
-    const presetStyles = Object.keys(window.forumStyles.styles);
-    if (presetStyles.length > 0) {
-      const presetGroup = document.createElement('optgroup');
-      presetGroup.label = '预设风格';
-
-      presetStyles.forEach(styleName => {
-        const option = document.createElement('option');
-        option.value = styleName;
-        option.textContent = styleName;
-        presetGroup.appendChild(option);
-      });
-
-      selectElement.appendChild(presetGroup);
-    }
+    
 
     // 添加自定义风格
     const customStyles = window.forumStyles.getAllCustomStyles();
