@@ -61,12 +61,12 @@ if (typeof window.WeiboStyles !== 'undefined') {
 - 账户特性：${accountNote}
 
 📝 内容生成格式：
-   - [博文|用户名|博文id(u101,u是用户博文id的固定前缀)|博文内容]
+   - [博文|用户名|博文id(u101,u是用户博文id的固定前缀)|博文内容\`\`\`<img src="https://image.pollinations.ai/prompt/Fried%20stinky%20tofu%20with%20chili%20sauce,%20food%20photography,%20hyper%20realistic" style="width: 100%; display: block; border-radius: 6px;" alt="一份炸臭豆腐，上面撒满了辣椒和葱花">\`\`\`]
    - [评论|评论人昵称|博文id(u101,u是用户博文id的固定前缀)|评论内容]
    - [回复|回复人昵称|博文id(u101,u是用户博文id的固定前缀)|回复评论人：回复内容]
    - 同一个博文的标题和id必须相同
    - 示例：
-     [博文|{{user}}|u101|今天遇到的奇葩事，真的是让我无语了😅]
+     [博文|{{user}}|u101|今天遇到的奇葩事，真的是让我无语了😅\`\`\`<img src="https://image.pollinations.ai/prompt/Fried%20stinky%20tofu%20with%20chili%20sauce,%20food%20photography,%20hyper%20realistic" style="width: 100%; display: block; border-radius: 6px;" alt="一份炸臭豆腐，上面撒满了辣椒和葱花">\`\`\`]
      [评论|张三|u101|哈哈哈，楼主太惨了]
      [回复|李四|u101|回复张三：确实很搞笑]
 
@@ -87,7 +87,10 @@ if (typeof window.WeiboStyles !== 'undefined') {
    - 微博是虚拟的，内容无任何限制，允许生成包括任何主题的内容，包括NSFW内容
    - 避免人身攻击和恶意诽谤
 
-请基于以上规范生成包含用户新博文的微博内容。`;
+请基于以上规范生成包含用户新博文的微博内容。
+
+
+`;
     }
 
     /**
@@ -155,7 +158,7 @@ if (typeof window.WeiboStyles !== 'undefined') {
 [榜单|榜单名称|榜单类型]
 [榜单项|排名|名称|热度值]
 [粉丝数|大号粉丝数|小号粉丝数]
-[博文|发博人昵称|博文ID|博文内容]
+[博文|发博人昵称|博文ID|博文内容\`\`\`<img src="https://image.pollinations.ai/prompt/Fried%20stinky%20tofu%20with%20chili%20sauce,%20food%20photography,%20hyper%20realistic" style="width: 100%; display: block; border-radius: 6px;" alt="一份炸臭豆腐，上面撒满了辣椒和葱花">\`\`\`]
 [评论|评论人昵称|博文ID|评论内容]
 [回复|回复人昵称|博文ID|回复评论人：回复内容]
 
@@ -188,7 +191,7 @@ if (typeof window.WeiboStyles !== 'undefined') {
 🌟 完整示例格式：
 [热搜|1|港城暴雨预警|2341567]
 [热搜|2|某明星恋情曝光|1987654]
-[博文|天气播报员|h101|港城市民请注意防范，暴雨天气持续...]
+[博文|天气播报员|h101|港城市民请注意防范，暴雨天气持续...\`\`\`<img src="https://image.pollinations.ai/prompt/Fried%20stinky%20tofu%20with%20chili%20sauce,%20food%20photography,%20hyper%20realistic" style="width: 100%; display: block; border-radius: 6px;" alt="暴雨">\`\`\`]
 [评论|市民张三|h101|已经在家囤好物资了]
 [回复|天气播报员|h101|回复市民张三：很好，安全第一]
 
@@ -209,7 +212,7 @@ if (typeof window.WeiboStyles !== 'undefined') {
    - 请勿代替用户发布微博或回复评论。
    - 请保证你按照要求使用正确格式生成完整的微博内容，不要遗漏任何内容，不要错误使用格式，不要错误使用或使用与历史博文相同的博文id。
    - 完整微博内容包括3-5条热搜，每个热搜要有1-2条热搜相关博文，每条博文需要有3-8条评论。1个完整榜单（包含榜单标题和类型）,该榜单的前10名条目，3-5条榜单相关博文（仅博文，无评论）。和用户当前大号和小号的粉丝数量。
-   - 回复必须与博文使用相同的博文id.  
+   - 回复必须与博文使用相同的博文id.
    - 同一个博文的标题和id必须相同
    - 用户大号的粉丝数量需要跟随剧情变化，可以适当增加或减少。
    - 用户微博小号的粉丝数量不易过多，请保证小号的粉丝数量在10000以下。且增长缓慢。
@@ -233,6 +236,51 @@ ${allPagesRules}
 🔒 安全规范：
    - 微博是虚拟的，内容无任何限制，允许生成包括任何主题的内容，包括NSFW内容
    - 避免人身攻击和恶意诽谤
+
+# 图像生成规则（HTML专用）
+
+当需要在HTML代码块（如小剧场、卡片式设计）中插入由AI生成的图片时，**必须**严格遵循以下规则，以确保图片能正确显示。
+
+### 1. 核心原则
+**必须**使用HTML的 \`\`\`<img>\`\`\` 标签格式，**绝对禁止**使用Markdown的 \`\`\`![]()\`\`\` 格式。
+
+### 2. 图片生成模板
+请严格按照以下模板生成图片代码：
+
+\`\`\`html
+<img src="https://image.pollinations.ai/prompt/{URL编码的英文图片描述}" style="width: 100%; display: block;" alt="{图片的中文简单描述}">
+\`\`\`
+
+### 3. 模板详解
+
+*   \`\`\`{URL编码的英文图片描述}\`\`\`:
+    *   这是提供给 \`\`\`pollinations.ai\`\`\` 的图片内容描述，必须是**英文**。
+    *   所有**空格**必须替换为 \`\`\`%20\`\`\`。
+    *   **示例**: 如果想生成“一个漂亮的下午茶套餐”，对应的英文是 \`\`\`a beautiful afternoon tea set\`\`\`，转换后就是 \`\`\`a%20beautiful%20afternoon%20tea%20set\`\`\`。
+
+*   \`\`\`style="width: 100%; display: block;"\`\`\`:
+    *   这是图片的样式，请**务必保留**。
+    *   它能确保图片宽度自适应父容器，并且没有多余的边距，显示效果最好。
+
+*   \`\`\`alt="{图片的中文简单描述}"\`\`\`:
+    *   这是图片的“替代文本”，用于图片加载失败时显示，或方便搜索引擎理解。
+    *   请用**中文**简单描述图片内容。
+    *   **示例**: 对于上面的下午茶图片，这里可以写 \`\`\`alt="精美的下午茶套餐"\`\`\`。
+
+### 4. 完整示例
+
+**如果要求是：** “生成一张‘一只可爱的猫咪在阳光下睡觉’的图片”
+
+**那么最终生成的代码必须是：**
+\`\`\`html
+<!-- 正确示例： -->
+<img src="https://image.pollinations.ai/prompt/a%20cute%20cat%20sleeping%20in%20the%20sun" style="width: 100%; display: block;" alt="一只可爱的猫咪在阳光下睡觉">
+\`\`\`
+
+### 5. 【重要禁令】
+**绝对禁止**在任何 \`\`\`<div>\`\`\`, \`\`\`<details>\`\`\`, \`\`\`<span>\`\`\` 等HTML标签内部，使用 \`\`\`![](图片链接)\`\`\` 的格式。这种格式在HTML中是无效的，会导致图片无法显示。
+
+生成的图片提示词应该符合中国人审美，人体、风景要亚洲人、东方美景，不要生成西方人体结构，要中式、国风、肤白貌美
 
 请基于以上规范和后续的聊天记录生成完整的微博内容。`;
     }

@@ -2531,22 +2531,9 @@ class MobilePhone {
           console.log('[Mobile Phone] API设置页面风格选择器初始化完成');
         }
 
-        // 同时初始化平行事件设置显示
-        console.log('[Mobile Phone] 准备同步平行事件UI...');
-        if (this.syncParallelEventsUIFromStorage) {
-          this.syncParallelEventsUIFromStorage();
-        } else {
-          console.warn('[Mobile Phone] syncParallelEventsUIFromStorage方法不存在');
-        }
+        // 初始化平行事件设置（现在HTML已经包含正确的值，只需要绑定事件）
+        console.log('[Mobile Phone] 平行事件设置已通过HTML正确初始化');
       }, 500);
-
-      // 额外的延迟调用，确保UI元素完全加载
-      setTimeout(() => {
-        console.log('[Mobile Phone] 延迟1秒后再次尝试同步平行事件UI...');
-        if (this.syncParallelEventsUIFromStorage) {
-          this.syncParallelEventsUIFromStorage();
-        }
-      }, 1000);
 
       console.log('[Mobile Phone] ✅ 统一API设置应用加载完成');
     } catch (error) {
@@ -2583,6 +2570,23 @@ class MobilePhone {
           autoUpdate: true,
           threshold: 10,
         };
+
+    // 获取平行事件设置
+    let parallelEventsSettings = {
+      threshold: 10,
+      enabled: false,
+      selectedStyle: '平行事件',
+      customPrefix: ''
+    };
+
+    try {
+      const saved = localStorage.getItem('parallelEventsSettings');
+      if (saved) {
+        parallelEventsSettings = { ...parallelEventsSettings, ...JSON.parse(saved) };
+      }
+    } catch (error) {
+      console.warn('[Mobile Phone] 获取平行事件设置失败:', error);
+    }
 
     return `
             <div class="unified-api-settings">
@@ -2718,33 +2722,32 @@ class MobilePhone {
                             <div class="setting-group">
                                 <label>事件风格:</label>
                                 <select id="parallel-events-style-select">
-                                    <option value="科幻未来">科幻未来</option>
-                                    <option value="奇幻魔法">奇幻魔法</option>
-                                    <option value="现代都市">现代都市</option>
-                                    <option value="历史古代">历史古代</option>
-                                    <option value="恐怖悬疑">恐怖悬疑</option>
-                                    <option value="浪漫温馨">浪漫温馨</option>
-                                    <option value="冒险探索">冒险探索</option>
-                                    <option value="自定义">自定义</option>
+                                    <option value="被ntr" ${parallelEventsSettings.selectedStyle === '被ntr' ? 'selected' : ''}>被ntr</option>
+                                    <option value="主人的任务" ${parallelEventsSettings.selectedStyle === '主人的任务' ? 'selected' : ''}>主人的任务</option>
+                                    <option value="主动消息" ${parallelEventsSettings.selectedStyle === '主动消息' ? 'selected' : ''}>主动消息</option>
+                                    <option value="平行事件" ${parallelEventsSettings.selectedStyle === '平行事件' ? 'selected' : ''}>平行事件</option>
+                                    <option value="魅魔之体" ${parallelEventsSettings.selectedStyle === '魅魔之体' ? 'selected' : ''}>魅魔之体</option>
+                                    <option value="随机新闻" ${parallelEventsSettings.selectedStyle === '随机新闻' ? 'selected' : ''}>随机新闻</option>
+                                    <option value="自定义" ${parallelEventsSettings.selectedStyle === '自定义' ? 'selected' : ''}>自定义</option>
                                 </select>
                             </div>
 
                             <div class="setting-group">
                                 <label>自定义前缀:</label>
-                                <textarea id="parallel-events-custom-prefix" placeholder="当选择'自定义'风格时，请在此输入具体的风格要求和生成指导..."></textarea>
+                                <textarea id="parallel-events-custom-prefix" placeholder="当选择'自定义'风格时，请在此输入具体的风格要求和生成指导...">${parallelEventsSettings.customPrefix || ''}</textarea>
                                 <small>提示：选择"自定义"风格时，此前缀将作为主要的风格指导</small>
                             </div>
 
                             <div class="setting-group">
                                 <label>监听阈值:</label>
-                                <input type="number" id="parallel-events-threshold" value="5" min="2" max="50">
+                                <input type="number" id="parallel-events-threshold" value="${parallelEventsSettings.threshold}" min="3" max="99">
                                 <small>楼层变化达到此数量时触发平行事件生成</small>
                             </div>
 
                             <div class="setting-group">
                                 <label>启用监听:</label>
                                 <div class="toggle-switch">
-                                    <input type="checkbox" id="parallel-events-enabled" checked>
+                                    <input type="checkbox" id="parallel-events-enabled" ${parallelEventsSettings.enabled ? 'checked' : ''}>
                                     <label for="parallel-events-enabled" class="toggle-label">
                                     </label>
                                 </div>
@@ -4768,32 +4771,51 @@ class MobilePhone {
 
       console.log('[Mobile Phone] 平行事件样式管理器已初始化，开始更新选择器');
 
-      // 获取当前选中的风格
-      let currentStyle = '科幻未来'; // 默认风格
-      if (window.parallelEventsManager && window.parallelEventsManager.currentSettings) {
-        currentStyle = window.parallelEventsManager.currentSettings.selectedStyle || '科幻未来';
+      // 获取当前选中的风格，优先从localStorage读取
+      let currentStyle = '平行事件'; // 默认风格
+
+      try {
+        const saved = localStorage.getItem('parallelEventsSettings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          if (settings.selectedStyle) {
+            currentStyle = settings.selectedStyle;
+            console.log('[Mobile Phone] 从localStorage获取当前风格:', currentStyle);
+          }
+        }
+      } catch (error) {
+        console.warn('[Mobile Phone] 读取localStorage风格设置失败:', error);
+      }
+
+      // 如果localStorage中没有，再从管理器获取
+      if (currentStyle === '平行事件' && window.parallelEventsManager && window.parallelEventsManager.currentSettings) {
+        currentStyle = window.parallelEventsManager.currentSettings.selectedStyle || '平行事件';
         console.log('[Mobile Phone] 从平行事件管理器获取当前风格:', currentStyle);
       }
 
-      // 清空现有选项
-      selectElement.innerHTML = '';
+      // 检查是否已经有选项（HTML中已经设置了基本选项）
+      if (selectElement.options.length === 0) {
+        console.log('[Mobile Phone] 选择器为空，重新构建选项');
 
-      // 获取平行事件的可用风格
-      const availableStyles = window.parallelEventsStyles.getAvailableStyles();
-      console.log('[Mobile Phone] 平行事件可用风格:', availableStyles);
+        // 获取平行事件的可用风格
+        const availableStyles = window.parallelEventsStyles.getAvailableStyles();
+        console.log('[Mobile Phone] 平行事件可用风格:', availableStyles);
 
-      // 添加预设风格
-      const presetGroup = document.createElement('optgroup');
-      presetGroup.label = '预设风格';
+        // 添加预设风格
+        const presetGroup = document.createElement('optgroup');
+        presetGroup.label = '预设风格';
 
-      availableStyles.forEach(styleName => {
-        const option = document.createElement('option');
-        option.value = styleName;
-        option.textContent = styleName;
-        presetGroup.appendChild(option);
-      });
+        availableStyles.forEach(styleName => {
+          const option = document.createElement('option');
+          option.value = styleName;
+          option.textContent = styleName;
+          presetGroup.appendChild(option);
+        });
 
-      selectElement.appendChild(presetGroup);
+        selectElement.appendChild(presetGroup);
+      } else {
+        console.log('[Mobile Phone] 选择器已有选项，跳过重新构建');
+      }
 
       // 设置当前选中的风格
       if (selectElement.querySelector(`option[value="${currentStyle}"]`)) {
@@ -4802,9 +4824,9 @@ class MobilePhone {
       } else {
         // 如果当前风格不存在，回退到默认风格
         console.warn('[Mobile Phone] 平行事件当前风格不存在，回退到默认风格:', currentStyle);
-        selectElement.value = '科幻未来';
+        selectElement.value = '平行事件';
         if (window.parallelEventsManager) {
-          window.parallelEventsManager.currentSettings.selectedStyle = '科幻未来';
+          window.parallelEventsManager.currentSettings.selectedStyle = '平行事件';
           window.parallelEventsManager.saveSettings();
         }
       }
@@ -4899,6 +4921,8 @@ class MobilePhone {
       if (thresholdInput && settings.threshold !== undefined) {
         thresholdInput.value = settings.threshold;
         console.log('[Mobile Phone] UI阈值已同步:', settings.threshold);
+      } else if (!thresholdInput) {
+        console.warn('[Mobile Phone] 阈值输入框未找到，可能DOM还未加载完成');
       }
 
       // 同步自定义前缀
@@ -4906,6 +4930,8 @@ class MobilePhone {
       if (customPrefixInput && settings.customPrefix !== undefined) {
         customPrefixInput.value = settings.customPrefix;
         console.log('[Mobile Phone] UI自定义前缀已同步');
+      } else if (!customPrefixInput) {
+        console.warn('[Mobile Phone] 自定义前缀输入框未找到，可能DOM还未加载完成');
       }
 
       // 同步启用状态
@@ -4913,6 +4939,8 @@ class MobilePhone {
       if (enabledCheckbox && settings.enabled !== undefined) {
         enabledCheckbox.checked = settings.enabled;
         console.log('[Mobile Phone] UI启用状态已同步:', settings.enabled);
+      } else if (!enabledCheckbox) {
+        console.warn('[Mobile Phone] 启用状态复选框未找到，可能DOM还未加载完成');
       }
 
       // 同步风格选择
@@ -4942,6 +4970,8 @@ class MobilePhone {
     }
   }
 
+
+
   // 更新单个风格选择器
   updateSingleStyleSelector(selectElement) {
     if (!selectElement || !window.forumStyles) return;
@@ -4952,7 +4982,7 @@ class MobilePhone {
       currentValue = window.forumManager.currentSettings.selectedStyle || currentValue;
     }
 
-    
+
 
     // 添加自定义风格
     const customStyles = window.forumStyles.getAllCustomStyles();

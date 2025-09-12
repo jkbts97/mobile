@@ -287,7 +287,7 @@ class ForumUI {
                 </div>
                 <div class="post-content">
                     <h2 class="thread-title">${thread.title}</h2>
-                    <p class="thread-content">${this.formatContent(thread.content)}</p>
+                    <div class="thread-content">${this.formatContent(thread.content)}</div>
                 </div>
                 <div class="thread-stats">
                     <div class="thread-actions">
@@ -350,7 +350,7 @@ class ForumUI {
                     <div class="post-meta">
                         <span class="thread-id">ID: t${thread.id}</span>
                     </div>
-                    <p class="post-full-content">${this.formatContent(thread.content)}</p>
+                    <div class="post-full-content">${this.formatContent(thread.content)}</div>
                     <div class="post-actions">
                         <button class="action-btn like-btn" data-thread-id="${thread.id}">
                             <i class="${this.getLikeIconClass(thread.id)} fa-heart"></i> ${this.getLikeCount(thread.id)}
@@ -488,8 +488,7 @@ class ForumUI {
     // 处理表情包标记
     let formatted = content.replace(/表情:\s*([^,\s]+)/g, '<span class="emoji-placeholder">[$1]</span>');
 
-    // 处理链接（如果有）
-    formatted = formatted.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="forum-link">$1</a>');
+
 
     // 处理@用户（如果有）
     formatted = formatted.replace(/@([^\s]+)/g, '<span class="mention">@$1</span>');

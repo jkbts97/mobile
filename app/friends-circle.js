@@ -25,7 +25,7 @@ if (typeof window.FriendsCircle === 'undefined') {
         // 视觉朋友圈（无文字）：[朋友圈|角色名|好友ID|s楼层ID|图片描述]
         visualCircleNoText: /\[朋友圈\|([^|\]]+)\|([^|\]]+)\|(s\d+)\|([^\]]+?)\]/g,
         // 🌟 新增：用户发送的图片朋友圈格式（6个部分）：[朋友圈|角色名|好友ID|s楼层ID|图片描述|文字内容]
-        userVisualCircle: /\[朋友圈\|([^|\]]+)\|([^|\]]+)\|(s\d+)\|图片:\s*([^|]+?)\|([^\]]+?)\]/g,
+        userVisualCircle: /\[朋友圈\|([^|\]]+)\|([^|\]]+)\|(s\d+)\|我的图片:\s*([^|]+?)\|([^\]]+?)\]/g,
         // 朋友圈回复
         circleReply: /\[朋友圈回复\|([^|\]]+)\|([^|\]]+)\|([ws]\d+)\|([^\]]+?)\]/g,
       };
@@ -205,7 +205,7 @@ if (typeof window.FriendsCircle === 'undefined') {
             author: author,
             friendId: friendId,
             type: 'visual',
-            imageDescription: `图片: ${fileName}`, // 构建图片描述
+            imageDescription: `我的图片: ${fileName}`, // 构建图片描述
             imageUrl: imageInfo.imageUrl, // 🌟 添加真实图片URL
             imageFileName: imageInfo.fileName || fileName, // 🌟 添加真实文件名
             content: textContent,
@@ -466,7 +466,7 @@ if (typeof window.FriendsCircle === 'undefined') {
               author: author,
               friendId: friendId,
               type: 'visual',
-              imageDescription: `图片: ${fileName}`,
+              imageDescription: `我的图片: ${fileName}`,
               content: textContent,
               messageIndex: i,
               latestActivityIndex: i,
@@ -2039,7 +2039,7 @@ if (typeof window.FriendsCircle === 'undefined') {
               <div class="char-count">0/200</div>
             </div>
             <div class="form-group">
-              <label>配文（可选）</label>
+              <label>配文（必填！！！）</label>
               <textarea class="text-input" placeholder="说点什么..." maxlength="300"></textarea>
               <div class="char-count">0/300</div>
             </div>
@@ -3265,7 +3265,7 @@ if (typeof window.FriendsCircle === 'undefined') {
 
           // 如果没有描述，使用文件名作为描述
           if (!imageDescription) {
-            finalImageDescription = `图片: ${uploadResult.fileName}`;
+            finalImageDescription = `我的图片: ${uploadResult.fileName}`;
           }
         }
 
@@ -3320,9 +3320,9 @@ if (typeof window.FriendsCircle === 'undefined') {
         // 构建朋友圈格式
         let circleFormat;
         if (textContent && textContent.trim()) {
-          circleFormat = `[朋友圈|{{user}}|483920|${floorId}|图片: ${fileName}|${textContent}]`;
+          circleFormat = `[朋友圈|{{user}}|483920|${floorId}|我的图片: ${fileName}|${textContent}]`;
         } else {
-          circleFormat = `[朋友圈|{{user}}|483920|${floorId}|图片: ${fileName}]`;
+          circleFormat = `[朋友圈|{{user}}|483920|${floorId}|我的图片: ${fileName}]`;
         }
 
         console.log('[Friends Circle] 发送朋友圈格式:', circleFormat);
@@ -3354,7 +3354,7 @@ if (typeof window.FriendsCircle === 'undefined') {
           author: currentUserName, // 使用当前用户名，而不是{{user}}
           friendId: '483920',
           type: 'visual',
-          imageDescription: `图片: ${fileName}`,
+          imageDescription: `我的图片: ${fileName}`,
           imageUrl: imageUrl, // 添加图片URL字段
           content: textContent || '',
           messageIndex: -1,
@@ -3518,8 +3518,8 @@ if (typeof window.FriendsCircle === 'undefined') {
             const content = message.mes || message.content || '';
 
             // 检查是否包含朋友圈格式的图片信息
-            if (content.includes('图片:') || content.includes('[朋友圈|')) {
-              const imageRegex = /图片:\s*([^|\]]+)/;
+            if (content.includes('我的图片:') || content.includes('[朋友圈|')) {
+              const imageRegex = /我的图片:\s*([^|\]]+)/;
               const match = content.match(imageRegex);
 
               if (match) {
