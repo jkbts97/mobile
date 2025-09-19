@@ -181,10 +181,10 @@ class ParallelEventsApp {
             const currentCount = messages.length;
 
             // 详细调试信息
-            console.log(`[Parallel Events App] 楼层检查 - 当前: ${currentCount}, 上次: ${this.lastFloorCount}, 阈值: ${this.currentSettings.threshold}`);
+            console.log(`[Parallel Events App] Floor Inspection - Current: ${currentCount}, Last time: ${this.lastFloorCount}, Threshold value: ${this.currentSettings.threshold}`);
 
             if (this.lastFloorCount === 0) {
-                console.log(`[Parallel Events App] 初始化楼层计数: ${currentCount}`);
+                console.log(`[Parallel Events App] Initialise the floor count: ${currentCount}`);
                 this.lastFloorCount = currentCount;
                 return;
             }
@@ -192,15 +192,15 @@ class ParallelEventsApp {
             const changeCount = currentCount - this.lastFloorCount;
 
             if (changeCount > 0) {
-                console.log(`[Parallel Events App] 检测到楼层变化: +${changeCount} 条消息 (需要 ${this.currentSettings.threshold} 条才触发)`);
+                console.log(`[Parallel Events App] Floor changes have been detected.: +${changeCount} messages (Need ${this.currentSettings.threshold} trigger)`);
             }
 
             if (changeCount >= this.currentSettings.threshold) {
-                console.log(`[Parallel Events App] 🎯 达到阈值！触发平行事件生成: ${changeCount} >= ${this.currentSettings.threshold}`);
+                console.log(`[Parallel Events App] 🎯 Reach the threshold! Trigger the generation of parallel events: ${changeCount} >= ${this.currentSettings.threshold}`);
                 this.onFloorChange(changeCount);
                 this.lastFloorCount = currentCount;
             } else if (changeCount > 0) {
-                console.log(`[Parallel Events App] 楼层变化未达到阈值，等待更多消息...`);
+                console.log(`[Parallel Events App] The floor change has not reached the threshold, waiting for more information....`);
             }
         } catch (error) {
             console.error('[Parallel Events App] Error checking floor changes:', error);
@@ -363,36 +363,41 @@ class ParallelEventsApp {
      * Build event generation prompt
      */
     buildEventPrompt(style, customPrefix) {
-        console.log(`[Parallel Events App] 构建提示词 - 风格: ${style}, 自定义前缀长度: ${customPrefix?.length || 0}`);
+        console.log(`[Parallel Events App] Constructing prompts - style: ${style}, Customise the length of the prefix: ${customPrefix?.length || 0}`);
 
         // 特殊处理：如果选择了"自定义"风格
-        if (style === '自定义') {
+        if (style === 'Customise') {
             if (customPrefix && customPrefix.trim()) {
-                console.log('[Parallel Events App] 使用自定义风格，仅发送自定义前缀内容');
+                console.log('[Parallel Events App] Use custom style and only send custom prefix content.');
                 return customPrefix.trim();
             } else {
-                console.log('[Parallel Events App] 自定义风格但无自定义前缀，使用默认提示');
-                return `你是一个专业的平行事件生成器。请根据当前对话内容生成一个有趣的平行事件。
+                console.log('[Parallel Events App] Custom style but no custom prefix, use the default prompt');
+                return `You are a professional parallel event generator. Please generate an interesting parallel event based on the current dialogue content.。
 
-要求：
-- 事件应该与当前对话相关但不直接干扰主线
-- 可以是背景事件、环境变化或相关角色的行动
-- 使用第三人称视角描述
-- 长度控制在100-200字
-- 内容要有趣且符合设定
+Requirements:
 
-请直接生成平行事件内容，不要包含其他解释。`;
+- The event should be related to the current conversation but not directly interfere with the main line.
+
+- It can be background events, environmental changes or the actions of related characters.
+
+- Use the third-person perspective to describe
+
+- The length is controlled at 100-200 words
+
+- The content should be interesting and in line with the settings.
+
+Please generate the content of parallel events directly, and do not include other explanations.。`;
             }
         }
 
         // 其他预设风格：使用风格管理器
         if (window.parallelEventsStyles) {
-            console.log('[Parallel Events App] 使用预设风格，调用风格管理器');
+            console.log('[Parallel Events App] Use the preset style to call the style manager');
             return window.parallelEventsStyles.buildFullPrompt(style, customPrefix);
         }
 
         // 回退方案：如果风格管理器不可用
-        console.log('[Parallel Events App] 风格管理器不可用，使用回退方案');
+        console.log('[Parallel Events App] Style manager is not available. Use the retrection scheme.');
         let basePrompt = `You are a professional parallel event generator. Please generate a ${style} style parallel event related to the current conversation content.
 
 Requirements:
@@ -460,27 +465,27 @@ Please generate event content directly without other explanations.`;
                     // Get recent 5 floors for context (like forum app)
                     const recentMessages = chatData.messages.slice(-5);
 
-                    console.log('[Parallel Events App] 📋 获取最近5层楼的消息:');
-                    console.log(`[Parallel Events App] 总消息数: ${chatData.messages.length}, 选取最近: ${recentMessages.length}`);
+                    console.log('[Parallel Events App] 📋 Get the news of the nearest 5 floors:');
+                    console.log(`[Parallel Events App] Total number of messages: ${chatData.messages.length}, Select recent: ${recentMessages.length}`);
 
                     contextInfo = recentMessages.map((msg, index) => {
                         const floorNumber = chatData.messages.length - recentMessages.length + index + 1;
-                        const sender = msg.is_user ? '用户' : (msg.name || '角色');
+                        const sender = msg.is_user ? 'Consumer' : (msg.name || 'Role');
                         const content = msg.mes || '';
 
-                        console.log(`[Parallel Events App] 第${floorNumber}楼 - ${sender}: ${content.substring(0, 100)}...`);
+                        console.log(`[Parallel Events App] The ${floorNumber} floor - ${sender}: ${content.substring(0, 100)}...`);
 
-                        return `【第${floorNumber}楼】${sender}: ${content}`;
+                        return `【The ${floorNumber} floor】${sender}: ${content}`;
                     }).join('\n\n');
 
-                    console.log('[Parallel Events App] 📝 构建的上下文信息长度:', contextInfo.length);
+                    console.log('[Parallel Events App] 📝 The length of the constructed context information:', contextInfo.length);
                 }
             }
 
             // Build API request messages
             const userContent = contextInfo ?
-                `🎯 请根据以下最近5层楼的对话内容生成平行事件：\n\n${contextInfo}` :
-                '🎯 请生成一个平行事件。';
+                `🎯 Please generate parallel events based on the dialogue content of the last 5 floors below.：\n\n${contextInfo}` :
+                '🎯 Please generate a parallel event.。';
 
             const messages = [
                 {
@@ -493,12 +498,12 @@ Please generate event content directly without other explanations.`;
                 }
             ];
 
-            console.log('📡 [平行事件API] 完整API请求:');
-            console.log('📋 [平行事件API] 系统提示词:');
+            console.log('📡 [Parallel Event API] Complete API Request:');
+            console.log('📋 [Parallel Event API] System prompts:');
             console.log(prompt);
-            console.log('\n📝 [平行事件API] 用户消息内容:');
+            console.log('\n📝 [Parallel Event API] User Message Content:');
             console.log(userContent);
-            console.log('\n📦 [平行事件API] 完整消息结构:');
+            console.log('\n📦 [Parallel Event API] Complete Message Structure:');
             console.log(JSON.stringify(messages, null, 2));
 
             const response = await window.mobileCustomAPIConfig.callAPI(messages, {
