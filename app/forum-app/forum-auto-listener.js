@@ -25,7 +25,7 @@ class ForumAutoListener {
     this.debounceTimer = null;
     this.isProcessingRequest = false; // Add：Request processing lock
     this.lastProcessedMessageCount = 0; // New: the number of messages processed at the end
-    this.currentStatus = '待机中'; // New addition: current status
+    this.currentStatus = 'On standby'; // New addition: current status
     this.statusElement = null; // New: Status display element
     this.lastGenerationTime = null; // New addition: the last generation time
     this.generationCount = 0; // New addition: statistics on the number of generations
