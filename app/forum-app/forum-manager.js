@@ -13,7 +13,7 @@ class ForumManager {
     this.isInitialized = false;
     this.currentSettings = {
       enabled: true,
-      selectedStyle: '贴吧老哥',
+      selectedStyle: 'Post it, brother.',
       autoUpdate: true,
       threshold: 10,
       apiConfig: {
@@ -46,7 +46,7 @@ class ForumManager {
    */
   async initialize() {
     try {
-      console.log('[Forum Manager] 初始化开始...');
+      console.log('[Forum Manager] Initialisation start...');
 
       // 加载设置
       this.loadSettings();
@@ -61,12 +61,12 @@ class ForumManager {
       this.registerConsoleCommands();
 
       this.isInitialized = true;
-      console.log('[Forum Manager] ✅ 初始化完成');
+      console.log('[Forum Manager] ✅ Initialisation completed');
 
       // 浏览器兼容性检测和提示
       this.detectBrowserAndShowTips();
     } catch (error) {
-      console.error('[Forum Manager] 初始化失败:', error);
+      console.error('[Forum Manager] Initialisation failed:', error);
     }
   }
 
@@ -79,12 +79,12 @@ class ForumManager {
     const isVia = /Via/.test(userAgent);
 
     if (isSafari || isVia) {
-      console.log('%c🍎 Safari/Via兼容性提示', 'color: #ff6b6b; font-weight: bold; font-size: 14px;');
+      console.log('%c🍎 Safari/ViaCompatibility Tips', 'color: #ff6b6b; font-weight: bold; font-size: 14px;');
       console.log(
-        '%c如果遇到按钮无响应问题，请运行: MobileContext.fixBrowserCompatibility()',
+        '%cIf you encounter the problem that the button is not responding, please run: MobileContext.fixBrowserCompatibility()',
         'color: #4ecdc4; font-size: 12px;',
       );
-      console.log('%c更多诊断信息: MobileContext.quickDiagnosis()', 'color: #45b7d1; font-size: 12px;');
+      console.log('%cMore diagnostic information: MobileContext.quickDiagnosis()', 'color: #45b7d1; font-size: 12px;');
     }
   }
 
@@ -98,10 +98,10 @@ class ForumManager {
         const customAPIReady = window.mobileCustomAPIConfig !== undefined;
 
         if (contextEditorReady && customAPIReady) {
-          console.log('[Forum Manager] 依赖模块已就绪');
+          console.log('[Forum Manager] Dependency modules are ready.');
           resolve();
         } else {
-          console.log('[Forum Manager] 等待依赖模块...', {
+          console.log('[Forum Manager] Waiting for the dependent module...', {
             contextEditor: contextEditorReady,
             customAPI: customAPIReady,
           });
@@ -116,7 +116,7 @@ class ForumManager {
    * 创建论坛UI按钮 - 已移除浮动按钮，现在通过手机框架集成
    */
   createForumUI() {
-    console.log('[Forum Manager] ✅ 论坛UI已集成到手机框架中');
+    console.log('[Forum Manager] ✅ The forum UI has been integrated into the mobile phone framework.');
   }
 
   /**
@@ -160,28 +160,28 @@ class ForumManager {
 
     panel.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0; color: #667eea;">📰 论坛管理器</h2>
+                <h2 style="margin: 0; color: #667eea;">📰 Forum Manager</h2>
                 <button id="close-forum-panel" style="background: none; border: none; color: #ccc; font-size: 24px; cursor: pointer;">×</button>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 10px; color: #333;">选择论坛风格:</label>
+                <label style="display: block; margin-bottom: 10px; color: #333;">Choose the forum style:</label>
                 <select id="forum-style-select" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #eee; color: #333;">
-                    <!-- 风格选项将通过JavaScript动态加载 -->
+                    <!-- Style options will be dynamically loaded by JavaScript.-->
                 </select>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 10px; color: #333;">自定义前缀 (发送给模型的额外提示词):</label>
-                <textarea id="forum-custom-prefix" placeholder="在此输入自定义前缀，将添加到风格提示词前面..."
+                <label style="display: block; margin-bottom: 10px; color: #333;">Custom prefix (additional prompts sent to the model):</label>
+                <textarea id="forum-custom-prefix" placeholder="Enter the custom prefix here, which will be added before the style prompt...."
                           style="width: 100%; height: 80px; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #eee; color: #333; resize: vertical; font-family: monospace; font-size: 16px;"></textarea>
                 <div style="margin-top: 5px; font-size: 16px; color: #333;">
-                    提示: 可以用来添加特殊指令、角色设定或生成要求
+                    Tip: It can be used to add special instructions, role settings or generation requirements.
                 </div>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 10px; color: #333;">消息阈值 (触发论坛生成):</label>
+                <label style="display: block; margin-bottom: 10px; color: #333;">Message threshold (trigger forum generation):</label>
                 <input type="number" id="forum-threshold" value="${this.currentSettings.threshold}" min="1" max="100"
                        style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #eee; color: #333;">
             </div>
@@ -211,12 +211,12 @@ class ForumManager {
             </div>
 
             <div id="forum-queue-status" style="margin-top: 10px; padding: 8px; background: #34495e; border-radius: 5px; font-size: 11px; color: #ecf0f1;">
-                <div style="font-weight: bold; margin-bottom: 5px;">🔄 生成状态监控</div>
-                <div>SillyTavern生成状态: <span id="generation-status">检查中...</span></div>
-                <div>待插入队列: <span id="queue-count">0</span> 项</div>
+                <div style="font-weight: bold; margin-bottom: 5px;">🔄 Generate status monitoring</div>
+                <div>SillyTavern generation status: <span id="generation-status">Checking...</span></div>
+                <div>Queue to be inserted: <span id="queue-count">0</span> Item</div>
                 <div style="margin-top: 5px;">
-                    <button id="clear-queue-btn" style="background: #e67e22; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;">清空队列</button>
-                    <button id="refresh-status-btn" style="background: #3498db; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-left: 5px;">刷新状态</button>
+                    <button id="clear-queue-btn" style="background: #e67e22; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;">ClearEmptyQueue</button>
+                    <button id="refresh-status-btn" style="background: #3498db; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-left: 5px;">ChangeAppearance</button>
                 </div>
             </div>
         `;
@@ -252,7 +252,7 @@ class ForumManager {
         const presetStyles = Object.keys(window.forumStyles.styles);
         if (presetStyles.length > 0) {
           const presetGroup = document.createElement('optgroup');
-          presetGroup.label = '预设风格';
+          presetGroup.label = 'Preset style';
 
           presetStyles.forEach(styleName => {
             const option = document.createElement('option');
@@ -270,12 +270,12 @@ class ForumManager {
         const customStyles = window.forumStyles.getAllCustomStyles();
         if (customStyles.length > 0) {
           const customGroup = document.createElement('optgroup');
-          customGroup.label = '自定义风格';
+          customGroup.label = 'Custom style';
 
           customStyles.forEach(style => {
             const option = document.createElement('option');
             option.value = style.name;
-            option.textContent = `${style.name} (自定义)`;
+            option.textContent = `${style.name} (Customise)`;
             customGroup.appendChild(option);
           });
 
@@ -295,14 +295,14 @@ class ForumManager {
         this.saveSettings();
       }
 
-      console.log('[ForumManager] 面板风格选择器已初始化，共', styleSelect.options.length, '个选项');
+      console.log('[ForumManager] The panel style selector has been initialised, total', styleSelect.options.length, 'Not an option');
     } catch (error) {
-      console.error('[ForumManager] 初始化面板风格选择器失败:', error);
+      console.error('[ForumManager] Failed to initialise the panel style selector:', error);
 
       // 降级处理：添加默认风格
-      styleSelect.innerHTML = '<option value="贴吧老哥">贴吧老哥</option>';
-      styleSelect.value = '贴吧老哥';
-      this.currentSettings.selectedStyle = '贴吧老哥';
+      styleSelect.innerHTML = '<option value="Post it, brother.">Post it, brother.</option>';
+      styleSelect.value = 'Post it, brother.';
+      this.currentSettings.selectedStyle = 'Post it, brother.';
     }
   }
 
@@ -343,7 +343,7 @@ class ForumManager {
     document.getElementById('forum-custom-prefix').addEventListener('blur', e => {
       if (window.forumStyles) {
         window.forumStyles.setCustomPrefix(e.target.value);
-        console.log('[Forum Manager] 前缀已更新');
+        console.log('[Forum Manager] The prefix has been updated');
       }
     });
 
@@ -361,7 +361,7 @@ class ForumManager {
 
     // 立即生成论坛
     document.getElementById('generate-forum-now').addEventListener('click', () => {
-      console.log('[Forum Manager] 🔘 立即生成按钮被点击（来自forum-manager.js）');
+      console.log('[Forum Manager] 🔘 The instant generation button is clicked (from forum-manager.js)');
       this.generateForumContent(true); // 强制生成，不检查消息增量
     });
 
@@ -375,7 +375,7 @@ class ForumManager {
       if (window.mobileCustomAPIConfig) {
         window.mobileCustomAPIConfig.showConfigPanel();
       } else {
-        this.updateStatus('API配置模块未就绪', 'error');
+        this.updateStatus('The API configuration module is not ready', 'error');
       }
     });
 
@@ -398,33 +398,33 @@ class ForumManager {
    */
   async generateForumContent(force = false) {
     // 记录调用源
-    const caller = force ? '手动强制生成' : '自动检查生成';
-    console.log(`[Forum Manager] 📞 调用源: ${caller}`);
+    const caller = force ? 'Manual forced generation' : 'Automatically check and generate';
+    console.log(`[Forum Manager] 📞 Call source: ${caller}`);
 
     // 如果是强制模式，立即阻止auto-listener
     if (force && window.forumAutoListener) {
       if (window.forumAutoListener.isProcessingRequest) {
-        console.log('[Forum Manager] ⚠️ auto-listener正在处理，但强制生成优先');
+        console.log('[Forum Manager] ⚠️ Auto-listener is being processed, but forced generation is prioritised.');
       }
       window.forumAutoListener.isProcessingRequest = true;
-      console.log('[Forum Manager] 🚫 已阻止auto-listener干扰');
+      console.log('[Forum Manager] 🚫 Auto-listener interference has been blocked.');
     }
 
     // 严格的重复请求防护 - 增强Safari兼容性
     if (this.isProcessing) {
-      console.log('[Forum Manager] 检测到正在处理中，检查是否为Safari兼容性问题...');
+      console.log('[Forum Manager] Detect that it is being processed. Check whether it is a Safari compatibility problem....');
 
       // Safari兼容性处理：如果是强制模式，给予一次机会重置状态
       if (force) {
-        console.log('[Forum Manager] 🍎 Safari兼容模式：强制重置状态');
+        console.log('[Forum Manager] 🍎 Safari compatibility mode: forced reset status');
         this.isProcessing = false;
         if (window.forumAutoListener) {
           window.forumAutoListener.isProcessingRequest = false;
         }
         // 继续执行，不返回false
       } else {
-        console.log('[Forum Manager] 正在处理中，跳过重复请求');
-        this.updateStatus('正在处理中，请稍候...', 'warning');
+        console.log('[Forum Manager] In process, skip the duplicate request');
+        this.updateStatus('Processing, please wait a moment....', 'warning');
 
         // 如果是强制模式，恢复auto-listener状态
         if (force && window.forumAutoListener) {
@@ -440,14 +440,14 @@ class ForumManager {
       autoListenerPaused = true;
       // 设置处理请求锁，阻止auto-listener触发
       window.forumAutoListener.isProcessingRequest = true;
-      console.log('[Forum Manager] 🔄 临时暂停auto-listener（设置处理锁）');
+      console.log('[Forum Manager] 🔄 Temporarily suspend auto-listener (set processing lock)');
     }
 
     // 检查是否有足够的消息变化
     try {
       const chatData = await this.getCurrentChatData();
       if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-        console.log('[Forum Manager] 无聊天数据，跳过生成');
+        console.log('[Forum Manager] No chat data, skip the generation');
         return false;
       }
 
@@ -459,32 +459,32 @@ class ForumManager {
 
         if (increment < this.currentSettings.threshold) {
           console.log(
-            `[Forum Manager] [自动检查] 消息增量不足 (${increment}/${this.currentSettings.threshold})，跳过生成`,
+            `[Forum Manager][Automatic Check] Insufficient message increment (${increment}/${this.currentSettings.threshold})，Skip generation`,
           );
           return false;
         }
       } else {
-        console.log('[Forum Manager] 🚀 强制生成模式，跳过消息增量检查');
+        console.log('[Forum Manager] 🚀 Forced generation mode, skip message incremental check');
       }
 
       // 开始处理
       this.isProcessing = true;
-      this.updateStatus('正在生成论坛内容...', 'info');
+      this.updateStatus('Forum content is being generated...', 'info');
 
       const currentCount = chatData.messages.length;
       const increment = currentCount - this.lastProcessedCount;
-      console.log(`[Forum Manager] 开始生成论坛内容 (消息数: ${currentCount}, 增量: ${increment}, 强制模式: ${force})`);
+      console.log(`[Forum Manager] Start to generate forum content (number of messages: ${currentCount}, Increment: ${increment}, Forced mode: ${force})`);
 
       // 2. 调用API生成论坛内容
       const forumContent = await this.callForumAPI(chatData);
       if (!forumContent) {
-        throw new Error('API返回空内容');
+        throw new Error('API returns empty content');
       }
 
       // 3. 通过上下文编辑器安全更新到第1楼层（带生成状态检查）
       const success = await this.safeUpdateContextWithForum(forumContent);
       if (success) {
-        this.updateStatus('论坛内容已添加到第1楼层', 'success');
+        this.updateStatus('The forum content has been added to the first floor.', 'success');
         this.lastProcessedCount = currentCount;
 
         // 同步到auto-listener
@@ -495,18 +495,18 @@ class ForumManager {
         // 刷新论坛UI界面以显示新内容
         this.clearForumUICache();
 
-        console.log(`[Forum Manager] ✅ 论坛内容生成成功`);
+        console.log(`[Forum Manager] ✅ Forum content generated successfully`);
         return true;
       } else {
-        throw new Error('更新上下文失败');
+        throw new Error('Failed to update the context');
       }
     } catch (error) {
-      console.error('[Forum Manager] 生成论坛内容失败:', error);
-      this.updateStatus(`生成失败: ${error.message}`, 'error');
+      console.error('[Forum Manager] Failed to generate forum content:', error);
+      this.updateStatus(`Failed to generate: ${error.message}`, 'error');
 
       // 显示错误提示
       if (window.showMobileToast) {
-        window.showMobileToast(`❌ 论坛生成失败: ${error.message}`, 'error');
+        window.showMobileToast(`❌ Forum generation failed: ${error.message}`, 'error');
       }
 
       return false;
@@ -519,7 +519,7 @@ class ForumManager {
         setTimeout(() => {
           if (window.forumAutoListener) {
             window.forumAutoListener.isProcessingRequest = false;
-            console.log('[Forum Manager] 🔄 恢复auto-listener（释放处理锁）');
+            console.log('[Forum Manager] 🔄 恢复auto-listener（Release the processing lock）');
           }
         }, 2000); // 2秒后恢复，确保手动操作完成
       }
@@ -527,7 +527,7 @@ class ForumManager {
       // 强制重置状态，防止卡住
       setTimeout(() => {
         if (this.isProcessing) {
-          console.warn('[Forum Manager] 强制重置处理状态');
+          console.warn('[Forum Manager] Forced reset processing status');
           this.isProcessing = false;
         }
       }, 5000);
@@ -549,10 +549,10 @@ class ForumManager {
       } else if (window.MobileContext) {
         return await window.MobileContext.loadChatToEditor();
       } else {
-        throw new Error('上下文编辑器未就绪');
+        throw new Error('Context editor is not ready');
       }
     } catch (error) {
-      console.error('[Forum Manager] 获取聊天数据失败:', error);
+      console.error('[Forum Manager] Failed to obtain chat data:', error);
       throw error;
     }
   }
@@ -562,11 +562,11 @@ class ForumManager {
    */
   async callForumAPI(chatData) {
     try {
-      console.log('🚀 [论坛API] ===== 开始生成论坛内容 =====');
+      console.log('🚀 [Forum API] ===== Start generating forum content =====');
 
       // 检查API配置
       if (!window.mobileCustomAPIConfig || !window.mobileCustomAPIConfig.isAPIAvailable()) {
-        throw new Error('请先配置API');
+        throw new Error('Please configure the API first.');
       }
 
       // 构建上下文信息
@@ -577,24 +577,24 @@ class ForumManager {
         ? window.forumStyles.getStylePrompt(this.currentSettings.selectedStyle, 'generate')
         : '';
 
-      console.log('📋 [论坛API] 系统提示词（立即生成论坛）:');
+      console.log('📋[Forum API] System prompts (generate a forum immediately):');
       console.log(stylePrompt);
-      console.log('\n📝 [论坛API] 用户消息内容:');
-      console.log(`请根据以下聊天记录生成论坛内容：\n\n${contextInfo}`);
+      console.log('\n📝 [Forum API] User Message Content:');
+      console.log(`Please generate the forum content according to the following chat records.：\n\n${contextInfo}`);
 
       // 构建API请求
       const messages = [
         {
           role: 'system',
-          content: `${stylePrompt}\n\n🎯 【特别注意】：\n- 重点关注用户的发帖和回帖内容，它们标记有⭐和特殊说明\n- 延续用户的语言风格、话题偏好和互动习惯\n- 让论坛内容体现用户的参与特点和行为模式\n- 如果用户有特定的观点或兴趣，请在论坛中适当呼应`,
+          content: `${stylePrompt}\n\n🎯 【Pay special attention】：\n- Focus on the content of users' posts and replies, which are marked with ⭐ and special instructions\n- Continue the user's language style, topic preferences and interaction habits\n- Let the forum content reflect the user's participation characteristics and behaviour patterns\n- If the user has specific views or interests, please echo appropriately in the forum.`,
         },
         {
           role: 'user',
-          content: `🎯 请根据以下聊天记录生成论坛内容，特别注意用户的发帖和回帖模式：\n\n${contextInfo}`,
+          content: `🎯 Please generate forum content according to the following chat records, and pay special attention to the user's posting and reply mode.：\n\n${contextInfo}`,
         },
       ];
 
-      console.log('📡 [论坛API] 完整API请求:');
+      console.log('📡 [Forum API] Complete API Request:');
       console.log(JSON.stringify(messages, null, 2));
 
       // 调用API
@@ -603,20 +603,20 @@ class ForumManager {
         max_tokens: 2000,
       });
 
-      console.log('📥 [论坛API] 模型返回内容:');
+      console.log('📥 [Forum API] Model Return Content:');
       console.log(response);
 
       if (response && response.content) {
-        console.log('✅ [论坛API] 生成的论坛内容:');
+        console.log('✅ [Forum API] Generated forum content:');
         console.log(response.content);
-        console.log('🏁 [论坛API] ===== 论坛内容生成完成 =====\n');
+        console.log('🏁 [Forum API] ===== Forum content generation completed =====\n');
         return response.content;
       } else {
-        throw new Error('API返回格式错误');
+        throw new Error('API returns format error');
       }
     } catch (error) {
-      console.error('❌ [论坛API] API调用失败:', error);
-      console.log('🏁 [论坛API] ===== 论坛内容生成失败 =====\n');
+      console.error('❌ [Forum API] API call failed:', error);
+      console.log('🏁 [Forum API] ===== Forum content generation failed =====\n');
       throw error;
     }
   }
@@ -625,8 +625,8 @@ class ForumManager {
    * 构建上下文信息（只发送倒数5层楼和第1层楼）
    */
   buildContextInfo(chatData) {
-    let contextInfo = `角色: ${chatData.characterName || '未知'}\n`;
-    contextInfo += `消息数量: ${chatData.messages.length}\n\n`;
+    let contextInfo = `Role: ${chatData.characterName || 'Unknown'}\n`;
+    contextInfo += `Number of messages: ${chatData.messages.length}\n\n`;
 
     const messages = chatData.messages;
     const selectedMessages = [];
@@ -643,10 +643,10 @@ class ForumManager {
       // 如果包含论坛内容，只提取论坛标记内的内容
       if (hasForumContent) {
         firstFloorContent = forumMatch[1].trim(); // 只保留标记内的内容
-        console.log('📋 [上下文构建] 第1层楼：提取论坛标记内容');
-        console.log('提取的内容:', firstFloorContent);
+        console.log('📋 [Context construction] The first floor: extract the forum mark content');
+        console.log('Extracted content:', firstFloorContent);
       } else {
-        console.log('📋 [上下文构建] 第1层楼：无论坛标记，保留完整内容');
+        console.log('📋 [Context Construction] Floor 1: No forum tags, keep the full content');
       }
 
       selectedMessages.push({
@@ -703,41 +703,41 @@ class ForumManager {
     });
 
     // 5. 构建增强注意力的内容
-    contextInfo += '选择的对话内容:\n';
+    contextInfo += 'Selected dialogue content:\n';
 
     // 特别标记用户的论坛参与行为
     if (userForumPosts.length > 0 || userReplies.length > 0) {
-      contextInfo += '\n⭐ 【重点关注：用户论坛参与模式】\n';
+      contextInfo += '\n⭐ 【Focus on: User Forum Participation Mode】\n';
 
       if (userForumPosts.length > 0) {
-        contextInfo += '👤 用户的发帖内容：\n';
+        contextInfo += '👤 Content posted by users：\n';
         userForumPosts.forEach(msg => {
-          contextInfo += `  📝 [用户发帖] ${msg.mes}\n`;
+          contextInfo += `  📝 [Users post] ${msg.mes}\n`;
         });
         contextInfo += '\n';
       }
 
       if (userReplies.length > 0) {
-        contextInfo += '💬 用户的回帖内容：\n';
+        contextInfo += '💬 Content of the user's reply：\n';
         userReplies.forEach(msg => {
-          contextInfo += `  💭 [用户回复] ${msg.mes}\n`;
+          contextInfo += `  💭 [User Reply] ${msg.mes}\n`;
         });
         contextInfo += '\n';
       }
 
-      contextInfo += '⚠️ 生成论坛内容时请特别注意延续和呼应用户的发帖风格、话题偏好和互动模式！\n\n';
+      contextInfo += '⚠️ When generating forum content, please pay special attention to the continuation and echo of users' posting style, topic preferences and interaction patterns.！\n\n';
     }
 
-    contextInfo += '完整对话记录:\n';
+    contextInfo += 'Complete transcript of the conversation:\n';
     uniqueMessages.forEach(msg => {
-      const speaker = msg.is_user ? '👤用户' : `🤖${chatData.characterName || '角色'}`;
+      const speaker = msg.is_user ? '👤Consumer' : `🤖${chatData.characterName || 'Role'}`;
       let floorInfo = '';
       let attentionMark = '';
 
       if (msg.isFirstFloor) {
-        floorInfo = msg.hasForumContent ? '[第1楼层-含论坛]' : '[第1楼层]';
+        floorInfo = msg.hasForumContent ? '[The first floor - including the forum]' : '[The first floor]';
       } else if (msg.isRecentMessage) {
-        floorInfo = '[最近消息]';
+        floorInfo = '[Recent news]';
       }
 
       // 为用户消息添加特殊注意力标记
@@ -748,15 +748,15 @@ class ForumManager {
       contextInfo += `${attentionMark}${speaker}${floorInfo}: ${msg.mes}\n`;
     });
 
-    console.log('📋 [上下文构建] ===== 上下文信息构建完成 =====');
-    console.log(`[上下文构建] 总消息数: ${chatData.messages.length}`);
-    console.log(`[上下文构建] 选择消息数: ${uniqueMessages.length}`);
-    console.log(`[上下文构建] 包含第1楼层: ${uniqueMessages.some(m => m.isFirstFloor)}`);
-    console.log(`[上下文构建] 第1楼层包含论坛内容: ${uniqueMessages.some(m => m.isFirstFloor && m.hasForumContent)}`);
-    console.log(`[上下文构建] 最近消息数: ${uniqueMessages.filter(m => m.isRecentMessage).length}`);
-    console.log('📝 [上下文构建] 构建的完整上下文信息:');
+    console.log('📋[Context Construction] ===== Context Information Construction Completed=====');
+    console.log(`[Context construction] Total number of messages: ${chatData.messages.length}`);
+    console.log(`[Context Construction] Select the number of messages: ${uniqueMessages.length}`);
+    console.log(`[Context Construction] Including the 1st floor: ${uniqueMessages.some(m => m.isFirstFloor)}`);
+    console.log(`[Context Construction] The first floor contains forum content: ${uniqueMessages.some(m => m.isFirstFloor && m.hasForumContent)}`);
+    console.log(`[Context Construction] Number of recent messages: ${uniqueMessages.filter(m => m.isRecentMessage).length}`);
+    console.log('📝 [Context Construction] Constructed complete context information:');
     console.log(contextInfo);
-    console.log('🏁 [上下文构建] ===== 上下文信息构建完成 =====\n');
+    console.log('🏁 [Context construction] ===== Context information construction completed =====\n');
 
     return contextInfo;
   }
@@ -766,21 +766,21 @@ class ForumManager {
    */
   async updateContextWithForum(forumContent) {
     try {
-      console.log('[Forum Manager] 开始在第1楼层追加论坛内容...');
+      console.log('[Forum Manager] Start adding forum content on the first floor...');
 
       // 确保上下文编辑器可用
       if (!window.mobileContextEditor) {
-        throw new Error('上下文编辑器未就绪');
+        throw new Error('Context editor is not ready');
       }
 
       // 获取当前聊天数据
       const chatData = window.mobileContextEditor.getCurrentChatData();
       if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-        throw new Error('无聊天数据可更新');
+        throw new Error('No chat data can be updated');
       }
 
       // 构建论坛内容格式（使用特殊标记包装）
-      const forumSection = `\n\n<!-- FORUM_CONTENT_START -->\n【论坛热议】\n\n${forumContent}\n\n---\n[由论坛管理器自动生成]\n<!-- FORUM_CONTENT_END -->`;
+      const forumSection = `\n\n<!-- FORUM_CONTENT_START -->\n【Hot discussion in the forum】\n\n${forumContent}\n\n---\n[Automatically generated by the forum manager]\n<!-- FORUM_CONTENT_END -->`;
 
       // 检查第1楼层是否存在
       if (chatData.messages.length >= 1) {
@@ -791,7 +791,7 @@ class ForumManager {
         const existingForumRegex = /<!-- FORUM_CONTENT_START -->[\s\S]*?<!-- FORUM_CONTENT_END -->/;
         if (existingForumRegex.test(originalContent)) {
           // 如果已存在论坛内容，智能合并新旧内容
-          console.log('[Forum Manager] 检测到已存在论坛内容，开始智能合并...');
+          console.log('[Forum Manager] It is detected that the forum content already exists, and start intelligent merging....');
 
           // 提取现有论坛内容
           const existingForumMatch = originalContent.match(existingForumRegex);
@@ -804,7 +804,7 @@ class ForumManager {
           originalContent = originalContent.replace(existingForumRegex, '').trim();
 
           // 使用合并后的内容
-          const mergedForumSection = `\n\n<!-- FORUM_CONTENT_START -->\n【论坛热议】\n\n${mergedForumContent}\n\n---\n[由论坛管理器自动生成]\n<!-- FORUM_CONTENT_END -->`;
+          const mergedForumSection = `\n\n<!-- FORUM_CONTENT_START -->\n【论坛热议】\n\n${mergedForumContent}\n\n---\n[Automatically generated by the forum manager]\n<!-- FORUM_CONTENT_END -->`;
 
           // 在原有内容后追加合并后的论坛内容
           const newContent = originalContent + mergedForumSection;
@@ -812,10 +812,10 @@ class ForumManager {
           // 更新第1楼层
           const success = await window.mobileContextEditor.modifyMessage(0, newContent);
           if (success) {
-            console.log('[Forum Manager] ✅ 论坛内容智能合并成功');
+            console.log('[Forum Manager] ✅ Successful integration of forum content intelligently');
             return true;
           } else {
-            throw new Error('modifyMessage返回false');
+            throw new Error('modifyMessage returns false');
           }
         }
 
@@ -825,23 +825,23 @@ class ForumManager {
         // 更新第1楼层
         const success = await window.mobileContextEditor.modifyMessage(0, newContent);
         if (success) {
-          console.log('[Forum Manager] ✅ 第1楼层追加论坛内容成功');
+          console.log('[Forum Manager] ✅ The additional forum content on the first floor was successful.');
           return true;
         } else {
-          throw new Error('modifyMessage返回false');
+          throw new Error('modifyMessage returns false');
         }
       } else {
         // 如果没有消息，创建新消息（只包含论坛内容）
-        const messageIndex = await window.mobileContextEditor.addMessage(forumSection.trim(), false, '论坛系统');
+        const messageIndex = await window.mobileContextEditor.addMessage(forumSection.trim(), false, 'Forum system');
         if (messageIndex >= 0) {
-          console.log('[Forum Manager] ✅ 新增第1楼层（包含论坛内容）成功');
+          console.log('[Forum Manager] ✅ The first floor (including forum content) has been added successfully');
           return true;
         } else {
-          throw new Error('addMessage返回负数');
+          throw new Error('addMessage returns a negative number');
         }
       }
     } catch (error) {
-      console.error('[Forum Manager] 更新第1楼层失败:', error);
+      console.error('[Forum Manager] Failed to update the first floor:', error);
       return false;
     }
   }
@@ -854,26 +854,26 @@ class ForumManager {
    */
   async mergeForumContent(existingForumContent, newForumContent) {
     try {
-      console.log('[Forum Manager] 🔄 开始智能合并论坛内容...');
+      console.log('[Forum Manager] 🔄 Start to integrate forum content intelligently...');
 
       // 提取现有论坛内容（去除标记）
       const existingContentMatch = existingForumContent.match(
-        /<!-- FORUM_CONTENT_START -->\s*【论坛热议】\s*([\s\S]*?)\s*---\s*\[由论坛管理器自动生成\]\s*<!-- FORUM_CONTENT_END -->/,
+        /<!-- FORUM_CONTENT_START -->\s*【Hot discussion in the forum】\s*([\s\S]*?)\s*---\s*\[Automatically generated by the forum manager\]\s*<!-- FORUM_CONTENT_END -->/,
       );
       const existingContent = existingContentMatch ? existingContentMatch[1].trim() : '';
 
-      console.log('[Forum Manager] 📋 现有论坛内容:');
+      console.log('[Forum Manager] 📋 Existing forum content:');
       console.log(existingContent);
-      console.log('[Forum Manager] 📋 新生成论坛内容:');
+      console.log('[Forum Manager] 📋 Newly generated forum content:');
       console.log(newForumContent);
 
       // 解析现有内容
       const existingData = this.parseForumContent(existingContent);
-      console.log('[Forum Manager] 📊 解析现有内容:', existingData);
+      console.log('[Forum Manager] 📊 Analyse the existing content:', existingData);
 
       // 解析新内容
       const newData = this.parseForumContent(newForumContent);
-      console.log('[Forum Manager] 📊 解析新内容:', newData);
+      console.log('[Forum Manager] 📊 Analyse the new content:', newData);
 
       // 合并逻辑
       const mergedThreads = new Map();
@@ -890,10 +890,10 @@ class ForumManager {
       newData.threads.forEach(newThread => {
         if (mergedThreads.has(newThread.id)) {
           // 如果是现有帖子，不覆盖，只合并回复
-          console.log(`[Forum Manager] 📝 发现对现有帖子 ${newThread.id} 的内容，合并回复...`);
+          console.log(`[Forum Manager] 📝 Discover the existing posts ${newThread.id} The content, combined reply...`);
         } else {
           // 如果是新帖子，直接添加并设置当前时间戳
-          console.log(`[Forum Manager] ✨ 添加新帖子: ${newThread.id}`);
+          console.log(`[Forum Manager] ✨ Add a new post: ${newThread.id}`);
           newThread.timestamp = currentTime.toLocaleString();
           newThread.latestActivityTime = currentTime; // 设置为Date对象，用于排序
           mergedThreads.set(newThread.id, newThread);
@@ -922,14 +922,14 @@ class ForumManager {
             newReply.sortTimestamp = currentTime.getTime(); // 用于排序的数值时间戳
 
             allReplies.push(newReply);
-            console.log(`[Forum Manager] 💬 添加新回复到帖子 ${newThread.id}: ${newReply.author}`);
+            console.log(`[Forum Manager] 💬 Add a new reply to the post ${newThread.id}: ${newReply.author}`);
 
             // 如果是对现有帖子的新回复，更新帖子的最新活动时间
             if (mergedThreads.has(newThread.id)) {
               const existingThread = mergedThreads.get(newThread.id);
               existingThread.latestActivityTime = currentTime;
               existingThread.timestamp = currentTime.toLocaleString(); // 也更新显示时间戳
-              console.log(`[Forum Manager] 📝 更新帖子 ${newThread.id} 的最新活动时间`);
+              console.log(`[Forum Manager] 📝 Update the post ${newThread.id} The latest activity time of`);
             }
           }
         });
@@ -940,13 +940,13 @@ class ForumManager {
       // 4. 重新构建论坛内容
       const mergedContent = this.buildForumContent(mergedThreads, mergedReplies);
 
-      console.log('[Forum Manager] ✅ 论坛内容合并完成');
-      console.log('[Forum Manager] 📋 合并后内容:');
+      console.log('[Forum Manager] ✅ The content of the forum has been merged.');
+      console.log('[Forum Manager] 📋 Consolidated content:');
       console.log(mergedContent);
 
       return mergedContent;
     } catch (error) {
-      console.error('[Forum Manager] ❌ 合并论坛内容失败:', error);
+      console.error('[Forum Manager] ❌ Failed to merge the content of the forum:', error);
       // 如果合并失败，返回新内容
       return newForumContent;
     }
@@ -966,11 +966,11 @@ class ForumManager {
     }
 
     // 解析标题格式: [标题|发帖人昵称|帖子id|标题内容|帖子详情]
-    const titleRegex = /\[标题\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
+    const titleRegex = /\[Heading\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
     // 解析回复格式: [回复|回帖人昵称|帖子id|回复内容]
-    const replyRegex = /\[回复\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
+    const replyRegex = /\[Answer\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
     // 解析楼中楼格式: [楼中楼|回帖人昵称|帖子id|父楼层|回复内容]
-    const subReplyRegex = /\[楼中楼\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
+    const subReplyRegex = /\[Building in the middle of the reply\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
 
     let match;
 
@@ -1113,17 +1113,17 @@ class ForumManager {
 
     sortedThreads.forEach(thread => {
       // 添加帖子
-      content += `[标题|${thread.author}|${thread.id}|${thread.title}|${thread.content}]\n\n`;
+      content += `[Heading|${thread.author}|${thread.id}|${thread.title}|${thread.content}]\n\n`;
 
       // 添加回复
       const threadReplies = repliesMap.get(thread.id) || [];
       threadReplies.forEach(reply => {
-        content += `[回复|${reply.author}|${reply.threadId}|${reply.content}]\n`;
+        content += `[Answer|${reply.author}|${reply.threadId}|${reply.content}]\n`;
 
         // 添加楼中楼回复
         if (reply.subReplies && reply.subReplies.length > 0) {
           reply.subReplies.forEach(subReply => {
-            content += `[楼中楼|${subReply.author}|${subReply.threadId}|${subReply.parentFloor}|${subReply.content}]\n`;
+            content += `[Building in the middle of the reply|${subReply.author}|${subReply.threadId}|${subReply.parentFloor}|${subReply.content}]\n`;
           });
         }
       });
@@ -1141,7 +1141,7 @@ class ForumManager {
   async getCurrentForumContent() {
     try {
       if (!window.mobileContextEditor) {
-        throw new Error('上下文编辑器未就绪');
+        throw new Error('Context editor is not ready');
       }
 
       const chatData = window.mobileContextEditor.getCurrentChatData();
@@ -1156,12 +1156,12 @@ class ForumManager {
 
       // 提取论坛内容
       const forumRegex =
-        /<!-- FORUM_CONTENT_START -->\s*【论坛热议】\s*([\s\S]*?)\s*---\s*\[由论坛管理器自动生成\]\s*<!-- FORUM_CONTENT_END -->/;
+        /<!-- FORUM_CONTENT_START -->\s*【Hot discussion in the forum】\s*([\s\S]*?)\s*---\s*\[Automatically generated by the forum manager\]\s*<!-- FORUM_CONTENT_END -->/;
       const match = firstMessage.mes.match(forumRegex);
 
       return match ? match[1].trim() : '';
     } catch (error) {
-      console.error('[Forum Manager] 获取当前论坛内容失败:', error);
+      console.error('[Forum Manager] Failed to get the current forum content:', error);
       return '';
     }
   }
@@ -1171,15 +1171,15 @@ class ForumManager {
    */
   async clearForumContent() {
     try {
-      this.updateStatus('正在清除论坛内容...', 'info');
+      this.updateStatus('Clearing the forum content...', 'info');
 
       if (!window.mobileContextEditor) {
-        throw new Error('上下文编辑器未就绪');
+        throw new Error('Context editor is not ready');
       }
 
       const chatData = window.mobileContextEditor.getCurrentChatData();
       if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-        throw new Error('无数据可清除');
+        throw new Error('No data can be cleared.');
       }
 
       // 检查第1楼层是否包含论坛内容标记
@@ -1196,8 +1196,8 @@ class ForumManager {
             // 如果清除论坛内容后消息变为空，删除整个消息
             const success = await window.mobileContextEditor.deleteMessage(0);
             if (success) {
-              this.updateStatus('论坛内容已清除（消息已删除）', 'success');
-              console.log('[Forum Manager] ✅ 第1楼层论坛内容已清除，消息已删除');
+              this.updateStatus('The forum content has been cleared (the message has been deleted)', 'success');
+              console.log('[Forum Manager] ✅ The content of the forum on the first floor has been cleared and the message has been deleted.');
             } else {
               throw new Error('删除空消息失败');
             }
@@ -1205,18 +1205,18 @@ class ForumManager {
             // 如果还有其他内容，只更新消息内容
             const success = await window.mobileContextEditor.modifyMessage(0, cleanedContent);
             if (success) {
-              this.updateStatus('论坛内容已清除（保留原有内容）', 'success');
-              console.log('[Forum Manager] ✅ 第1楼层论坛内容已清除，原有内容已保留');
+              this.updateStatus('The content of the forum has been cleared (keep the original content)', 'success');
+              console.log('[Forum Manager] ✅ The content of the forum on the first floor has been cleared, and the original content has been retained.');
             } else {
-              throw new Error('更新消息失败');
+              throw new Error('Failed to update the message');
             }
           }
         } else {
-          this.updateStatus('第1楼层未发现论坛内容标记', 'warning');
-          console.log('[Forum Manager] 第1楼层未发现论坛内容标记');
+          this.updateStatus('No forum content marks were found on the first floor.i', 'warning');
+          console.log('[Forum Manager] No forum content marks were found on the first floor.');
         }
       } else {
-        this.updateStatus('第1楼层消息为空', 'warning');
+        this.updateStatus('The message on the first floor is empty.', 'warning');
       }
 
       // 立即重置处理状态 - 兼容Safari
@@ -1230,10 +1230,10 @@ class ForumManager {
       // 刷新论坛UI界面以反映数据变化
       this.clearForumUICache();
 
-      console.log('[Forum Manager] 🔄 清除完成，状态已重置（兼容Safari）');
+      console.log('[Forum Manager] 🔄 Cleared, the status has been reset (compatible with Safari)');
     } catch (error) {
-      console.error('[Forum Manager] 清除论坛内容失败:', error);
-      this.updateStatus(`清除失败: ${error.message}`, 'error');
+      console.error('[Forum Manager] Failed to clear the forum content:', error);
+      this.updateStatus(`Failed to clear: ${error.message}`, 'error');
 
       // 确保状态被重置 - 立即重置，不依赖setTimeout
       this.isProcessing = false;
@@ -1253,7 +1253,7 @@ class ForumManager {
         if (window.forumAutoListener) {
           window.forumAutoListener.isProcessingRequest = false;
         }
-        console.log('[Forum Manager] 🛡️ 延迟状态重置完成（最后保障）');
+        console.log('[Forum Manager] 🛡️ Delayed status reset completed (final guarantee)');
       }, 500); // 减少到500ms，提升响应速度
     }
   }
@@ -1266,13 +1266,13 @@ class ForumManager {
       // 刷新论坛UI界面，因为论坛UI现在没有缓存数据，只需要重新渲染即可
       if (window.forumUI && window.forumUI.refreshThreadList) {
         window.forumUI.refreshThreadList();
-        console.log('[Forum Manager] ✅ 论坛UI界面已刷新');
+        console.log('[Forum Manager] ✅ The forum UI interface has been refreshed.');
       }
 
       // 如果有其他论坛UI实例，也刷新它们
       if (window.mobileForumUI && window.mobileForumUI.refreshThreadList) {
         window.mobileForumUI.refreshThreadList();
-        console.log('[Forum Manager] ✅ 移动论坛UI界面已刷新');
+        console.log('[Forum Manager] ✅ The mobile forum UI interface has been refreshed.');
       }
 
       // 清除localStorage中的论坛相关数据（如果有）
@@ -1281,11 +1281,11 @@ class ForumManager {
       forumDataKeys.forEach(key => {
         if (localStorage.getItem(key)) {
           localStorage.removeItem(key);
-          console.log(`[Forum Manager] ✅ 已清除localStorage中的${key}`);
+          console.log(`[Forum Manager] ✅ The ${key in localStorage has been cleared}`);
         }
       });
     } catch (error) {
-      console.warn('[Forum Manager] 刷新论坛UI界面时出现警告:', error);
+      console.warn('[Forum Manager] A warning appears when refreshing the forum UI interface.:', error);
     }
   }
 
@@ -1294,18 +1294,18 @@ class ForumManager {
    */
   async sendReplyToAPI(replyFormat) {
     try {
-      console.log('💬 [回复API] ===== 开始发送用户回复 =====');
-      this.updateStatus('正在发送回复...', 'info');
+      console.log('💬 [Reply API] ===== Start sending user replies =====');
+      this.updateStatus('Sending a reply...', 'info');
 
       // 检查API配置
       if (!window.mobileCustomAPIConfig || !window.mobileCustomAPIConfig.isAPIAvailable()) {
-        throw new Error('请先配置API');
+        throw new Error('Please configure the API first.');
       }
 
       // 获取当前聊天数据
       const chatData = await this.getCurrentChatData();
       if (!chatData || !chatData.messages || chatData.messages.length === 0) {
-        throw new Error('无法获取聊天数据');
+        throw new Error('Chat data cannot be obtained.');
       }
 
       // 构建上下文信息
@@ -1316,11 +1316,11 @@ class ForumManager {
         ? window.forumStyles.getStylePrompt(this.currentSettings.selectedStyle, 'reply')
         : '';
 
-      console.log('📋 [回复API] 系统提示词（用户回复）:');
+      console.log('📋 [Reply API] System prompt words (user reply):');
       console.log(stylePrompt);
-      console.log('\n💭 [回复API] 用户回复内容:');
+      console.log('\n💭 [Reply API] User reply content:');
       console.log(replyFormat);
-      console.log('\n📝 [回复API] 完整用户消息:');
+      console.log('\n📝 [Reply to API] Complete user message:');
       const userMessage = `🎯 请根据以下聊天记录和用户回复，生成包含用户回复和AI回复的完整论坛内容：
 
 📋 聊天记录：
