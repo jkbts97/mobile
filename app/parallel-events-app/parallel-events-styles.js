@@ -16,7 +16,7 @@ class ParallelEventsStyles {
         this.loadPrefixSettings();
         this.loadCustomStyles();
 
-        console.log('[Parallel Events Styles] 风格管理器已创建');
+        console.log('[Parallel Events Styles] The style manager has been created');
     }
 
     /**
@@ -24,127 +24,181 @@ class ParallelEventsStyles {
      */
     initializeStyles() {
         return {
-            '被ntr': `你是一个专业的成人小说生成器。请根据当前对话内容，生成一段不在当前场景内的角色和其他人做爱或者前戏的场景。
+            'Be ntr': `You are a professional adult novel generator. According to the content of the current dialogue, please generate a scene where the character who is not in the current scene has sex or foreplay with others.。
 
-风格要求：
-- 动作描写细腻
-- 丰富的内心描写
-- 对主角的愧疚或者别的想法
-- 长度控制在1000-1400字
+Style requirements:
 
-请直接生成平行事件内容，不要包含其他解释。`,
+- The description of the action is delicate
 
-            '主人的任务': `你是一个专业的成人小说生成器。请根据当前对话内容，生成一段当前场景内对方正在执行他不知名的主人的任务剧情。
+- Rich inner description
 
-风格要求：
-- 动作描写细腻
-- 丰富的内心描写
-- 对主角的愧疚或者别的想法
-- 长度控制在1000-1400字
+- Guilt or other thoughts about the protagonist
 
-示例元素：
-- 跳蛋或衣服下面的绳缚或没穿内衣或因为任务要求勾引主角
+- The length is controlled at 1000-1400 words
 
-请直接生成平行事件内容，不要包含其他解释。`,
+Please generate the content of parallel events directly, and do not include other explanations.。`,
 
-            '主动消息': `其他角色进行线上聊天私聊用户时的AI行为与输出格式。
+            'Master's task': 'You are a professional adult novel generator. According to the content of the current dialogue, please generate a plot where the other party is performing the mission of his unknown master in the current scene.。
 
-## 一、核心扮演准则
+Style requirements:
 
-1.  **触发条件**
-    *   当用户通过任何形式的线上聊天软件与任意角色进行一对一私聊或角色主动给用户发送信息时，AI必须强制启用本条目规则。
-    *   此规则**不适用**于任何角色之间的私聊场景。
-2.  **角色扮演**
-    *   AI的唯一职责是扮演并生成**非用户方角色**的回复消息。
-3.  **绝对禁止事项**
-    *   **严禁**代替 用户发言或生成任何属于用户的消息。**严禁**重复用户信息
-    *   **严禁**在消息格式之外，输出任何前缀、后缀、时间戳、剧情描述、心理活动、场景说明、注释或任何额外内容。
-    *   **严禁**输出空行或不必要的换行。
-    * *   **严禁**搞错搞混好友的名字和id。
-    *   **严禁**省略任何格式部分。**严禁**省略"[和{{人名或群名}}的聊天]"部分。
-    *   输出内容**必须**且**只能**是符合以下格式的一条或多条消息。
+- The description of the action is delicate
 
-## 二、消息输出格式
-### 1. 标准格式
-所有文字消息，无论类型，都必须严格遵循以下结构：
-[和{char}的聊天]
-{{消息内容}}
+- Rich inner description
 
-### 2. {{消息内容}}格式：
-[对方消息|{{对方名字}}|{{对方好友id}}|{{消息类型}}|{{消息内容}}]
+- Guilt or other thoughts about the protagonist
 
-## 三、特殊消息类型详解
+- The length is controlled at 1000-1400 words
 
-### 1. 文字消息 (Text)
-*   **类型**: 文字
-*   **内容**: 角色发送的具体文本内容。
-*   **示例**:
-[对方消息|秦倦|500002|文字|小朋友，这么晚还不睡，在想什么呢]
+Example elements:
 
-### 2. 红包消息 (Red Packet)
-*   **类型**: 红包
-*   **内容**: 红包内包含的金额（纯数字）。
-*   **示例**:
-    [对方消息|霍谨|400003|红包|52000]
+- Jumping eggs or ropes under clothes or not wearing underwear or seducing the protagonist because of the task requirements
 
-### 3. 语音消息 (Voice)
-*   **类型**: 语音
-*   **内容**: 语音消息的文字转录内容。
-*   **示例**:
-    [对方消息|夏阳|300004|语音|好想你啊，你什么时候回来]
+Please generate the content of parallel events directly without including other explanations. `,
+
+'Active Message': `AI behaviour and output format when other roles chat online and chat privately with users。
+
+## I、Core role-playing guidelines
+
+1. **Trigger conditions**
+
+* When the user has a one-on-one private chat with any role through any form of online chat software or the role actively sends information to the user, AI must force the rule of this entry.
+
+* This rule ** does not apply to ** private chat scenes between any characters.
+
+2. **Role-playing**
+
+* The only responsibility of AI is to play and generate **non-user roles**'s reply messages.
+
+3. **Absolutely prohibited matters**
+
+* **It is strictly forbidden** to speak on behalf of the user or generate any message belonging to the user. **Duplicate user information is strictly prohibited**
+
+* **It is strictly forbidden** to output any prefix, suffix, time stamp, plot description, psychological activity, scene description, annotation or any additional content outside the message format.
+
+* **It is strictly forbidden** to output empty lines or unnecessary line wraps.
+
+* * **It is strictly forbidden to confuse your friend's name and id by mistake.
+
+* **It is strictly forbidden** to omit any format part. **It is strictly forbidden** to omit the "[chat with {{person name or group name}}]" section.
+
+* The output content ** must ** and ** can only ** be one or more messages that conform to the following format.
+
+## II. Message output format
+
+### 1. Standard format
+
+All text messages, regardless of type, must strictly follow the following structure:
+
+[Chat with {char}]
+
+{{Message Content}}
+
+### 2. {{Message content}} format:
+
+[Message of the other party|{{Other party's name}}|{{Other party's friend id}}|{{Message type}}|{{Message content}}]
+
+## III. Detailed explanation of special message types
+
+### 1. Text message (Text)
+
+* **Type**: Text
+
+* **Content**: Specific text content sent by the role.
+
+* **Example**:
+
+[The other party's message | Qin Yan | 500002 | Text | Kid, you haven't slept so late, what are you thinking about]
+
+### 2. Red Packet News (Red Packet)
+
+* **Type**: Red envelope
+
+* **Content**: The amount included in the red envelope (pure numbers).
+
+* **Example**:
+
+[News from the other party | Huo Jin | 400003 | Red envelope | 52000]
+
+###3. Voice message (Voice)
+
+* **Type**: Voice
+
+* **Content**: Text transcription content of voice messages.
+
+* **Example**:
+
+[Message from the other party | Xia Yang | 300004 | Voice | I miss you so much, when will you come back]
 
 
 
-## 四、行为与交互模拟
+## IV. Behaviour and interaction simulation
 
-*   **动态回复**：每次回复的消息数量应根据具体情境（如角色的情绪、对话的节奏）在 **1 到 7 条**之间动态变化。**禁止**每次都回复固定数量的消息。
-*   **模拟真实**：消息之间的时间间隔应有微小且合理的变化，以模拟真实聊天场景的输入延迟。
-*   **情景感知**：回复的内容、语气和频率必须完全符合角色当前的设定、情绪以及与用户的关系阶段。
-## 五、消息条数
-生成至少8-10条不同类型的消息
+* **Dynamic reply**: The number of messages replied each time should change dynamically between **1 and 7** according to the specific situation (such as the mood of the character and the rhythm of the dialogue). **Prohibited** to reply to a fixed number of messages every time.
+
+* **Simulate the truth**: The time interval between messages should have small and reasonable changes to simulate the input delay of the real chat scene.
+
+* **Scenario perception**: The content, tone and frequency of the reply must be fully consistent with the current setting, mood and relationship with the user of the character.
+
+## V. Number of messages
+
+Generate at least 8-10 different types of messages
+
 `,
 
-            '平行事件': `你是一个专业的平行事件生成器。请根据当前对话内容，生成一个当前世界进展或者不在当前内场景npc行动的个人日常或者行动。
+'Parallel Event': `You are a professional parallel event generator. According to the content of the current dialogue, please generate a personal daily life or action of the current world progress or npc action that is not in the current internal scene.
 
-风格要求：
-- 贴近原文设定
-- 事件应该与当前对话相关
-- 长度控制在600-800字
+Style requirements:
 
+- Close to the original setting
 
-请直接生成平行事件内容，不要包含其他解释。`,
+- The event should be related to the current dialogue.
 
+- The length is controlled at 600-800 words
 
-            '魅魔之体': `你是一个专业的小说生成器生成器。请根据当前对话内容，生成#一个新角色#突然情不自禁爱上了主角的描述。
+Please generate the content of parallel events directly without including other explanations. `,
 
-风格要求：
-- 突出身体反应与心理反应的矛盾
-- 仔细描写肢体语言和内心
-- 长度控制在600-800字
+'Demon's Body': `You are a professional novel generator. According to the content of the current dialogue, please generate a description of #a new character # suddenly can't help falling in love with the protagonist.
 
-请直接生成平行事件内容，不要包含其他解释。`,
+Style requirements:
 
-            '随机新闻': `你是一个专业的新闻生成器。请根据当前世界观，生成一个随机的新闻。
+- Highlight the contradiction between physical reaction and psychological reaction
 
-风格要求：
-- 贴近当前世界观
-- 长度控制在600-800字
-- 政治、军事、娱乐、体育、财经、科技、社会、教育、文化、健康、旅游、美食等等，所有题材皆可
+- Carefully describe body language and heart
 
-请直接生成平行事件内容，不要包含其他解释。`,
+- The length is controlled at 600-800 words
 
-            '自定义': `你是一个专业的平行事件生成器。请根据当前对话内容和用户的自定义要求，生成相应风格的平行事件。
+Please generate the content of parallel events directly without including other explanations. `,
 
-基本要求：
-- 事件应该与当前对话相关但不直接干扰主线
-- 可以是背景事件、环境变化或相关角色的行动
-- 使用第三人称视角描述
-- 长度控制在100-200字
-- 内容要有趣且符合设定
+'Random News': `You are a professional news generator. Please generate a random news according to the current worldview.
 
-请根据用户提供的自定义前缀要求来调整风格和内容方向。如果没有特殊要求，请生成一个与对话内容相关的有趣平行事件。
+Style requirements:
 
-请直接生成平行事件内容，不要包含其他解释。`
+- Close to the current worldview
+
+- The length is controlled at 600-800 words
+
+- Politics, military, entertainment, sports, finance, science and technology, society, education, culture, health, tourism, food, etc., all subjects are available.
+
+Please generate the content of parallel events directly without including other explanations. `,
+
+'Custom': `You are a professional parallel event generator. Please generate parallel events of the corresponding style according to the current conversation content and the user's custom requirements.
+
+Basic requirements:
+
+- The event should be related to the current conversation but not directly interfere with the main line.
+
+- It can be background events, environmental changes or the actions of related characters.
+
+- Use the third-person perspective to describe
+
+- The length is controlled at 100-200 words
+
+- The content should be interesting and in line with the settings.
+
+Please adjust the style and content direction according to the custom prefix requirements provided by the user. If there is no special requirement, please generate an interesting parallel event related to the content of the dialogue.
+
+Please generate the content of parallel events directly, and do not include other explanations.。`
         };
     }
 
@@ -173,7 +227,7 @@ class ParallelEventsStyles {
     addCustomStyle(name, prompt) {
         this.customStyles.set(name, prompt);
         this.saveCustomStyles();
-        console.log('[Parallel Events Styles] 添加自定义风格:', name);
+        console.log('[Parallel Events Styles] Add a custom style:', name);
     }
 
     /**
@@ -183,7 +237,7 @@ class ParallelEventsStyles {
         if (this.customStyles.has(name)) {
             this.customStyles.delete(name);
             this.saveCustomStyles();
-            console.log('[Parallel Events Styles] 删除自定义风格:', name);
+            console.log('[Parallel Events Styles] Delete the custom style:', name);
             return true;
         }
         return false;
@@ -209,7 +263,7 @@ class ParallelEventsStyles {
     setCustomPrefix(prefix) {
         this.customPrefix = prefix;
         this.savePrefixSettings();
-        console.log('[Parallel Events Styles] 自定义前缀已更新');
+        console.log('[Parallel Events Styles] The custom prefix has been updated');
     }
 
     /**
@@ -219,11 +273,11 @@ class ParallelEventsStyles {
         let basePrompt = this.getStylePrompt(styleName);
 
         if (customPrefix) {
-            basePrompt += `\n\n自定义要求：${customPrefix}`;
+            basePrompt += `\n\nCustomised requirements：${customPrefix}`;
         }
 
         if (this.customPrefix) {
-            basePrompt += `\n\n全局要求：${this.customPrefix}`;
+            basePrompt += `\n\nGlobal requirements：${this.customPrefix}`;
         }
 
         return basePrompt;
@@ -239,7 +293,7 @@ class ParallelEventsStyles {
                 this.customPrefix = saved;
             }
         } catch (error) {
-            console.error('[Parallel Events Styles] 加载前缀设置失败:', error);
+            console.error('[Parallel Events Styles] Failed to load the prefix setting:', error);
         }
     }
 
@@ -250,7 +304,7 @@ class ParallelEventsStyles {
         try {
             localStorage.setItem('parallelEventsCustomPrefix', this.customPrefix);
         } catch (error) {
-            console.error('[Parallel Events Styles] 保存前缀设置失败:', error);
+            console.error('[Parallel Events Styles] Failed to save prefix settings:', error);
         }
     }
 
@@ -263,10 +317,10 @@ class ParallelEventsStyles {
             if (saved) {
                 const customStylesData = JSON.parse(saved);
                 this.customStyles = new Map(Object.entries(customStylesData));
-                console.log('[Parallel Events Styles] 加载自定义风格:', this.customStyles.size, '个');
+                console.log('[Parallel Events Styles] Load custom style:', this.customStyles.size, '个');
             }
         } catch (error) {
-            console.error('[Parallel Events Styles] 加载自定义风格失败:', error);
+            console.error('[Parallel Events Styles] Failed to load the custom style:', error);
         }
     }
 
@@ -278,7 +332,7 @@ class ParallelEventsStyles {
             const customStylesData = Object.fromEntries(this.customStyles);
             localStorage.setItem('parallelEventsCustomStyles', JSON.stringify(customStylesData));
         } catch (error) {
-            console.error('[Parallel Events Styles] 保存自定义风格失败:', error);
+            console.error('[Parallel Events Styles] Failed to save the custom style:', error);
         }
     }
 
@@ -315,10 +369,10 @@ class ParallelEventsStyles {
                 this.savePrefixSettings();
             }
 
-            console.log('[Parallel Events Styles] 导入完成');
+            console.log('[Parallel Events Styles] Import completed');
             return true;
         } catch (error) {
-            console.error('[Parallel Events Styles] 导入失败:', error);
+            console.error('[Parallel Events Styles] Failed to import:', error);
             return false;
         }
     }
@@ -331,11 +385,11 @@ class ParallelEventsStyles {
         this.customPrefix = '';
         this.saveCustomStyles();
         this.savePrefixSettings();
-        console.log('[Parallel Events Styles] 设置已重置');
+        console.log('[Parallel Events Styles] The settings have been reset');
     }
 }
 
 // 创建全局实例
 window.parallelEventsStyles = new ParallelEventsStyles();
 
-console.log('[Parallel Events Styles] ✅ 平行事件风格管理器加载完成');
+console.log('[Parallel Events Styles] ✅ The parallel event style manager has been loaded');
