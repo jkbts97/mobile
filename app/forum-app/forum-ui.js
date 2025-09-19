@@ -42,7 +42,7 @@ class ForumUI {
   }
 
   init() {
-    console.log('[Forum UI] 论坛UI管理器初始化');
+    console.log('[Forum UI] Forum UI Manager Initialisation');
   }
 
   /**
@@ -90,7 +90,7 @@ class ForumUI {
     const match = content.match(forumRegex);
 
     if (!match) {
-      console.log('[Forum UI] 未找到论坛内容');
+      console.log('[Forum UI] Forum content not found');
       return { threads: [], replies: {} };
     }
 
@@ -99,11 +99,11 @@ class ForumUI {
     const replies = {};
 
     // 解析标题格式: [标题|发帖人昵称|帖子id|标题内容|帖子详情]
-    const titleRegex = /\[标题\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
+    const titleRegex = /\[Heading\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
     // 解析回复格式: [回复|回帖人昵称|帖子id|回复内容]
-    const replyRegex = /\[回复\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
+    const replyRegex = /\[Answer\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
     // 解析楼中楼格式: [楼中楼|回帖人昵称|帖子id|父楼层|回复内容]
-    const subReplyRegex = /\[楼中楼\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
+    const subReplyRegex = /\[Building in the middle of the building\|([^|]+)\|([^|]+)\|([^|]+)\|([^\]]+)\]/g;
 
     let match_title;
     let match_reply;
@@ -186,7 +186,7 @@ class ForumUI {
       }
     });
 
-    console.log('[Forum UI] 解析完成，帖子数:', threads.length);
+    console.log('[Forum UI] The analysis is completed, and the number of posts:', threads.length);
     return { threads, replies };
   }
 
@@ -196,25 +196,25 @@ class ForumUI {
   getForumMainHTML() {
     return `
             <div class="forum-app">
-                <!-- 论坛内容 -->
+                <!-- Forum content -->
                 <div class="forum-content" id="forum-content">
                     ${this.getThreadListHTML()}
                 </div>
 
-                <!-- 发帖对话框 -->
+                <!-- Posting dialogue box -->
                 <div class="post-dialog" id="post-dialog" style="display: none;">
                     <div class="dialog-overlay" id="dialog-overlay"></div>
                     <div class="dialog-content">
                         <div class="dialog-header">
-                            <h3>发新帖</h3>
+                            <h3>Post a new post</h3>
                             <button class="close-btn" id="close-dialog-btn">×</button>
                         </div>
                         <div class="dialog-body">
-                            <input type="text" class="post-title-input" id="post-title" placeholder="请输入帖子标题...">
-                            <textarea class="post-content-input" id="post-content" placeholder="分享你的想法..."></textarea>
+                            <input type="text" class="post-title-input" id="post-title" placeholder="Please enter a post title...">
+                            <textarea class="post-content-input" id="post-content" placeholder="Share your ideas..."></textarea>
                         </div>
                         <div class="dialog-footer">
-                            <button class="cancel-btn" id="cancel-post-btn">取消</button>
+                            <button class="cancel-btn" id="cancel-post-btn">Cancel</button>
                             <button class="submit-btn" id="submit-post-btn">✈</button>
                         </div>
                     </div>
@@ -234,8 +234,8 @@ class ForumUI {
       return `
                 <div class="empty-state">
                     <div class="empty-icon">💬</div>
-                    <div class="empty-text">暂无帖子</div>
-                    <div class="empty-hint">点击右上角发帖按钮开始讨论吧～</div>
+                    <div class="empty-text">No posts yet</div>
+                    <div class="empty-hint">Click the posting button in the upper right corner to start the discussion.～</div>
                 </div>
             `;
     }
@@ -319,7 +319,7 @@ class ForumUI {
         }
       }
     } catch (error) {
-      console.warn('[Forum UI] 获取论坛数据失败:', error);
+      console.warn('[Forum UI] Failed to obtain forum data:', error);
     }
 
     return { threads: [], replies: {} };
@@ -332,13 +332,13 @@ class ForumUI {
     // 实时从消息中提取论坛数据
     const forumData = this.getCurrentForumData();
     const thread = forumData.threads.find(t => t.id === threadId);
-    if (!thread) return '<div class="error">帖子不存在</div>';
+    if (!thread) return '<div class="error">The post does not exist</div>';
 
     const replies = forumData.replies[threadId] || [];
 
     return `
             <div class="thread-detail">
-                <!-- 主帖 -->
+                <!-- Main post -->
                 <div class="main-post">
                     <div class="post-header">
                         ${this.generateAvatarHTML(thread.author, 'large')}
@@ -359,17 +359,17 @@ class ForumUI {
                     </div>
                 </div>
 
-                <!-- 回复列表 -->
+                <!-- List of replies -->
                 <div class="reply-list">
                     <div class="reply-header">
-                        <h4>全部回复 (${replies.length})</h4>
+                        <h4>All replies (${replies.length})</h4>
                     </div>
                     ${this.getRepliesHTML(replies)}
                 </div>
 
-                <!-- 回复输入框 -->
+                <!-- Reply to the input box -->
                 <div class="comment-input-bar">
-                    <input type="text" class="reply-input" id="reply-input" placeholder="留下你的想法吧">
+                    <input type="text" class="reply-input" id="reply-input" placeholder="Leave your thoughts behind.">
                     <button class="action-btn submit-reply-btn" id="submit-reply-btn" style="color: var(--accent-pink); font-size: 16px;"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -384,7 +384,7 @@ class ForumUI {
       return `
                 <div class="no-replies">
                     <div class="no-replies-icon">💭</div>
-                    <div class="no-replies-text">暂无回复，来抢沙发吧～</div>
+                    <div class="no-replies-text">There is no reply yet. Let's grab the sofa.～</div>
                 </div>
             `;
     }
@@ -417,19 +417,19 @@ class ForumUI {
                           reply.author
                         }" data-floor="${floorNumber}" data-reply-id="${
           reply.id
-        }"><i class="fas fa-reply"></i> 回复</button>
+        }"><i class="fas fa-reply"></i> Answer</button>
                     </div>
 
-                    <!-- 楼中楼回复 -->
+                    <!-- Reply in the middle of the building -->
                     ${this.getSubRepliesHTML(reply.subReplies || [], floorNumber)}
 
-                    <!-- 楼中楼回复输入框 -->
+                    <!-- Reply input box in the middle of the building -->
                     <div class="sub-reply-input-container" id="sub-reply-input-${reply.id}" style="display: none;">
                         <div class="sub-reply-input-box">
-                            <div class="sub-reply-target">回复 ${reply.author}:</div>
-                            <textarea class="sub-reply-input" placeholder="写下你的回复..." rows="2"></textarea>
+                            <div class="sub-reply-target">Answer ${reply.author}:</div>
+                            <textarea class="sub-reply-input" placeholder="Write down your reply..." rows="2"></textarea>
                             <div class="sub-reply-actions">
-                                <button class="cancel-sub-reply-btn" data-reply-id="${reply.id}">取消</button>
+                                <button class="cancel-sub-reply-btn" data-reply-id="${reply.id}">Cancel</button>
                                 <button class="submit-sub-reply-btn" data-reply-id="${
                                   reply.id
                                 }" data-parent-floor="${floorNumber}" data-parent-author="${reply.author}">✈</button>
@@ -453,7 +453,7 @@ class ForumUI {
     return `
             <div class="sub-replies-container">
                 <div class="sub-replies-header">
-                    <span class="sub-replies-count">${subReplies.length} 条回复</span>
+                    <span class="sub-replies-count">${subReplies.length} Reply</span>
                 </div>
                 <div class="sub-replies-list">
                     ${subReplies
@@ -470,7 +470,7 @@ class ForumUI {
                                 <button class="action-btn like-sub-reply">👍 ${Math.floor(Math.random() * 5)}</button>
                                 <button class="action-btn reply-to-sub-reply" data-reply-to="${
                                   subReply.author
-                                }" data-parent-floor="${parentFloor}">回复</button>
+                                }" data-parent-floor="${parentFloor}">Answer</button>
                             </div>
                         </div>
                     `,
@@ -486,7 +486,7 @@ class ForumUI {
    */
   formatContent(content) {
     // 处理表情包标记
-    let formatted = content.replace(/表情:\s*([^,\s]+)/g, '<span class="emoji-placeholder">[$1]</span>');
+    let formatted = content.replace(/Expression:\s*([^,\s]+)/g, '<span class="emoji-placeholder">[$1]</span>');
 
 
 
@@ -602,12 +602,12 @@ class ForumUI {
       if (shouldPushState) {
         const state = {
           app: 'forum',
-          title: '帖子详情',
+          title: 'Details of the post',
           view: 'threadDetail',
           threadId: threadId,
         };
         window.mobilePhone.pushAppState(state);
-        console.log('[Forum UI] 推送帖子详情状态:', state);
+        console.log('[Forum UI] Push the status of the post details:', state);
       }
     }
 
@@ -616,7 +616,7 @@ class ForumUI {
     if (forumContent) {
       forumContent.innerHTML = this.getThreadDetailHTML(threadId);
     } else {
-      console.error('[Forum UI] 找不到forum-content元素');
+      console.error('[Forum UI] The forum-content element cannot be found');
     }
 
     // 绑定回复事件
@@ -727,7 +727,7 @@ class ForumUI {
 
     const content = input.value.trim();
     if (!content) {
-      alert('请输入回复内容');
+      alert('Please enter the content of the reply');
       return;
     }
 
@@ -736,15 +736,15 @@ class ForumUI {
     const currentThread = forumData.threads.find(t => t.id === this.currentThreadId);
 
     if (!currentThread) {
-      alert('无法找到当前帖子信息');
+      alert('Unable to find the current post information');
       return;
     }
 
     // 构建回复前缀：我回复帖子'作者|帖子id|帖子标题'
-    const threadPrefix = `我回复帖子'${currentThread.author}|${currentThread.id}|${currentThread.title}'`;
+    const threadPrefix = `I replied to the post.'${currentThread.author}|${currentThread.id}|${currentThread.title}'`;
 
     // 构建回复格式
-    const replyFormat = `[回复|我|${this.currentThreadId}|${content}]`;
+    const replyFormat = `[Answer|Me|${this.currentThreadId}|${content}]`;
 
     // 直接发送回复，无需确认
     // 清空输入框并隐藏
@@ -756,41 +756,41 @@ class ForumUI {
 
     // 显示发送成功提示
     if (window.showMobileToast) {
-      window.showMobileToast('📤 回复已发送', 'success');
+      window.showMobileToast('📤 The reply has been sent', 'success');
     } else {
       // 如果没有toast功能，使用简单的alert
       setTimeout(() => {
-        alert('回复已发送');
+        alert('The reply has been sent');
       }, 100);
     }
 
     // 直接发送回复给AI
     if (window.forumManager.sendReplyToAPI) {
       const fullReply = `${threadPrefix}\n${replyFormat}`;
-      console.log('[Forum UI] 发送主回复给AI:', fullReply);
+      console.log('[Forum UI] Send the main reply to AI:', fullReply);
 
       window.forumManager
         .sendReplyToAPI(fullReply)
         .then(() => {
-          console.log('[Forum UI] 回复已通过API发送给模型，论坛内容已更新');
+          console.log('[Forum UI] The reply has been sent to the model through API.，The content of the forum has been updated');
           // 刷新论坛内容
           setTimeout(() => {
             this.refreshThreadList();
           }, 500);
         })
         .catch(error => {
-          console.error('[Forum UI] API发送回复失败:', error);
+          console.error('[Forum UI] API failed to send the reply:', error);
           if (window.showMobileToast) {
-            window.showMobileToast('❌ 发送回复失败，请重试', 'error');
+            window.showMobileToast('❌ Failed to send a reply, please try again.', 'error');
           } else {
-            alert('发送回复失败，请重试');
+            alert('Failed to send a reply, please try again.');
           }
         });
     } else {
       if (window.showMobileToast) {
-        window.showMobileToast('❌ 回复功能不可用', 'error');
+        window.showMobileToast('❌ The reply function is not available', 'error');
       } else {
-        alert('回复功能不可用，请检查论坛管理器配置');
+        alert('The reply function is not available. Please check the configuration of the forum manager.');
       }
     }
   }
@@ -894,15 +894,15 @@ class ForumUI {
     }
 
     if (!parentReply) {
-      alert('无法找到被回复的评论信息');
+      alert('Unable to find the replied comments');
       return;
     }
 
     // 构建评论前缀：我回复评论'作者|帖子id|评论内容'
-    const commentPrefix = `我回复评论'${parentReply.author}|${this.currentThreadId}|${parentReply.content}'`;
+    const commentPrefix = `I replied to the comments.'${parentReply.author}|${this.currentThreadId}|${parentReply.content}'`;
 
     // 构建楼中楼回复格式：[回复|我|帖子id|回复作者：回复内容]
-    const replyFormat = `[回复|我|${this.currentThreadId}|回复${parentReply.author}：${content}]`;
+    const replyFormat = `[Answer|Me|${this.currentThreadId}|Answer${parentReply.author}：${content}]`;
 
     const subReplyData = {
       type: 'subreply',
@@ -952,7 +952,7 @@ class ForumUI {
     const content = document.getElementById('post-content').value.trim();
 
     if (!title || !content) {
-      alert('请填写标题和内容');
+      alert('Please fill in the title and content.');
       return;
     }
 
@@ -960,24 +960,24 @@ class ForumUI {
     this.hidePostDialog();
 
     if (!window.forumManager) {
-      alert('论坛管理器未初始化，请稍后再试');
+      alert('The forum manager has not been initialised. Please try again later.');
       return;
     }
 
     // 构建发帖格式：[标题|我|帖子id|标题内容|帖子详情]
     // 帖子id固定为四个字，让模型自己编
-    const postFormat = `[标题|我|帖子|${title}|${content}]`;
+    const postFormat = `[Heading|Me|Post|${title}|${content}]`;
 
-    console.log('[Forum UI] 用户发帖:', { title, content, postFormat });
+    console.log('[Forum UI] Users post:', { title, content, postFormat });
 
     // 直接发布帖子，无需确认
     // 显示发布成功提示
     if (window.showMobileToast) {
-      window.showMobileToast('📝 帖子已发布', 'success');
+      window.showMobileToast('📝 The post has been published', 'success');
     } else {
       // 如果没有toast功能，使用简单的alert
       setTimeout(() => {
-        alert('帖子已发布');
+        alert('The post has been published');
       }, 100);
     }
 
@@ -986,27 +986,27 @@ class ForumUI {
       window.forumManager
         .sendPostToAPI(postFormat)
         .then(() => {
-          console.log('[Forum UI] 帖子已发布');
+          console.log('[Forum UI] The post has been published');
           // 刷新论坛内容
           setTimeout(() => {
             this.refreshThreadList();
           }, 1000);
         })
         .catch(error => {
-          console.error('[Forum UI] 发帖失败:', error);
+          console.error('[Forum UI] Failed to post:', error);
           if (window.showMobileToast) {
-            window.showMobileToast('❌ 发帖失败，请重试', 'error');
+            window.showMobileToast('❌ The posting failed, please try again.', 'error');
           } else {
-            alert('发帖失败，请重试');
+            alert('The posting failed, please try again.');
           }
         });
     } else {
       if (window.showMobileToast) {
-        window.showMobileToast('❌ 发帖功能不可用', 'error');
+        window.showMobileToast('❌ The posting function is not available.', 'error');
       } else {
-        alert('发帖功能不可用，请检查论坛管理器配置');
+        alert('The posting function is not available. Please check the forum manager configuration.');
       }
-      console.error('[Forum UI] sendPostToAPI方法不存在');
+      console.error('[Forum UI] The sendPostToAPI method does not exist.');
     }
   }
 
@@ -1018,7 +1018,7 @@ class ForumUI {
 
     const content = document.getElementById('reply-input').value.trim();
     if (!content) {
-      alert('请输入回复内容');
+      alert('Please enter the content of the reply');
       return;
     }
 
@@ -1030,15 +1030,15 @@ class ForumUI {
     const currentThread = forumData.threads.find(t => t.id === this.currentThreadId);
 
     if (!currentThread) {
-      alert('无法找到当前帖子信息');
+      alert('Unable to find the current post information');
       return;
     }
 
     // 构建回复前缀：我回复帖子'作者|帖子id|帖子标题和内容'
-    const threadPrefix = `我回复帖子'${currentThread.author}|${currentThread.id}|${currentThread.title}'`;
+    const threadPrefix = `I replied to the post.'${currentThread.author}|${currentThread.id}|${currentThread.title}'`;
 
     // 构建普通回复格式：[回复|我|帖子id|回复内容]
-    const replyFormat = `[回复|我|${this.currentThreadId}|${content}]`;
+    const replyFormat = `[Answer|Me|${this.currentThreadId}|${content}]`;
 
     const replyData = {
       type: 'reply',
@@ -1057,32 +1057,32 @@ class ForumUI {
    */
   sendReplyToForum(replyData) {
     if (!window.forumManager) {
-      alert('论坛管理器未初始化，请稍后再试');
+      alert('The forum manager has not been initialised. Please try again later.');
       return;
     }
 
-    console.log('[Forum UI] 发送回复到论坛管理器:', replyData);
+    console.log('[Forum UI] Send a reply to the forum manager:', replyData);
 
     // 直接发送回复，无需确认
     // 显示发送成功提示
     if (window.showMobileToast) {
-      window.showMobileToast('📤 回复已发送', 'success');
+      window.showMobileToast('📤 The reply has been sent', 'success');
     } else {
       // 如果没有toast功能，使用简单的alert
       setTimeout(() => {
-        alert('回复已发送');
+        alert('The reply has been sent');
       }, 100);
     }
 
     // 直接通过API发送回复给模型，让AI生成包含用户回复的完整论坛内容
     if (window.forumManager.sendReplyToAPI) {
       const fullReply = `${replyData.prefix}\n${replyData.replyFormat}`;
-      console.log('[Forum UI] 发送回复给AI生成完整论坛内容:', fullReply);
+      console.log('[Forum UI] Send a reply to AI to generate the complete forum content:', fullReply);
 
       window.forumManager
         .sendReplyToAPI(fullReply)
         .then(() => {
-          console.log('[Forum UI] 回复已通过API发送给模型，论坛内容已更新');
+          console.log('[Forum UI] The reply has been sent to the model through API, and the forum content has been updated.');
 
           // 刷新论坛内容
           setTimeout(() => {
@@ -1090,41 +1090,41 @@ class ForumUI {
           }, 500);
         })
         .catch(error => {
-          console.error('[Forum UI] API发送回复失败:', error);
+          console.error('[Forum UI] API failed to send the reply:', error);
           if (window.showMobileToast) {
-            window.showMobileToast('❌ 发送回复失败，请重试', 'error');
+            window.showMobileToast('❌ Failed to send a reply, please try again.', 'error');
           } else {
-            alert('发送回复失败，请重试');
+            alert('Failed to send a reply, please try again.');
           }
         });
     } else {
       // 如果API功能不可用，回退到插入模式
-      console.warn('[Forum UI] API发送功能不可用，回退到直接插入模式');
+      console.warn('[Forum UI] The API sending function is not available. Return to the direct insertion mode.');
       if (window.forumManager.insertReplyToFirstLayer) {
         window.forumManager
           .insertReplyToFirstLayer(replyData.prefix, replyData.replyFormat)
           .then(() => {
-            console.log('[Forum UI] 回复已插入到第一层');
+            console.log('[Forum UI] The reply has been inserted into the first layer.');
             // 刷新论坛内容
             setTimeout(() => {
               this.refreshThreadList();
             }, 500);
           })
           .catch(error => {
-            console.error('[Forum UI] 插入回复失败:', error);
+            console.error('[Forum UI] Failed to insert the reply:', error);
             if (window.showMobileToast) {
-              window.showMobileToast('❌ 发送回复失败，请重试', 'error');
+              window.showMobileToast('❌ Failed to send a reply, please try again.', 'error');
             } else {
-              alert('发送回复失败，请重试');
+              alert('Failed to send a reply, please try again.');
             }
           });
       } else {
         if (window.showMobileToast) {
-          window.showMobileToast('❌ 回复功能不可用', 'error');
+          window.showMobileToast('❌ The reply function is not available', 'error');
         } else {
-          alert('回复功能需要通过论坛管理器重新生成论坛内容来实现。请使用论坛管理器功能。');
+          alert('The reply function needs to be realised by regenerating the forum content through the forum manager. Please use the forum manager function.。');
         }
-        console.log('[Forum UI] 用户尝试回复:', replyData);
+        console.log('[Forum UI] The user tries to reply:', replyData);
       }
     }
   }
@@ -1133,7 +1133,7 @@ class ForumUI {
    * 刷新论坛
    */
   refreshForum() {
-    console.log('[Forum UI] 刷新论坛内容');
+    console.log('[Forum UI] Refresh the forum content');
     this.refreshThreadList();
   }
 
@@ -1152,7 +1152,7 @@ class ForumUI {
    */
   generateDemoContent() {
     if (window.forumManager) {
-      console.log('[Forum UI] 调用论坛管理器生成内容');
+      console.log('[Forum UI] Call the forum manager to generate content');
       window.forumManager.generateForumContent().then(() => {
         // 生成完成后刷新界面
         setTimeout(() => {
@@ -1160,8 +1160,8 @@ class ForumUI {
         }, 1000);
       });
     } else {
-      console.warn('[Forum UI] 论坛管理器未找到');
-      alert('论坛管理器未初始化，请稍后再试');
+      console.warn('[Forum UI] Forum Manager Not Found');
+      alert('The forum manager has not been initialised. Please try again later.');
     }
   }
 
@@ -1177,13 +1177,13 @@ class ForumUI {
       if (currentState && currentState.app === 'forum' && currentState.view !== 'main') {
         const mainState = {
           app: 'forum',
-          title: '论坛',
+          title: 'Forum',
           view: 'main',
         };
         // 替换当前状态而不是推送新状态
         window.mobilePhone.currentAppState = mainState;
         window.mobilePhone.updateAppHeader(mainState);
-        console.log('[Forum UI] 更新状态到论坛主列表:', mainState);
+        console.log('[Forum UI] Update the status to the main list of the forum:', mainState);
       }
     }
 
@@ -1205,7 +1205,7 @@ class ForumUI {
     if (window.mobilePhone) {
       const state = {
         app: 'forum',
-        title: '论坛设置',
+        title: 'Forum setting',
         view: 'forumControl',
       };
       window.mobilePhone.pushAppState(state);
@@ -1219,7 +1219,7 @@ class ForumUI {
 
   // 重置论坛UI状态
   resetState() {
-    console.log('[Forum UI] 重置论坛UI状态');
+    console.log('[Forum UI] Reset the forum UI status');
     this.currentThreadId = null;
     this.currentView = 'main';
 
@@ -1240,7 +1240,7 @@ class ForumUI {
     // 重置到主列表视图
     this.showMainList();
 
-    console.log('[Forum UI] 论坛UI状态重置完成');
+    console.log('[Forum UI] Forum UI status reset completed');
   }
 
   /**
@@ -1465,8 +1465,8 @@ window.getForumAppContent = function () {
 window.bindForumEvents = function () {
   if (window.forumUI) {
     window.forumUI.bindEvents();
-    console.log('[Forum UI] 事件绑定完成');
+    console.log('[Forum UI] Event binding is complete');
   }
 };
 
-console.log('[Forum UI] 论坛UI模块加载完成');
+console.log('[Forum UI] Forum UI module loading completed');
